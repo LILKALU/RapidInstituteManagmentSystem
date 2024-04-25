@@ -1,0 +1,157 @@
+<div *ngIf="!isLoading">
+    <div class="grid pt-4 pl-3">
+        <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search A Hall</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="createAction">Create A Hall</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div>
+        <div class="col-4">
+            <button label="Create A Hall" pButton *ngIf="action === 2" (click)="openHallForm(true)"></button>
+            <div class="grid pt-4" *ngIf="action == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Hall</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" pButton (click)="searchHall()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid pt-5">
+        <div class="col-12">
+            <p-table  [value]="hallTableData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header">
+                    <th>Hall Name</th>
+                    <th>A/C Or Non A/C</th>
+                    <th>Number of Chairs</th>
+                    <th>Number of Desks</th>
+                    <th>Capacity</th>
+                    <th>Action</th>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-halldata>
+                    <tr>
+                        <td class="centerText">{{halldata.hallName}}</td>
+                        <td class="centerText" *ngIf="halldata.isAC">A/C</td>
+                        <td class="centerText" *ngIf="!halldata.isAC">NON A/C</td>
+                        <td class="centerText">{{halldata.numberOfChairs}}</td>
+                        <td class="centerText">{{halldata.numberOfDesks}}</td>
+                        <td class="centerText">{{halldata.capacity}}</td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(halldata)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteHall(halldata)"></i></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+            <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+        </div>
+    </div>
+    
+    <p-dialog header="Hall Creation Form" [(visible)]="isHallFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeHallCreationPopup()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+        
+        <form [formGroup]="hallCreationForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="hallName" formControlName="hallName">
+                    <label For="hallName"><span class="Requied ">* </span>Hall Name</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-3 p-float-label">
+                    <input type="number" min="1" pInputText class="inputsStyle" id="numberOfChairs" formControlName="numberOfChairs">
+                    <label For="numberOfChairs"><span class="Requied ">* </span>Number of Chairs</label>
+                </div>
+                <div class="col-3 p-float-label">
+                    <input type="number" min="1" pInputText class="inputsStyle" id="numberOfDesks" formControlName="numberOfDesks">
+                    <label For="numberOfDesks"><span class="Requied ">* </span>Number of Desks</label>
+                </div>
+                <div class="col-3 p-float-label">
+                    <input type="number" min="1" pInputText class="inputsStyle" id="capacity" formControlName="capacity">
+                    <label For="capacity"><span class="Requied ">* </span>Capacity</label>
+                </div>
+                <div class="col-3">
+                    <label>Is A/C ?</label>&nbsp;
+                    <label for="isAcYes">Yes : &nbsp;</label> <p-radioButton value="true" inputId="isAcYes" formControlName="isAc"></p-radioButton>&nbsp;
+                    <label for="isAcNo">No : &nbsp;</label> <p-radioButton value="false" inputId="isAcNo" formControlName="isAc"></p-radioButton>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!hallCreationForm.valid" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-dialog header="Hall Update Form" [(visible)]="isHallUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeHallUpdatePopup()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+
+        <form [formGroup]="hallUpdateForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="hallName" formControlName="hallName">
+                    <label For="hallName"><span class="Requied ">* </span>Hall Name</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-3 p-float-label">
+                    <input type="number" min="1" pInputText class="inputsStyle" id="numberOfChairs" formControlName="numberOfChairs">
+                    <label For="numberOfChairs"><span class="Requied ">* </span>Number of Chairs</label>
+                </div>
+                <div class="col-3 p-float-label">
+                    <input type="number" min="1" pInputText class="inputsStyle" id="numberOfDesks" formControlName="numberOfDesks">
+                    <label For="numberOfDesks"><span class="Requied ">* </span>Number of Desks</label>
+                </div>
+                <div class="col-3 p-float-label">
+                    <input type="number" min="1" pInputText class="inputsStyle" id="capacity" formControlName="capacity">
+                    <label For="capacity"><span class="Requied ">* </span>Capacity</label>
+                </div>
+                <div class="col-3">
+                    <label>Is A/C ?</label>&nbsp;
+                    <label for="isAcYes">Yes : &nbsp;</label> <p-radioButton value="true" inputId="isAcYes" formControlName="isAc"></p-radioButton>&nbsp;
+                    <label for="isAcNo">No : &nbsp;</label> <p-radioButton value="false" inputId="isAcNo" formControlName="isAc"></p-radioButton>
+                </div>
+            </div>
+            <div class="grid">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!hallUpdateForm.valid" (click)="submitUpdateClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+    
+    <p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
+</div>
+
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>

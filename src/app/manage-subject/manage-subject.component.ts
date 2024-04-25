@@ -1,0 +1,213 @@
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SubjectService } from '../shared/services/subject.service';
+import { SubSink } from 'subsink';
+import { SubjectVM } from '../shared/models/subjectVM';
+import { ConfirmationService } from 'primeng/api';
+
+@Component({
+  selector: 'app-manage-subject',
+  templateUrl: './manage-subject.component.html',
+  styleUrls: ['./manage-subject.component.css']
+})
+export class ManageSubjectComponent implements OnInit {
+
+  private subs = new SubSink();
+  isloading : boolean = false;
+  isUpdating: boolean = false;
+  subjectTableData: SubjectVM[] = [];
+  newlyCreatedSubject : SubjectVM = {};
+  selectAction !: FormGroup;
+  subjectCreationForm !: FormGroup;
+  subjectUpdateForm !: FormGroup;
+  updateSubjectData : SubjectVM = {};
+  searchForm !: FormGroup;
+  isCreateSubjectFormButtonVisible : boolean = false;
+  action : number | undefined
+  isSubjectFormVisible : boolean = false;
+  isUpdateFormVisible : boolean = false;
+  subjectsAllData : SubjectVM[] = [];
+
+  // get action value
+  get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
+
+  // get search value
+  get getSearchValue(): AbstractControl { return this.searchForm.get('searchValue') as AbstractControl; }
+
+  // get create subject form data 
+  get getCreateSubjectName(): AbstractControl { return this.subjectCreationForm.get('subName') as AbstractControl; }
+  get getCreateFirstTermModulesCount(): AbstractControl { return this.subjectCreationForm.get('moduleCountFirst') as AbstractControl; }
+  get getCreateSecondTermModulesCount(): AbstractControl { return this.subjectCreationForm.get('moduleCountSecond') as AbstractControl; }
+  get getCreateThirdTermModulesCount(): AbstractControl { return this.subjectCreationForm.get('moduleCountThird') as AbstractControl; }
+
+  // get update subject form data 
+  get getUpdateSubjectName(): AbstractControl { return this.subjectUpdateForm.get('subName') as AbstractControl; }
+  get getUpdateFirstTermModulesCount(): AbstractControl { return this.subjectUpdateForm.get('moduleCountFirst') as AbstractControl; }
+  get getUpdateSecondTermModulesCount(): AbstractControl { return this.subjectUpdateForm.get('moduleCountSecond') as AbstractControl; }
+  get getUpdateThirdTermModulesCount(): AbstractControl { return this.subjectUpdateForm.get('moduleCountThird') as AbstractControl; }
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private subjectservice : SubjectService,
+    private confirmationService: ConfirmationService
+  ){}
+
+  ngOnInit(): void {
+    this.buildForm();
+    this.getsubjects();
+  }
+
+  buildForm(){
+    this.selectAction = this.formBuilder.group({
+      action : ['' , Validators.required]
+    })
+
+    this.searchForm = this.formBuilder.group({
+      searchValue : ['',Validators.required]
+    });
+
+    this.subjectCreationForm = this.formBuilder.group({
+      subName : ['' , Validators.required],
+      moduleCountFirst : ['' , Validators.required],
+      moduleCountSecond : ['' , Validators.required],
+      moduleCountThird : ['' , Validators.required],
+    })
+
+    this.subjectUpdateForm = this.formBuilder.group({
+      subName : ['' , Validators.required],
+      moduleCountFirst : ['' , Validators.required],
+      moduleCountSecond : ['' , Validators.required],
+      moduleCountThird : ['' , Validators.required],
+    })
+  }
+
+  openUpdateForm(subdata : SubjectVM){
+    this.updateSubjectData = subdata;
+    this.getUpdateSubjectName.patchValue(subdata.name);
+    this.getUpdateFirstTermModulesCount.patchValue(subdata.firstTermModuleCount);
+    this.getUpdateSecondTermModulesCount.patchValue(subdata.secondTermModuleCount);
+    this.getUpdateThirdTermModulesCount.patchValue(subdata.thirdTermModuleCount);
+    this.isUpdateFormVisible = true;
+  }
+
+  submitClick(){
+    this.isloading = true;
+    
+    let sub : SubjectVM = {
+      name : this.getCreateSubjectName.value,
+      firstTermModuleCount : this.getCreateFirstTermModulesCount.value,
+      secondTermModuleCount : this.getCreateSecondTermModulesCount.value,
+      thirdTermModuleCount : this.getCreateThirdTermModulesCount.value,
+      isActive : true
+    }
+
+    this.subs.sink = this.subjectservice.createSubject(sub).subscribe(data =>{
+      if(data){
+        this.newlyCreatedSubject = data.content;
+        this.subjectsAllData.push(this.newlyCreatedSubject);
+        this.subjectTableData = this.subjectsAllData;
+        this.subjectTableData.reverse()
+        this.isloading = false;
+        this.closeDialog();
+      }
+    });
+  }
+
+  deleteHall(subdata : SubjectVM){
+    let subject : SubjectVM;
+    let delsub : SubjectVM;
+    delsub = subdata;
+    
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete',
+      accept: () => {
+        this.isloading = true;
+        subject = {
+          ...delsub,
+          isActive : false
+        }
+    
+        this.subjectservice.deleteSubject(subject).subscribe(data =>{
+          if(data){
+            this.subjectsAllData.forEach((element , index) => {
+              if(element.id === subdata.id){
+                this.subjectsAllData.splice(index , 1);
+                this.subjectTableData = this.subjectsAllData
+                this.isloading = false;
+              }
+            });
+          }
+        })
+      }
+  });
+
+  }
+
+  submitUpdateClick(){
+    console.log(this.getCreateFirstTermModulesCount.value);
+    this.isloading = true
+    let sub : SubjectVM;
+
+    sub = {
+      code : this.updateSubjectData.code,
+      course : this.updateSubjectData.course,
+      firstTermModuleCount : this.getUpdateFirstTermModulesCount.value,
+      id : this.updateSubjectData.id,
+      isActive : this.updateSubjectData.isActive,
+      name : this.getUpdateSubjectName.value,
+      secondTermModuleCount : this.getUpdateSecondTermModulesCount.value,
+      thirdTermModuleCount : this.getUpdateThirdTermModulesCount.value
+    }
+
+    this.subs.sink = this.subjectservice.updateSubject(sub).subscribe(data =>{
+      if(data){
+        this.subjectsAllData.forEach((element, index) => {
+          if(element.id == this.updateSubjectData.id){
+            this.subjectsAllData.splice(index,1,data.content);
+          }
+        });
+      }
+      this.isloading = false;
+      this.closeUpdateDialog();
+    });
+  }
+
+  closeDialog(){
+    this.subjectCreationForm.reset();
+    this.isSubjectFormVisible = false;
+  }
+
+  closeUpdateDialog(){
+    this.subjectUpdateForm.reset();
+    this.isUpdateFormVisible = false;
+  }
+
+  getsubjects(){
+    this.isloading = true;
+    this.subs.sink = this.subjectservice.getSubjects().subscribe(data =>{
+      if(data){
+        this.subjectsAllData = data.content;
+        this.subjectTableData = this.subjectsAllData
+        this.subjectTableData.reverse();
+        console.log(this.subjectsAllData);
+      }
+      this.isloading = false;
+    })
+  }
+
+  loadTheContent(){
+    this.action = parseInt(this.getAction.value);
+  }
+
+  openSubjectForm(hallFormVisibility : boolean){
+    this.isSubjectFormVisible = hallFormVisibility;
+  }
+
+  searchHall(){
+    this.subjectTableData = this.subjectsAllData.filter(el => el.code == this.getSearchValue.value);
+  }
+  
+  reset(){
+    this.subjectTableData = this.subjectsAllData;
+  }
+}

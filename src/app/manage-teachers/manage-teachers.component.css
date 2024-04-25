@@ -1,0 +1,16 @@
+.acceptreq{
+    color: blue;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: -5%;
+}
+
+.noticount{
+    background-color: red;
+    color: white;
+    margin-left: -5%;
+}
+
+.left-margin-color{
+    margin-left: 2px red;
+}

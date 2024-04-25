@@ -1,0 +1,27 @@
+.background-navbar{
+    background-image: linear-gradient(to right, rgb(0, 225, 255) , rgb(255, 0, 255)) !important;
+}
+
+a{
+    text-decoration: none;
+}
+
+.navbarText{
+    font-size: x-large;
+    color: aliceblue;
+}
+
+.sideBar{
+    background-image: linear-gradient(to bottom, rgb(0, 225, 255) , rgb(255, 0, 255)) !important;
+    height: 640px;
+}
+
+.sideBarText{
+    background-color: transparent;
+    color: aliceblue;
+    text-decoration: none;
+    border: none;
+    font-size: large;
+    cursor: pointer;
+    text-align: start;
+}

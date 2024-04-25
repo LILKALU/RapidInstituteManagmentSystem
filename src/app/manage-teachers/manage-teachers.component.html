@@ -1,0 +1,180 @@
+
+<div *ngIf="isloading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isloading">
+    <div class="grid pt-4 pl-3">
+        <div class="col-2">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search A Teacher</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-2">
+            <div [formGroup]="selectAction">
+                <label for="createAction">Add A Teacher</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div>
+        <div class="col-4 left-margin-color">
+            <button label="Add a Tearcher" pButton *ngIf="action === 2" (click)="openTeacherForm(true)"></button>
+            <div class="grid pt-4" *ngIf="action == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Teacher</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" [disabled]="!searchForm.valid" pButton (click)="searchTeacher()"></button>
+                </div>
+            </div>
+        </div>
+        <div class="col-3"></div>
+        <div class="col-1">
+            <i class="fa-solid fa-bell fa-2xl" style="color: #FFD43B;" (click)="op.toggle($event)"></i>
+            <span class="noticount p-1">5</span>
+            <p-overlayPanel #op>
+                <p>Mr. Sarasa Ask a leave On this Saturday</p>
+                <div class="grid">
+                    <div class="col-3"><p class="acceptreq">Accept</p></div>
+                    <div class="col-3"><p class="acceptreq">Reject</p></div>
+                </div>
+            </p-overlayPanel>
+        </div>
+    </div><br><br><br>
+
+    <div class="grid pl-3 pr-3" >
+        <div class="col-12">
+            <p-table  [value]="teachersTabelData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header" >
+                    <th>Code</th>
+                    <th>Full Name</th>
+                    <th>Highest Qulification</th>
+                    <th>Birthday</th>
+                    <th>Contact Number</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </ng-template>
+                <ng-template pTemplate="body" let-teacher>
+                    <tr>
+                        <td class="centerText">{{teacher.tcode}}</td>
+                        <td class="centerText">{{teacher.fullName}}</td>
+                        <td class="centerText">{{teacher.highestQulification}}</td>
+                        <td class="centerText">{{teacher.birthday}}</td>
+                        <td class="centerText">{{teacher.contactNumber}}</td>
+                        <td class="centerText">{{teacher.email}}</td>
+                        <td class="centerText"><i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(teacher)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteTeacher(teacher)"></i></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+        <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+    </div>
+
+    <p-dialog header="Teacher Registration Form" [(visible)]="isTeacherFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeDialog()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+        
+        <form [formGroup]="teacherCreationForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="fullName" formControlName="fullName">
+                    <label For="fullName"><span class="Requied ">* </span>Full Name</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-6 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                    <label For="title"><span class="Requied ">* </span>Title</label>
+                </div>
+                <div class="col-6 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="highestQuli" formControlName="highestQuli">
+                    <label For="highestQuli"><span class="Requied ">* </span>Highest Qualification</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-4 p-float-label">
+                    <p-calendar formControlName="birthday" id="birthday" appendTo="body" [showIcon]="true"></p-calendar>
+                    <label For="birthday"><span class="Requied ">* </span>Birthday</label>
+                </div>
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                    <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+                </div>
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                    <label For="email"><span class="Requied ">* </span>Email</label>
+                </div>
+            </div>
+
+            <div class="grid mt-4">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!teacherCreationForm.valid" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-dialog header="Teacher Update Form" [(visible)]="isTeacherUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeUpdateDialog()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+        
+        <form [formGroup]="teacherUpdateForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="fullName" formControlName="fullName">
+                    <label For="fullName"><span class="Requied ">* </span>Full Name</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-6 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                    <label For="title"><span class="Requied ">* </span>Title</label>
+                </div>
+                <div class="col-6 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="highestQuli" formControlName="highestQuli">
+                    <label For="highestQuli"><span class="Requied ">* </span>Highest Qualification</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-4 p-float-label">
+                    <p-calendar formControlName="birthday" id="birthday" appendTo="body" [showIcon]="true"></p-calendar>
+                    <label For="birthday"><span class="Requied ">* </span>Birthday</label>
+                </div>
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                    <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+                </div>
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                    <label For="email"><span class="Requied ">* </span>Email</label>
+                </div>
+            </div>
+
+            <div class="grid mt-4">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!teacherUpdateForm.valid" (click)="submitUpdateClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+</div>
+
+<p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>

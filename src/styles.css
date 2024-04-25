@@ -1,0 +1,54 @@
+/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/primeng.css";
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeflex/primeflex.css";
+@import "@fortawesome/fontawesome-free/css/fontawesome.css";
+/* @import  "~primeicons/primeicons.css"; */
+
+
+.loading{
+    align-items: center;
+}
+
+.centerText{
+    text-align: center !important;
+}
+
+.Requied{
+    color: red;
+    font-size: larger;
+}
+
+i{
+    cursor: pointer;
+}
+
+.lodingGif{
+    width: 10%;
+    height: 10%;
+    margin-top: 20%;
+    margin-left: 40%;
+}
+
+.info-color{
+    color: #74C0FC;
+}
+
+.delete-color{
+    color: #DC2626;
+}
+
+.inputsStyle{
+    width: 100%;
+}
+
+.deletingGif{
+    width: 30%;
+    height: 30%;
+    margin-top: 20%;
+    margin-left: 40%;
+}
+
+body{
+    background-color: #FFFFFF;
+}

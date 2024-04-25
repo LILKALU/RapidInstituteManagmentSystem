@@ -1,0 +1,524 @@
+<div *ngIf="isloaded">
+    <div class="grid pt-4 pl-3">
+        <div class="col-4">
+            <div [formGroup]="selectStudentStatus">
+                <label for="ExsistingStudentStatus">Existing Student</label><br><br>
+                <p-radioButton value=1 inputId="ExsistingStudentStatus" formControlName="studentStatus" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-4">
+            <div [formGroup]="selectStudentStatus">
+                <label for="NewstudentStatus">New Student</label><br><br>
+                <p-radioButton value=2 inputId="NewstudentStatus" formControlName="studentStatus" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div>
+        <div class="col-4">
+            <button label="Add Student" pButton *ngIf="studentStatus === 2" (click)="openStudentForm(true)"></button>
+            <div class="grid pt-4" *ngIf="studentStatus == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search Student</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" pButton (click)="searchStudent()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p-dialog header="Quick Student Registration Form" [(visible)]="isStudentFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeQuickStudentCreationPopup()">
+        <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex"></p-steps>
+        <br>
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2"  *ngIf="activeStepIndex == 0 || activeStepIndex == 1">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+    
+        <!-- student form -->
+        <form *ngIf="activeStepIndex == 0"  [formGroup]="studentDetailForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="FullName" formControlName="fullName">
+                    <label For="FullName"><span class="Requied ">* </span>Full Name</label>
+                </div>
+            </div>
+    
+            <div class="grid pt-5">
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                    <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+                </div>
+                <div class="col-4 p-float-label">
+                    <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true"></p-calendar>
+                    <label For="birthaday"><span class="Requied ">* </span>Birthday</label>
+                </div>
+                <div class="col-4">
+                    <label><span class="Requied ">* </span>Gender : </label> &nbsp;
+                    <label for="male">Male</label>&nbsp;
+                    <p-radioButton value="male" inputId="male" formControlName="gender" (click)="loadTheContent()"></p-radioButton>&nbsp;
+                    <label for="female">Female</label>&nbsp;
+                    <p-radioButton value="female" inputId="female" formControlName="gender" (click)="loadTheContent()"></p-radioButton>
+                </div>
+            </div>
+    
+            <div class="grid pt-5">
+                <div class="col-6 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="callingName" formControlName="callingName">
+                    <label For="callingName"><span class="Requied ">* </span>Calling Name</label>
+                </div>
+                <div class="col-6 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="school" formControlName="school">
+                    <label For="school"><span class="Requied ">* </span>School</label>
+                </div>
+            </div>
+    
+            <div class="grid pt-5">
+                <div class="col-3 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="houseNo"  formControlName="houseNo">
+                    <label For="houseNo"><span class="Requied ">* </span>House No</label>
+                </div>
+                <div class="col-3 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="lane" formControlName="lane">
+                    <label For="lane">Lane</label>
+                </div>
+                <div class="col-3 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="city" formControlName="city">
+                    <label For="city"><span class="Requied ">* </span>City</label>
+                </div>
+                <div class="col-3 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="district" formControlName="district">
+                    <label For="district"><span class="Requied ">* </span>District</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-11"></div>
+                <div class="col-1">
+                    <button label="Next" pButton severity="info" [disabled]="!studentDetailForm.valid" (click)="nextClick()"></button>
+                </div>
+            </div>
+        </form>
+    
+        <!-- parent search form -->
+        <form *ngIf="activeStepIndex == 1" [formGroup]="parentSearchForm">
+            <div class="grid">
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="nicNo" formControlName="nicNo" maxlength="12">
+                    <label for="nicNo">NIC No</label>
+                </div>
+    
+                <div class="col-3">
+                    <button (click)="searchParent()" pButton [disabled]="!parentSearchForm.valid">Search Parent</button>
+                </div>
+            </div>
+        </form><br>
+        <!-- parent form -->
+        <form *ngIf="activeStepIndex == 1 && isSearchParent" [formGroup]="parentDetailForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
+                    <label for="parentName">Parent Name</label>
+                </div>
+            </div>
+    
+            <div class="grid pt-5">
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                    <label for="title">Title</label>
+                </div>
+    
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="NIC" formControlName="NIC">
+                    <label for="NIC">NIC No</label>
+                </div>
+    
+                <div class="col-4 p-float-label">
+                    <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true"></p-calendar>
+                    <label For="birthaday"><span class="Requied ">* </span>Birthday</label>
+                </div>
+            </div>
+    
+            <div class="grid pt-5">
+                <div class="col-4 p-float-label" *ngIf="relationships">
+                    <p-dropdown  [showClear]="true" appendTo="body"inputId="relationship" [options]="relationships" optionLabel="name"  placeholder="Relationship" [style]="{'width':'100%'}" formControlName="relationship"></p-dropdown>
+                    <label for="relationship">Relationship</label>
+                </div>
+    
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="occupation" formControlName="occupation">
+                    <label for="occupation">Occupation</label>
+                </div>
+    
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                    <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+                </div>
+            </div>
+    
+            <div class="grid pt-5">
+                <div class="col-2">
+                    <button label="Previous" pButton class="p-button-secondary" (click)="previousClick()"></button>
+                </div>
+                <div class="col-6"></div>
+                <div class="col-4">
+                    <button label="Submit and Next" pButton class="p-button-success" [disabled]="!parentDetailForm.valid" (click)="submitAndNextClick()"></button>
+                </div>
+            </div>
+        </form>
+        <!-- student enroment form -->
+        <form *ngIf="activeStepIndex == 2" [formGroup]="enrollmentForm">
+            <div class="grid">
+                <div class="col-2">
+                    <p-dropdown [options]="grades" optionLabel="name" appendTo="body" placeholder="Grade" [style]="{'width':'100%'}" class="inputsStyle" formControlName="grade" (onChange)="getsubjects()"></p-dropdown>
+                </div>
+                <div class="col-2">
+                    <p-dropdown  [options]="subjects" optionLabel="name" appendTo="body" placeholder="Subject" [style]="{'width':'100%'}" class="inputsStyle" formControlName="subject" (onChange)="getInstructors()"></p-dropdown>
+                </div>
+                <div class="col-2">
+                    <p-dropdown [options]="instructors" optionLabel="fullName" appendTo="body" placeholder="Instructor" [style]="{'width':'100%'}" class="inputsStyle" formControlName="instructor" (onChange)="getDates()"></p-dropdown>
+                </div>
+                <div class="col-2">
+                    <p-dropdown  [options]="courseDates" appendTo="body" placeholder="Date" [style]="{'width':'100%'}" class="inputsStyle" formControlName="date" (onChange)="getTimes()"></p-dropdown>
+                </div>
+                <div class="col-2">
+                    <p-dropdown  [options]="courseTimes" appendTo="body" placeholder="Time" [style]="{'width':'100%'}" class="inputsStyle" formControlName="time"></p-dropdown>
+                    <!-- <p-calendar  id="startHour" name="startHour" [timeOnly]="true" hourFormat="12" [inline]="false" placeholder="Select start hour" formControlName="time" appendTo="body"></p-calendar> -->
+                </div>
+                <div class="col-2">
+                    <button pButton class="p-button-primary" (click)="addClass()" [disabled]="!enrollmentForm.valid">Add Class</button>
+                </div>
+                
+            </div><br><br>
+            <div class="grid" *ngIf="enrolledCourses && enrolledCourses.length > 0">
+                <div class="col-12">
+                    <p-table class="centerText" [value]="enrolledCourses" [tableStyle]="{ 'min-width': '100%' }">
+                        <ng-template pTemplate="header">
+                            <th>Grade</th>
+                            <th>Subject</th>
+                            <th>Instructor</th>
+                            <th>Date of the class</th>
+                            <th>Time of the class</th>
+                            <th>Remove</th>
+                        </ng-template>
+                        <ng-template  pTemplate="body" let-enrolledCourses>
+                            <tr>
+                                <td class="centerText">{{enrolledCourses.grade.name}}</td>
+                                <td class="centerText">{{enrolledCourses.subject.name}}</td>
+                                <td class="centerText">{{enrolledCourses.teacher.fullName}}</td>
+                                <td class="centerText">{{enrolledCourses.date}}</td>
+                                <td class="centerText">{{enrolledCourses.startTime}}</td>
+                                <td class="centerText">
+                                    <!-- <i class="fa-solid fa-xmark" (click)="removeCourse(enrolledCourses)"></i> -->
+                                    <i class="fa-solid fa-circle-xmark fa-xl " style="color: #ff0000;" (click)="removeCourse(enrolledCourses)"></i>
+                                    <!-- <button pButton class="p-button-danger" (click)="removeCourse(enrolledCourses)">Remove Class</button> -->
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+
+            <div class="grid" *ngIf="enrolledCourses && enrolledCourses.length > 0">
+                <div class="col-10"></div>
+                <div class="col-2">
+                    <button pButton class="p-button-success" (click)="enrollCourses()">Submit</button>
+                </div>
+            </div>
+        </form>
+        <!-- student class fee payment details -->
+        <div class="grid pt-5" *ngIf="activeStepIndex == 3">
+            <div class="col-2"></div>
+            <div class="col-8" >
+                <!-- {{enrolCorseDTO | json}} -->
+                <div class="grid">
+                    <div class="col-8">
+                        <h6>Admission Fee</h6>
+                    </div>
+                    <div class="col-4">
+                        <h6>{{addmisionFee}}</h6>
+                    </div>
+                </div>
+                <div class="grid" *ngFor="let enrolCorseDTO of enrolledCourses">
+                    <div class="col-8">
+                        <h6>{{enrolCorseDTO.grade.name}} &nbsp; {{enrolCorseDTO.teacher.fullName}} &nbsp; {{enrolCorseDTO.subject.name}} class</h6>
+                    </div>
+                    <div class="col-4">
+                        <h6>{{enrolCorseDTO.classFeeAmount}}</h6>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="col-8">
+                        <h5>Total</h5>
+                    </div>
+                    <div class="col-4">
+                        <h5>{{classfeeWithAddmision()}}</h5>
+                    </div>
+                </div><br>
+                <div class="grid">
+                    <div class="col-6" [formGroup]="classFeeForm">
+                        <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
+                        <label for="payed">&nbsp; &nbsp; IS Payment Payed?</label>
+                    </div>
+                    <div class="col-6">
+                        <button pButton class="p-button-primary" (click)="proceddPayment()" [disabled]="!(getHasPaymentDone.value)">Save and Next</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+        <!-- student login details -->
+        <div class="grid pt-5" *ngIf="activeStepIndex == 4">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="grid">
+                    <div class="col-6">
+                        <h6>Student UserCode : {{adAccountDetails.userCode}}</h6>
+                    </div>
+                    <div class="col-6">
+                        <h6>Student Password : {{adAccountDetails.passWord}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+        <div class="grid" *ngIf="activeStepIndex == 4">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <button pButton class="p-button-info" (click)="closeQuickStudentCreationPopup()">Close</button>
+            </div>
+        </div>
+        
+    </p-dialog>
+    <br><br><br>
+    <div class="grid">
+        <div class="col-12">
+            <p-table  [value]="studentTableData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header" >
+                    <th>Scode</th>
+                    <th>Full Name</th>
+                    <th>Calling Name</th>
+                    <th>Birthday</th>
+                    <th>Gender</th>
+                    <th>Contact Number</th>
+                    <th>School</th>
+                    <th>Address</th>
+                    <th>Aditional Info</th>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-studentdata>
+                    <tr>
+                        <td class="centerText">{{studentdata?.scode}}</td>
+                        <td class="centerText">{{studentdata?.fullName}}</td>
+                        <td class="centerText">{{studentdata?.callingName}}</td>
+                        <td class="centerText">{{studentdata?.birthDay}}</td>
+                        <td class="centerText">{{studentdata?.gender}}</td>
+                        <td class="centerText">{{studentdata?.contactNumber}}</td>
+                        <td class="centerText">{{studentdata?.school}}</td>
+                        <td class="centerText">{{studentdata?.address?.houseNo}},{{studentdata?.address?.lane}},{{studentdata?.address?.city}},{{studentdata?.address?.district}}</td>
+                        <td>
+                            <i class="fa-solid fa-arrow-up-right-from-square pl-6" (click)="openAditionalInfo(studentdata)"></i>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table><br>
+            <div class="grid">
+                <div class="col-10"></div>
+                <div class="col-2">
+                    <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- aditional info popup -->
+<p-dialog header="Aditional Info" [(visible)]="isAditionalInfo" [style]="{width: '50vw'}" [modal]="true">
+    <div class="grid">
+        <div class="col-6">
+            <p-card header="Parent Card">
+                <h6>Name : {{additionalInfoPopUpData?.parent?.fullName}}</h6><br>
+                <h6>NIC : {{additionalInfoPopUpData?.parent?.nic}}</h6><br>
+                <h6>Birthday : {{additionalInfoPopUpData?.parent?.birthday}}</h6><br>
+                <h6>Relationship : {{additionalInfoPopUpData?.parent?.relationship}}</h6><br>
+                <h6>Occupation : {{additionalInfoPopUpData?.parent?.occupation}}</h6><br>
+                <h6>Contact Number : {{additionalInfoPopUpData?.parent?.contactNumber}}</h6><br>
+                <!-- <div class="grid">
+                    <div class="col-2">
+                        <h6>Name : {{additionalInfoPopUpData?.parent?.fullName}}</h6>
+                    </div>
+                    <div class="col-2">
+                        <h6>NIC : {{additionalInfoPopUpData?.parent?.nic}}</h6>
+                    </div>
+                    <div class="col-2">
+                        <h6>Birthday : {{additionalInfoPopUpData?.parent?.birthday}}</h6>
+                    </div>
+                    <div class="col-2">
+                        <h6>Relationship : {{additionalInfoPopUpData?.parent?.relationship}}</h6>
+                    </div>
+                    <div class="col-2">
+                        <h6>Occupation : {{additionalInfoPopUpData?.parent?.occupation}}</h6>
+                    </div>
+                    <div class="col-2">
+                        <h6>Contact Number : {{additionalInfoPopUpData?.parent?.contactNumber}}</h6>
+                    </div>
+                </div> -->
+            </p-card>
+        </div>
+        <div class="col-6">
+            <p-card>
+                <div class="grid">
+                    <div class="col-6 pl-6">
+                        <button  pButton class="p-button-success" (click)="goToUpdateForm()">Update Student</button>
+                    </div>
+                    <div class="col-6">
+                        <button  pButton class="p-button-danger" (click)="removeStudent()">Delete Student</button>
+                    </div>
+                </div>
+            </p-card>
+            <div *ngIf="isDeleting" class="loading">
+                <img src="../../assets/giphy.gif" alt="" srcset="" class="deletingGif">
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- update student popup -->
+<p-dialog header="  Update Info" [(visible)]="isUpdateFormRedy" [style]="{width: '40vw'}" [modal]="true" (onHide)="updatePopupClose()">
+    <p-steps [model]="updatesteps" [readonly]="true" [(activeIndex)]="updateActiveStepIndex"></p-steps>
+    <br><br>
+    <div class="grid">
+        <div class="col-10"></div>
+        <div class="col-2">
+            <span class="Requied ">* </span> <b> Requied</b> 
+        </div>
+    </div><br>
+
+    <!-- student update form -->
+    <form *ngIf="updateActiveStepIndex == 0"  [formGroup]="studentUpdateForm">
+        <div class="grid">
+            <div class="col-12 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="FullName" formControlName="fullName">
+                <label For="FullName"><span class="Requied ">* </span>Full Name</label>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-4 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+            </div>
+            <div class="col-4 p-float-label">
+                <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true"></p-calendar>
+                <label For="birthaday"><span class="Requied ">* </span>Birthday</label>
+            </div>
+            <div class="col-4">
+                <label><span class="Requied ">* </span>Gender : </label> <br>
+                <label for="male">Male</label>&nbsp;
+                <p-radioButton value="male" inputId="male" formControlName="gender" (click)="loadTheContent()"></p-radioButton>&nbsp;
+                <label for="female">Female</label>&nbsp;
+                <p-radioButton value="female" inputId="female" formControlName="gender" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-6 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="callingName" formControlName="callingName">
+                <label For="callingName"><span class="Requied ">* </span>Calling Name</label>
+            </div>
+            <div class="col-6 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="school" formControlName="school">
+                <label For="school"><span class="Requied ">* </span>School</label>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-3 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="houseNo"  formControlName="houseNo">
+                <label For="houseNo"><span class="Requied ">* </span>House No</label>
+            </div>
+            <div class="col-3 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="lane" formControlName="lane">
+                <label For="lane">Lane</label>
+            </div>
+            <div class="col-3 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="city" formControlName="city">
+                <label For="city"><span class="Requied ">* </span>City</label>
+            </div>
+            <div class="col-3 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="district" formControlName="district">
+                <label For="district"><span class="Requied ">* </span>District</label>
+            </div>
+        </div>
+        <div class="grid pt-5">
+            <div class="col-11"></div>
+            <div class="col-1">
+                <button label="Next" pButton severity="info" [disabled]="!studentUpdateForm.valid" (click)="updateNextClick()"></button>
+            </div>
+        </div>
+    </form>
+
+    <!-- parent update form -->
+    <form *ngIf="updateActiveStepIndex == 1" [formGroup]="parentUpdateForm">
+        <div class="grid">
+            <div class="col-12 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
+                <label for="parentName">Parent Name</label>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-4 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                <label for="title">Title</label>
+            </div>
+
+            <div class="col-4 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="NIC" formControlName="NIC">
+                <label for="NIC">NIC No</label>
+            </div>
+
+            <div class="col-4 p-float-label">
+                <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true"></p-calendar>
+                <label For="birthaday"><span class="Requied ">* </span>Birthday</label>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-4 p-float-label" *ngIf="relationships">
+                <p-dropdown  [showClear]="true" appendTo="body"inputId="relationship" [options]="relationships" optionLabel="name"  placeholder="Relationship" [style]="{'width':'100%'}" formControlName="relationship"></p-dropdown>
+                <label for="relationship">Relationship</label>
+            </div>
+
+            <div class="col-4 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="occupation" formControlName="occupation">
+                <label for="occupation">Occupation</label>
+            </div>
+
+            <div class="col-4 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-2">
+                <button label="Previous" pButton class="p-button-secondary" (click)="previousClick()"></button>
+            </div>
+            <div class="col-6"></div>
+            <div class="col-4">
+                <button label="Submit and Next" pButton class="p-button-success" [disabled]="!parentUpdateForm.valid" (click)="updateStudent()"></button>
+            </div>
+        </div>
+    </form>
+
+    <div *ngIf="isUpdating" class="loading">
+        <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+    </div>
+</p-dialog>
+
+
+
+<div *ngIf="!isloaded" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>

@@ -1,0 +1,151 @@
+
+<div *ngIf="isloading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isloading">
+    <div class="grid pt-4 pl-3">
+        <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search A Subject</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="createAction">Create A Subject</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div>
+        <div class="col-4">
+            <button label="Create A Subject" pButton *ngIf="action === 2" (click)="openSubjectForm(true)"></button>
+            <div class="grid pt-4" *ngIf="action == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Subject</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" pButton (click)="searchHall()"></button>
+                </div>
+            </div>
+        </div>
+    </div><br><br><br>
+
+    <div class="grid pl-3 pr-3" >
+        <div class="col-12">
+            <p-table  [value]="subjectTableData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header" >
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>First Term Module Count</th>
+                    <th>Second Term Module Count</th>
+                    <th>Third Term Module Count</th>
+                    <th>Total Modules</th>
+                    <th>Action</th>
+                </ng-template>
+                <ng-template pTemplate="body" let-subject>
+                    <tr>
+                        <td class="centerText">{{subject.code}}</td>
+                        <td class="centerText">{{subject.name}}</td>
+                        <td class="centerText">{{subject.firstTermModuleCount}}</td>
+                        <td class="centerText">{{subject.secondTermModuleCount}}</td>
+                        <td class="centerText">{{subject.thirdTermModuleCount}}</td>
+                        <td class="centerText">{{subject.thirdTermModuleCount + subject.secondTermModuleCount + subject.firstTermModuleCount}}</td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(subject)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteHall(subject)"></i></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+            <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+        </div>
+    </div>
+</div>
+
+
+
+<p-dialog header="Hall Creation Form" [(visible)]="isSubjectFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeDialog()">
+    <div class="grid">
+        <div class="col-10"></div>
+        <div class="col-2">
+            <span class="Requied ">* </span> <b> Requied</b> 
+        </div>
+    </div><br>
+    
+    <form [formGroup]="subjectCreationForm">
+        <div class="grid">
+            <div class="col-12 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="subName" formControlName="subName">
+                <label For="subName"><span class="Requied ">* </span>Subject Name</label>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-4 p-float-label">
+                <input type="number" min="1" pInputText class="inputsStyle" id="moduleCountFirst" formControlName="moduleCountFirst">
+                <label For="moduleCountFirst"><span class="Requied ">* </span>Number Of First Term Modules</label>
+            </div>
+            <div class="col-4 p-float-label">
+                <input type="number" min="1" pInputText class="inputsStyle" id="moduleCountSecond" formControlName="moduleCountSecond">
+                <label For="moduleCountSecond"><span class="Requied ">* </span>Number Of Second Term Modules</label>
+            </div>
+            <div class="col-4 p-float-label">
+                <input type="number" min="1" pInputText class="inputsStyle" id="moduleCountThird" formControlName="moduleCountThird">
+                <label For="moduleCountThird"><span class="Requied ">* </span>Number Of Third Term Modules</label>
+            </div>
+        </div>
+        <div class="grid mt-4">
+            <div class="col-1"></div>
+            <div class="col-9"></div>
+            <div class="col-2">
+                <button label="Submit" pButton class="p-button-success" [disabled]="!subjectCreationForm.valid" (click)="submitClick()"></button>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+
+<p-dialog header="Hall Update Form" [(visible)]="isUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeUpdateDialog()">
+    <div class="grid">
+        <div class="col-10"></div>
+        <div class="col-2">
+            <span class="Requied ">* </span> <b> Requied</b> 
+        </div>
+    </div><br>
+    
+    <form [formGroup]="subjectUpdateForm">
+        <div class="grid">
+            <div class="col-12 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="subName" formControlName="subName">
+                <label For="subName"><span class="Requied ">* </span>Subject Name</label>
+            </div>
+        </div>
+
+        <div class="grid pt-5">
+            <div class="col-4 p-float-label">
+                <input type="number" min="1" pInputText class="inputsStyle" id="moduleCountFirst" formControlName="moduleCountFirst">
+                <label For="moduleCountFirst"><span class="Requied ">* </span>Number Of First Term Modules</label>
+            </div>
+            <div class="col-4 p-float-label">
+                <input type="number" min="1" pInputText class="inputsStyle" id="moduleCountSecond" formControlName="moduleCountSecond">
+                <label For="moduleCountSecond"><span class="Requied ">* </span>Number Of Second Term Modules</label>
+            </div>
+            <div class="col-4 p-float-label">
+                <input type="number" min="1" pInputText class="inputsStyle" id="moduleCountThird" formControlName="moduleCountThird">
+                <label For="moduleCountThird"><span class="Requied ">* </span>Number Of Third Term Modules</label>
+            </div>
+        </div>
+        <div class="grid mt-4">
+            <div class="col-1"></div>
+            <div class="col-9"></div>
+            <div class="col-2">
+                <button label="Submit" pButton class="p-button-success" [disabled]="!subjectUpdateForm.valid" (click)="submitUpdateClick()"></button>
+            </div>
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
