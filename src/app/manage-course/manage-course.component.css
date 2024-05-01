@@ -1,0 +1,46 @@
+.ui-inputtext {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+}
+
+.ui-inputtext .ui-inputtext {
+    width: auto;
+}
+
+.ui-inputtext input[type="number"] {
+    width: 100%;
+    padding: .429em .857em;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    outline: none;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.ui-inputtext input[type="number"]:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+}
+
+.ui-inputtext.ui-state-disabled input[type="number"] {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    color: #6c757d;
+}
+
+.ui-inputtext.ui-state-disabled input[type="number"]:focus {
+    border-color: #ced4da;
+    box-shadow: none;
+}
+
+.ui-inputtext.ui-state-invalid input[type="number"] {
+    border-color: #dc3545;
+}
+
+.ui-inputtext.ui-state-invalid input[type="number"]:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 .2rem rgba(220, 53, 69, .25);
+}

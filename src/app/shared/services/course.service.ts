@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CourseResponse } from '../models/courseResponse';
+import { CourseVM } from '../models/coursesVM';
+import { CourseResponses } from '../models/courseResponses';
 
 @Injectable({
   providedIn: 'root'
@@ -14,5 +16,17 @@ export class CourseService {
 
   getCourses() : Observable<CourseResponse> {
     return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcourses`)
+  }
+
+  createCourse(course :CourseVM) : Observable<CourseResponses> {
+    return this.httpClient.post<CourseResponses>(`${this.BaseURL}/addcourse`,course);
+  }
+
+  deleteCourse(course :CourseVM) : Observable<CourseResponses> {
+    return this.httpClient.put<CourseResponses>(`${this.BaseURL}/deletecourse`,course);
+  }
+
+  updateCourse(course :CourseVM) : Observable<CourseResponses> {
+    return this.httpClient.put<CourseResponses>(`${this.BaseURL}/updatecourse`,course);
   }
 }

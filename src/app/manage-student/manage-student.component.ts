@@ -602,14 +602,14 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   addClass(){
-      this.courses.forEach(element => {
-        if(element.grade.id === this.getTheGrade.value.id && element.subject.id === this.getTheSubject.value.id && element.teacher === this.getTheInstructor.value && element.date === this.getTheDate.value && element.startTime === this.getTheTime.value){
-          this.enrolledCourses.push(element);
-        }
-      });
-
-      this.enrollmentForm.reset();
-      console.log(this.enrolledCourses);
+    this.courses.forEach(element => {
+      if(element.grade.id === this.getTheGrade.value.id && element.subject.id === this.getTheSubject.value.id && element.teacher === this.getTheInstructor.value && element.date === this.getTheDate.value && element.startTime === this.getTheTime.value){
+        this.enrolledCourses.push(element);
+      }
+    });
+    
+    this.enrollmentForm.reset();
+    console.log(this.enrolledCourses);
   }
 
   searchParent(){

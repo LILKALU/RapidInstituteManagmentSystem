@@ -13,4 +13,6 @@ export interface CourseVM{
     startTime : string;
     endTime : string;
     classFeeAmount : number;
+    isActive : boolean;
+    code ?: string;
 }

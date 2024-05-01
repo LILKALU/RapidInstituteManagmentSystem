@@ -1,3 +1,7 @@
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
 <div *ngIf="!isLoading">
     <div class="grid pt-4 pl-3">
         <div class="col-4">
@@ -21,9 +25,172 @@
                     <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Course</label>
                 </div>
                 <div class="col-4">
-                    <button label="Search" pButton (click)="searchHall()"></button>
+                    <button label="Search" pButton (click)="searchCourse()"></button>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="grid pt-4 pl-3">
+        <div class="col-12">
+            <p-table class="centerText" [value]="coursesTableData" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header">
+                    <th>Code</th>
+                    <th>Teacher</th>
+                    <th>Subject</th>
+                    <th>Grade</th>
+                    <th>Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Hall</th>
+                    <th>Class Fee</th>
+                    <th>Action</th>
+                </ng-template>
+                <ng-template  pTemplate="body" let-Course>
+                    <tr>
+                        <td class="centerText">{{Course.code}}</td>
+                        <td class="centerText">{{Course.teacher.fullName}}</td>
+                        <td class="centerText">{{Course.subject.name}}</td>
+                        <td class="centerText">{{Course.grade.name}}</td>
+                        <td class="centerText">{{Course.date}}</td>
+                        <td class="centerText">{{Course.startTime}}</td>
+                        <td class="centerText">{{Course.endTime}}</td>
+                        <td class="centerText">{{Course.hall.hallName}}</td>
+                        <td class="centerText">{{Course.classFeeAmount}}</td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(Course)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteCourse(Course)"></i></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+            <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+        </div>
+    </div>
+    <p-dialog header="Hall Update Form" [(visible)]="isUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeCourseUpdatePopup()">
+         <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+
+        <form [formGroup]="courseUpdatePopUp">
+            <div class="grid">
+                <div class="col-12">
+                    <p-dropdown [options]="teachers" optionLabel="fullName" appendTo="body" placeholder="Teacher Name" [style]="{'width':'100%'}" class="inputsStyle" formControlName="teacherName" (onBlur)="setUpdateSubject()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isUpdateSubjectFeildVisible && getUpdateTeacherName.value">
+                <div class="col-12">
+                    <p-dropdown [options]="subjects" optionLabel="name" appendTo="body" placeholder="Subject" [style]="{'width':'100%'}" class="inputsStyle" formControlName="subject" (onBlur)="setUpdateGrade()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isUpdateGradeFeildVisible && getUpdateSubject.value">
+                <div class="col-12">
+                    <p-dropdown [options]="grades" optionLabel="name" appendTo="body" placeholder="Grade" [style]="{'width':'100%'}" class="inputsStyle" formControlName="grade" (onBlur)="setUpdateDay()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isUpdateDayFeildVisible && getUpdateGrade.value">
+                <div class="col-12">
+                    <p-dropdown [options]="days" optionLabel="name" appendTo="body" placeholder="Day" [style]="{'width':'100%'}" class="inputsStyle" formControlName="day" (onBlur)="setUpdateStartTime()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isUpdateStartTimeFeildVisible && getUpdateDay.value">
+                <div class="col-12">
+                    <p-dropdown [options]="startTimeSlots" optionLabel="time" appendTo="body" placeholder="Start Time" [style]="{'width':'100%'}" class="inputsStyle" formControlName="startTime" (onBlur)="setUpdateEndTime()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isUpdateEndTimeFeildVisible && getUpdateStartTime.value">
+                <div class="col-12">
+                    <p-dropdown [options]="endTimeSlots" optionLabel="time" appendTo="body" placeholder="End Time" [style]="{'width':'100%'}" class="inputsStyle" formControlName="endTime" (onBlur)="setUpdateHalls()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isUpdateHallFeildVisible && getUpdateEndTime.value"> 
+                <!-- isHallSelecting -->
+                <div class="col-12">
+                    <p-dropdown [options]="selectableHalls" optionLabel="hallName" appendTo="body" placeholder="Hall" [style]="{'width':'100%'}" class="inputsStyle" formControlName="hall" (onBlur)="setUpdateClassFee()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isUpdateClassFeeFeildVisible && getUpdateHall.value"> 
+                <!-- isHallSelecting -->
+                <div class="col-12">
+                    <p-inputNumber mode="decimal" class="inputsStyle" inputId="locale-user" [style]="{'width':'100%'}" [minFractionDigits]="2" formControlName="courseFee" ></p-inputNumber>
+                </div>
+            </div>
+            <div class="grid mt-5">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Update" pButton class="p-button-success" [disabled]="!courseUpdatePopUp.valid" (click)="updateClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-dialog header="Hall Creation Form" [(visible)]="isCourseFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeCourseCreationPopup()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+        
+        <form [formGroup]="courseCreationPopUp">
+            <div class="grid">
+                <div class="col-12">
+                    <p-dropdown [options]="teachers" optionLabel="fullName" appendTo="body" placeholder="Teacher Name" [style]="{'width':'100%'}" class="inputsStyle" formControlName="teacherName" (ngModelChange)="setSubject()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isSubjectFeildVisible && getTeacherName.value">
+                <div class="col-12">
+                    <p-dropdown [options]="subjects" optionLabel="name" appendTo="body" placeholder="Subject" [style]="{'width':'100%'}" class="inputsStyle" formControlName="subject" (ngModelChange)="setGrade()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isGradeFeildVisible && getSubject.value">
+                <div class="col-12">
+                    <p-dropdown [options]="grades" optionLabel="name" appendTo="body" placeholder="Grade" [style]="{'width':'100%'}" class="inputsStyle" formControlName="grade" (ngModelChange)="setDay()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isDayFeildVisible && getGrade.value">
+                <div class="col-12">
+                    <p-dropdown [options]="days" optionLabel="name" appendTo="body" placeholder="Day" [style]="{'width':'100%'}" class="inputsStyle" formControlName="day" (ngModelChange)="setStartTime()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isStartTimeFeildVisible && getDay.value">
+                <div class="col-12">
+                    <p-dropdown [options]="startTimeSlots" optionLabel="time" appendTo="body" placeholder="Start Time" [style]="{'width':'100%'}" class="inputsStyle" formControlName="startTime" (ngModelChange)="setEndTime()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isEndTimeFeildVisible && getStartTime.value">
+                <div class="col-12">
+                    <p-dropdown [options]="endTimeSlots" optionLabel="time" appendTo="body" placeholder="End Time" [style]="{'width':'100%'}" class="inputsStyle" formControlName="endTime" (ngModelChange)="setHalls()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isHallFeildVisible && getEndTime.value"> 
+                <!-- isHallSelecting -->
+                <div class="col-12">
+                    <p-dropdown [options]="selectableHalls" optionLabel="hallName" appendTo="body" placeholder="Hall" [style]="{'width':'100%'}" class="inputsStyle" formControlName="hall" (ngModelChange)="setClassFee()"></p-dropdown>
+                </div>
+            </div>
+            <div class="grid mt-5" *ngIf="isClassFeeFeildVisible && getHall.value"> 
+                <!-- isHallSelecting -->
+                <div class="col-12">
+                    <p-inputNumber mode="decimal" class="inputsStyle" inputId="locale-user" [style]="{'width':'100%'}" [minFractionDigits]="2" formControlName="courseFee" (ngModelChange)="test()" ></p-inputNumber>
+                </div>
+            </div>
+            <div class="grid mt-5">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!courseCreationPopUp.valid" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
+
 </div>
