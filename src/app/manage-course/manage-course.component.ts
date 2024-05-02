@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SubSink } from 'subsink';
 import { TeacherService } from '../shared/services/teacher.service';
@@ -22,7 +22,7 @@ import { ConfirmationService } from 'primeng/api';
   templateUrl: './manage-course.component.html',
   styleUrls: ['./manage-course.component.css']
 })
-export class ManageCourseComponent implements OnInit {
+export class ManageCourseComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   isLoading : boolean = false;
@@ -107,6 +107,10 @@ export class ManageCourseComponent implements OnInit {
     private confirmationService: ConfirmationService
   ){}
 
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
+  }
+
   ngOnInit(): void {
     this.buildForm();
     this.getMasterData();
@@ -118,7 +122,7 @@ export class ManageCourseComponent implements OnInit {
   }
 
   getTeachersDetails(){
-    this.teachersService.getTeachers().subscribe(data =>{
+    this.subs.sink = this.teachersService.getTeachers().subscribe(data =>{
       if(data){
         this.teachers = data.content;
         this.getSubjectDetails();
@@ -127,7 +131,7 @@ export class ManageCourseComponent implements OnInit {
   }
 
   getSubjectDetails(){
-    this.subjectService.getSubjects().subscribe(data =>{
+    this.subs.sink = this.subjectService.getSubjects().subscribe(data =>{
       if(data){
         this.subjects = data.content
         this.getGradeDetails();
@@ -136,7 +140,7 @@ export class ManageCourseComponent implements OnInit {
   }
 
   getGradeDetails(){
-    this.gradeService.getGrades().subscribe(data => {
+    this.subs.sink = this.gradeService.getGrades().subscribe(data => {
       if(data){
         this.grades = data.content;
         this.getHallDetails();
@@ -145,7 +149,7 @@ export class ManageCourseComponent implements OnInit {
   }
 
   getHallDetails(){
-    this.hallService.getHalls().subscribe(data =>{
+    this.subs.sink = this.hallService.getHalls().subscribe(data =>{
       if(data){
         this.halls = data.content;
         this.getCourseDetails();
@@ -154,7 +158,7 @@ export class ManageCourseComponent implements OnInit {
   }
 
   getCourseDetails(){
-    this.courseService.getCourses().subscribe(data =>{
+    this.subs.sink = this.courseService.getCourses().subscribe(data =>{
       if(data){
         this.coursesAllData = data.content;
         console.log("initCourset",this.coursesAllData);
@@ -167,7 +171,7 @@ export class ManageCourseComponent implements OnInit {
   }
 
   getTimeSlots(){
-    this.timeSlotService.getTimeSlots().subscribe(data =>{
+    this.subs.sink = this.timeSlotService.getTimeSlots().subscribe(data =>{
       if(data){
         this.allTimeSlots = data.content;
         this.startTimeSlots = this.allTimeSlots;
@@ -235,7 +239,7 @@ export class ManageCourseComponent implements OnInit {
       code : this.updateingCourse?.code
     }
 
-    this.courseService.updateCourse(course).subscribe(data => {
+    this.subs.sink = this.courseService.updateCourse(course).subscribe(data => {
       if(data){
         this.updatedCourse = data.content;
         console.log("success");
@@ -274,7 +278,7 @@ export class ManageCourseComponent implements OnInit {
     }
     console.log(course);
     
-    this.courseService.createCourse(course).subscribe(data =>{
+    this.subs.sink = this.courseService.createCourse(course).subscribe(data =>{
       if(data){
         this.closeCourseCreationPopup();
         this.coursesAllData.push(data.content);
@@ -330,7 +334,7 @@ export class ManageCourseComponent implements OnInit {
           isActive : false
         }
     
-        this.subs.sink = this.courseService.deleteCourse(delCourse).subscribe(data =>{
+        this.subs.sink = this.subs.sink = this.courseService.deleteCourse(delCourse).subscribe(data =>{
           if(data){
             this.deletedCourse = data.content
             this.coursesAllData.forEach((element,index) => {

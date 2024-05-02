@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SubSink } from 'subsink';
 import { teacherVM } from '../shared/models/teachersVM';
@@ -12,7 +12,7 @@ import { ConfirmationService } from 'primeng/api';
   templateUrl: './manage-teachers.component.html',
   styleUrls: ['./manage-teachers.component.css']
 })
-export class ManageTeachersComponent implements OnInit {
+export class ManageTeachersComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   isloading : boolean = false;
@@ -61,6 +61,10 @@ export class ManageTeachersComponent implements OnInit {
   ngOnInit(): void {
     this.buildForms()
     this.getTeachers()
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   buildForms(){
@@ -243,7 +247,7 @@ export class ManageTeachersComponent implements OnInit {
           isActive : false
         }
     
-        this.teachersService.deleteTeacher(teacher).subscribe(data =>{
+        this.subs.sink = this.teachersService.deleteTeacher(teacher).subscribe(data =>{
           if(data){
             this.teachersAllData.forEach((element , index) => {
               if(element.id === teacherdata.id){

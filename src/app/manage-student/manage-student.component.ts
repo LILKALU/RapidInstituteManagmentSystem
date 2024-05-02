@@ -20,6 +20,7 @@ import { ClassFeeCourseVM } from '../shared/models/classFeeCourseVM';
 import { ParentService } from '../shared/services/parent.service';
 import { ADAccountVM } from '../shared/models/adAccountVM';
 import { AdAccountServiceService } from '../shared/services/ad-account-service.service';
+import { GradeService } from '../shared/services/grade.service';
 
 
 @Component({
@@ -153,7 +154,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     private enrolmentService : EnrolmentService,
     private classFeeService : ClassFeeService,
     private parentService : ParentService,
-    private adAccountServiceService : AdAccountServiceService
+    private adAccountServiceService : AdAccountServiceService,
+    private gradeServise : GradeService
   ) {
   }
   
@@ -277,9 +279,14 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   getGrade(){
-    this.courses.forEach(element => {
-      this.grades.push(element.grade)
-    });
+    this.subs.sink = this.gradeServise.getGrades().subscribe(data => {
+      if(data){
+        this.grades = data.content
+      } 
+    })
+    // this.courses.forEach(element => {
+    //   this.grades.push(element.grade)
+    // });
     // this.getTheSubject?.disable();
     console.log("grade", this.grades);
     
@@ -287,13 +294,28 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
   getsubjects(){
     this.subjects = [];
+    let uniqueSubjects : SubjectVM[];
     this.courses.forEach(element => {
-      if(element.grade.id === this.getTheGrade.value.id){
-        this.subjects.push(element.subject);
+      console.log(this.getTheGrade.value);
+      
+      console.log(element.grade.id === this.getTheGrade.value.id);
+      console.log(!this.subjects.includes(element.subject));
+      
+      
+      if(element.grade.id === this.getTheGrade.value.id && !this.subjects.includes(element.subject)){
+        this.subjects.push(element.subject)
       }
     });
+
+    uniqueSubjects = this.subjects.filter((subject, index, self) =>
+      index === self.findIndex((s) => (
+          s.id === subject.id
+      ))
+    );
+
+    this.subjects = uniqueSubjects;
     this.getTheSubject?.enable();
-    console.log(this.getTheGrade.value.id);
+    console.log(this.subjects);
   }
 
   getstudentcode(id : number) : string{
@@ -607,7 +629,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         this.enrolledCourses.push(element);
       }
     });
-    
+
     this.enrollmentForm.reset();
     console.log(this.enrolledCourses);
   }

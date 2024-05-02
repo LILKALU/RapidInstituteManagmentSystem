@@ -30,6 +30,7 @@ import { MessagesModule } from 'primeng/messages';
 import { ManageSubjectComponent } from './manage-subject/manage-subject.component';
 import { ManageTeachersComponent } from './manage-teachers/manage-teachers.component';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ManageEnrolmentComponent } from './manage-enrolment/manage-enrolment.component';
 
 
 
@@ -43,6 +44,7 @@ import { OverlayPanelModule } from 'primeng/overlaypanel';
     ManageHallComponent,
     ManageSubjectComponent,
     ManageTeachersComponent,
+    ManageEnrolmentComponent,
   ],
   imports: [
     BrowserModule,

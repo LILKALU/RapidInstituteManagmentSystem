@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SubSink } from 'subsink';
 import { HallVM } from '../shared/models/hallVM';
@@ -10,7 +10,7 @@ import { ConfirmationService } from 'primeng/api';
   templateUrl: './manage-hall.component.html',
   styleUrls: ['./manage-hall.component.css']
 })
-export class ManageHallComponent implements OnInit {
+export class ManageHallComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   isLoading : boolean = false;
@@ -55,6 +55,10 @@ export class ManageHallComponent implements OnInit {
     private hallService : HallServiceService,
     private confirmationService: ConfirmationService
   ){}
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
+  }
 
   ngOnInit(): void {
     this.buildForm();

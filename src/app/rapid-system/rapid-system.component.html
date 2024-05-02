@@ -21,13 +21,16 @@
             <i class="fa-solid fa-users-rectangle"></i> &nbsp; Manage Course
         </button><br><br>
         <button class="sideBarText ml-4" (click)="changeModule(4)">
-            <i class="fa-brands fa-buromobelexperte"></i> &nbsp; Manage Hall
+            <i class="fa-solid fa-building-columns"></i> &nbsp; Manage Hall
         </button><br><br>
         <button class="sideBarText ml-4" (click)="changeModule(5)">
             <i class="fa-solid fa-book-open"></i> &nbsp; Manage Subjects
         </button><br><br>
         <button class="sideBarText ml-4" (click)="changeModule(6)">
             <i class="fa-solid fa-person-chalkboard"></i> &nbsp; Manage Teachers
+        </button><br><br>
+        <button class="sideBarText ml-4" (click)="changeModule(7)">
+            <i class="fa-solid fa-right-to-bracket"></i> &nbsp; Manage Enrolment
         </button><br><br>
     </div>
     <div class="col-10">
@@ -37,5 +40,6 @@
         <app-manage-hall *ngIf="selectedModuleEnum === 4"></app-manage-hall>
         <app-manage-subject *ngIf="selectedModuleEnum === 5"></app-manage-subject>
         <app-manage-teachers *ngIf="selectedModuleEnum === 6"></app-manage-teachers>
+        <app-manage-enrolment *ngIf="selectedModuleEnum === 7"></app-manage-enrolment>
     </div>
 </div>

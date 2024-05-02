@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SubjectService } from '../shared/services/subject.service';
 import { SubSink } from 'subsink';
@@ -10,7 +10,7 @@ import { ConfirmationService } from 'primeng/api';
   templateUrl: './manage-subject.component.html',
   styleUrls: ['./manage-subject.component.css']
 })
-export class ManageSubjectComponent implements OnInit {
+export class ManageSubjectComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   isloading : boolean = false;
@@ -55,6 +55,10 @@ export class ManageSubjectComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.getsubjects();
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   buildForm(){
@@ -127,7 +131,7 @@ export class ManageSubjectComponent implements OnInit {
           isActive : false
         }
     
-        this.subjectservice.deleteSubject(subject).subscribe(data =>{
+        this.subs.sink = this.subjectservice.deleteSubject(subject).subscribe(data =>{
           if(data){
             this.subjectsAllData.forEach((element , index) => {
               if(element.id === subdata.id){

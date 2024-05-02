@@ -170,7 +170,7 @@
         <form *ngIf="activeStepIndex == 2" [formGroup]="enrollmentForm">
             <div class="grid">
                 <div class="col-2">
-                    <p-dropdown [options]="grades" optionLabel="name" appendTo="body" placeholder="Grade" [style]="{'width':'100%'}" class="inputsStyle" formControlName="grade" (onChange)="getsubjects()"></p-dropdown>
+                    <p-dropdown [options]="grades" optionLabel="name" appendTo="body" placeholder="Grade" [style]="{'width':'100%'}" class="inputsStyle" formControlName="grade" (ngModelChange)="getsubjects()"></p-dropdown>
                 </div>
                 <div class="col-2">
                     <p-dropdown  [options]="subjects" optionLabel="name" appendTo="body" placeholder="Subject" [style]="{'width':'100%'}" class="inputsStyle" formControlName="subject" (onChange)="getInstructors()"></p-dropdown>
