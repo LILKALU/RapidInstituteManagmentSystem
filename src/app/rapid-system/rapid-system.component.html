@@ -32,6 +32,9 @@
         <button class="sideBarText ml-4" (click)="changeModule(7)">
             <i class="fa-solid fa-right-to-bracket"></i> &nbsp; Manage Enrolment
         </button><br><br>
+        <button class="sideBarText ml-4" (click)="changeModule(8)">
+            <i class="fa-solid fa-award"></i> &nbsp; Manage Grades
+        </button><br><br>
     </div>
     <div class="col-10">
         <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
@@ -41,5 +44,6 @@
         <app-manage-subject *ngIf="selectedModuleEnum === 5"></app-manage-subject>
         <app-manage-teachers *ngIf="selectedModuleEnum === 6"></app-manage-teachers>
         <app-manage-enrolment *ngIf="selectedModuleEnum === 7"></app-manage-enrolment>
+        <app-manage-grade *ngIf="selectedModuleEnum === 8"></app-manage-grade>
     </div>
 </div>

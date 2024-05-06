@@ -31,6 +31,7 @@ import { ManageSubjectComponent } from './manage-subject/manage-subject.componen
 import { ManageTeachersComponent } from './manage-teachers/manage-teachers.component';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ManageEnrolmentComponent } from './manage-enrolment/manage-enrolment.component';
+import { ManageGradeComponent } from './manage-grade/manage-grade.component';
 
 
 
@@ -45,6 +46,7 @@ import { ManageEnrolmentComponent } from './manage-enrolment/manage-enrolment.co
     ManageSubjectComponent,
     ManageTeachersComponent,
     ManageEnrolmentComponent,
+    ManageGradeComponent,
   ],
   imports: [
     BrowserModule,

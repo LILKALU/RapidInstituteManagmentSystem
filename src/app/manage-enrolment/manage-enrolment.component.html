@@ -1,1 +1,165 @@
-<p>manage-enrolment works!</p>
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div class="grid pt-5" *ngIf="!isLoading">
+    <div class="col-6">
+        <div class="grid p-5" *ngFor="let course of leftSideCourses">
+            <div class="col-12">
+                <p-table class="centerText" [value]="filterByCourse(course)" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                    <ng-template pTemplate="caption">
+                        <div class="grid">
+                            <div class="col-2">
+                                <h6>
+                                    [{{course.code}}]
+                                </h6>
+                            </div>
+                            <div class="col-8">
+                                <h6>{{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}</h6>
+                            </div>
+                            <div class="col-2">
+                                <i class="fa-solid fa-plus" (click)="openEnrolDialog(course)"></i>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <th>SCode</th>
+                        <th>Student Name</th>
+                        <th>Enrolled Date</th>
+                        <th>Action</th>
+                    </ng-template>
+                    <ng-template  pTemplate="body" let-studentCourse>
+                        <tr>
+                            <td class="centerText">{{studentCourse.student.scode}}</td>
+                            <td class="centerText">{{studentCourse.student.callingName}}</td>
+                            <td class="centerText">{{getEnrolledDate(studentCourse.enrolledDate)}}</td>
+                            <td class="centerText"><i class="fa-solid fa-trash delete-color" (click)="deleteCourse(studentCourse , course)"></i></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="grid p-5" *ngFor="let course of rightSideCourses">
+            <div class="col-12">
+                <p-table class="centerText" [value]="filterByCourse(course)" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                    <ng-template pTemplate="caption">
+                        <div class="grid">
+                            <div class="col-2">
+                                <h6>
+                                    [{{course.code}}]
+                                </h6>
+                            </div>
+                            <div class="col-8">
+                                <h6>{{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}</h6>
+                            </div>
+                            <div class="col-2">
+                                <i class="fa-solid fa-plus" (click)="openEnrolDialog(course)"></i>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <th>SCode</th>
+                        <th>Student Name</th>
+                        <th>Enrolled Date</th>
+                        <th>Action</th>
+                    </ng-template>
+                    <ng-template  pTemplate="body" let-studentCourse>
+                        <tr>
+                            <td class="centerText">{{studentCourse.student.scode}}</td>
+                            <td class="centerText">{{studentCourse.student.callingName}}</td>
+                            <td class="centerText">{{getEnrolledDate(studentCourse.enrolledDate)}}</td>
+                            <td class="centerText"><i class="fa-solid fa-trash delete-color" (click)="deleteCourse(studentCourse , course)"></i></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+    <p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
+    <p-dialog header="Student Enrol Form" [(visible)]="isEnrolDialogVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeCourseCreationPopup()">
+        <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex"></p-steps>
+        <form [formGroup]="enrolmentForm" class="mt-4" *ngIf="activeStepIndex == 0">
+            <div class="grid pt-5">
+                <div class="col-8 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="occupation" formControlName="scode">
+                    <label for="occupation">Enter Student Code</label>
+                </div>
+                <div class="col-4">
+                    <button label="Enroll" pButton class="p-button-primary" [disabled]="!enrolmentForm.valid" (click)="searchStudent()"></button>
+                </div>
+            </div>
+
+            <div class="grid pt-5">
+                <div class="col-12">
+                    <p-table class="centerText" [value]="courseStudent" [tableStyle]="{ 'min-width': '100%' }">
+                        <ng-template pTemplate="header">
+                            <th>Course Code</th>
+                            <th>Student Code</th>
+                            <th>Student Name</th>
+                            <th>Remove</th>
+                        </ng-template>
+                        <ng-template  pTemplate="body" let-courseStudent>
+                            <tr>
+                                <td class="centerText">{{courseStudent.course.code}}</td>
+                                <td class="centerText">{{courseStudent.student.scode}}</td>
+                                <td class="centerText">{{courseStudent.student.callingName}}</td>
+                                <td class="centerText">
+                                    <!-- <i class="fa-solid fa-xmark" (click)="removeCourse(enrolledCourses)"></i> -->
+                                    <i class="fa-solid fa-circle-xmark fa-xl " style="color: #ff0000;" (click)="removeCourseStudent(courseStudent)"></i>
+                                    <!-- <button pButton class="p-button-danger" (click)="removeCourse(enrolledCourses)">Remove Class</button> -->
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                    <div class="grid pt-4" *ngIf="courseStudent && courseStudent.length > 0">
+                        <div class="col-10"></div>
+                        <div class="col-2">
+                            <button pButton class="p-button-success" (click)="enrollCourses()">Submit and next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="isStudentGetting" class="loading">
+                <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+            </div>
+        </form>
+        
+        <!-- student class fee payment details -->
+        <div class="grid pt-5" *ngIf="activeStepIndex == 1">
+            <div class="col-2"></div>
+            <div class="col-8" >
+                <!-- {{enrolCorseDTO | json}} -->
+                <div class="grid">
+                    <div class="col-8">
+                        <h6>{{enrolingCourse?.grade?.name}} &nbsp; {{enrolingCourse?.teacher?.fullName}} &nbsp; {{enrolingCourse?.subject?.name}} class</h6>
+                    </div>
+                    <div class="col-4">
+                        <h6>{{enrolingCourse?.classFeeAmount}}</h6>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="col-8">
+                        <h5>Total</h5>
+                    </div>
+                    <div class="col-4">
+                        <h5>{{enrolingCourse?.classFeeAmount}}</h5>
+                    </div>
+                </div><br>
+                <div class="grid">
+                    <div class="col-6" [formGroup]="classFeeForm">
+                        <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
+                        <label for="payed">&nbsp; &nbsp; IS Payment Payed?</label>
+                    </div>
+                    <div class="col-6">
+                        <button pButton class="p-button-primary" (click)="proceddPayment()" [disabled]="!(getHasPaymentDone.value)">Save and Next</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2"></div>
+        </div>
+    </p-dialog>
+</div>
+

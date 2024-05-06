@@ -584,7 +584,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
     this.enrolledCourses.forEach(element => {
       e = {
-        course : element
+        course : element,
+        isActive : true
       }
       enrolmentCourse.push(e);
     });
