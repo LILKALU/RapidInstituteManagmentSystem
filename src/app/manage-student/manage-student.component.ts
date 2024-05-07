@@ -45,7 +45,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   isAditionalInfo : boolean = false;
   isUpdateFormRedy : boolean = false;
   addmisionFee : number = 1300;
-  activeStepIndex : number = 0;
+  activeStepIndex : number = 2;
   updateActiveStepIndex : number = 0;
   courses : CourseVM[] = [];
   student : studentVM | undefined;
@@ -296,12 +296,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.subjects = [];
     let uniqueSubjects : SubjectVM[];
     this.courses.forEach(element => {
-      console.log(this.getTheGrade.value);
-      
-      console.log(element.grade.id === this.getTheGrade.value.id);
-      console.log(!this.subjects.includes(element.subject));
-      
-      
       if(element.grade.id === this.getTheGrade.value.id && !this.subjects.includes(element.subject)){
         this.subjects.push(element.subject)
       }
@@ -328,13 +322,21 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   getInstructors(){
+    let uniqueInstructors : teacherVM[];
     this.instructors = [];
     this.courses.forEach(element => {
       if(element.grade.id === this.getTheGrade.value.id && element.subject.id === this.getTheSubject.value.id){
         this.instructors.push(element.teacher);
-        
       }
     });
+
+    uniqueInstructors = this.instructors.filter((instructor, index, self) =>
+      index === self.findIndex((i) => (
+          i.id === instructor.id
+      ))
+    );
+
+    this.instructors = uniqueInstructors;
     this.getTheInstructor?.enable();
     console.log(this.instructors);
   }
