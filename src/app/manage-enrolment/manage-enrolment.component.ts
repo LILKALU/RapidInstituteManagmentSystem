@@ -15,6 +15,8 @@ import { EnrolmentService } from '../shared/services/enrolment.service';
 import { ClassFeeVM } from '../shared/models/classFeeVM';
 import { ClassFeeCourseVM } from '../shared/models/classFeeCourseVM';
 import { ClassFeeService } from '../shared/services/class-fee.service';
+import { MonthService } from '../shared/services/month.service';
+import { MonthVM } from '../shared/models/monthVM';
 
 @Component({
   selector: 'app-manage-enrolment',
@@ -24,6 +26,7 @@ import { ClassFeeService } from '../shared/services/class-fee.service';
 export class ManageEnrolmentComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
+  today = new Date();
   isLoading : boolean = false;
   leftSideCourses : CourseVM[] = [];
   enrolmentForm !: FormGroup;
@@ -36,6 +39,7 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   isEnrolDialogVisible : boolean = false;
   isStudentGetting : boolean = false;
   classFeeForm !: FormGroup;
+  months : MonthVM[] = [];
   searchedStudent : studentVM | undefined;
   enrollments : EnrolmentVM = {};
   activeStepIndex : number = 0;
@@ -57,6 +61,7 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     private studentServices : StudentService,
     private enrolmentService : EnrolmentService, 
     private classFeeService : ClassFeeService,
+    private monthService : MonthService,
   ){}
 
   ngOnDestroy(): void {
@@ -105,7 +110,17 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
         this.groupEnrolments();
       }
     })
-    this.isLoading = false;
+    this.getMonths();
+  }
+
+  getMonths(){
+    this.subs.sink = this.monthService.getMonths().subscribe(data =>{
+      if(data){
+        this.months = data.content;
+        console.log("months" , this.months);
+        this.isLoading = false;
+      }
+    })
   }
 
   groupEnrolments(){
@@ -209,15 +224,24 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   }
 
   proceddPayment(){
+    let todayMonth : number = this.today.getMonth() + 1;
     let classFee : ClassFeeVM;
     let classFeeCourses : ClassFeeCourseVM[]=[];
     let cf : ClassFeeCourseVM;
     let cfa : ClassFeeCourseVM;
+    let month : MonthVM | undefined;
+    
+    this.months.forEach(element => {
+      if(element.id == todayMonth){
+        month = element;
+      }
+    });
 
     cf = {
       course : this.enrolingCourse,
       amount : this.enrolingCourse?.classFeeAmount,
-      isAddmision : 0
+      isAddmision : 0,
+      month : month
     }
     classFeeCourses.push(cf);
 

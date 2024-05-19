@@ -21,6 +21,8 @@ import { ParentService } from '../shared/services/parent.service';
 import { ADAccountVM } from '../shared/models/adAccountVM';
 import { AdAccountServiceService } from '../shared/services/ad-account-service.service';
 import { GradeService } from '../shared/services/grade.service';
+import { MonthService } from '../shared/services/month.service';
+import { MonthVM } from '../shared/models/monthVM';
 
 
 @Component({
@@ -45,7 +47,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   isAditionalInfo : boolean = false;
   isUpdateFormRedy : boolean = false;
   addmisionFee : number = 1300;
-  activeStepIndex : number = 2;
+  activeStepIndex : number = 0;
   updateActiveStepIndex : number = 0;
   courses : CourseVM[] = [];
   student : studentVM | undefined;
@@ -54,6 +56,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   enrolledCourses : CourseVM[] = [];
   grades : GradeVM[]= [];
   subjects : SubjectVM[] = [];
+  months : MonthVM[] = [];
   isSearching : boolean = false;
   isASearchedParent : boolean = false;
   courseDates : string[] = [];
@@ -155,7 +158,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     private classFeeService : ClassFeeService,
     private parentService : ParentService,
     private adAccountServiceService : AdAccountServiceService,
-    private gradeServise : GradeService
+    private gradeServise : GradeService,
+    private monthService : MonthService
   ) {
   }
   
@@ -282,6 +286,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.subs.sink = this.gradeServise.getGrades().subscribe(data => {
       if(data){
         this.grades = data.content
+        this.getMonths();
       } 
     })
     // this.courses.forEach(element => {
@@ -290,6 +295,16 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     // this.getTheSubject?.disable();
     console.log("grade", this.grades);
     
+  }
+
+  getMonths(){
+    this.subs.sink = this.monthService.getMonths().subscribe(data =>{
+      if(data){
+        this.months = data.content;
+        console.log("months" , this.months);
+        
+      }
+    })
   }
 
   getsubjects(){
@@ -522,23 +537,34 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   proceddPayment(){
+    let todayMonth : number = this.today.getMonth() + 1;
     let classFee : ClassFeeVM;
     let classFeeCourses : ClassFeeCourseVM[]=[];
     let cf : ClassFeeCourseVM;
     let cfa : ClassFeeCourseVM;
+    let month : MonthVM;
+    month = this.months[-1];
+    
+    this.months.forEach(element => {
+      if(element.id == todayMonth){
+        month = element;
+      }
+    });
 
     this.enrolledCourses.forEach(element => {
       cf = {
         course : element,
         amount : element.classFeeAmount,
-        isAddmision : 0
+        isAddmision : 0,
+        month : month
       }
       classFeeCourses.push(cf);
     });
 
     cfa = {
       amount : this.addmisionFee,
-      isAddmision : 1
+      isAddmision : 1,
+      month : month
     }
     classFeeCourses.push(cfa);
 

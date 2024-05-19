@@ -1,0 +1,31 @@
+.border-color{
+    border-width: 3px; /* Adjust border width as needed */
+    border-style: solid;
+    border-image: linear-gradient(to right, rgb(0, 225, 255), rgb(255, 0, 255)) 1;
+    text-align: center;
+}
+
+.green_background{
+    background-color: #16a34a;
+}
+
+.red_background{
+    background-color: #ef4444;
+}
+
+.black_background{
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+.empty_background{
+    background-color: transparent;
+}
+
+.div_size{
+    width: 15px;
+    height: 15px;
+    border-radius: 100%;
+    margin-top: 50%;
+}
+

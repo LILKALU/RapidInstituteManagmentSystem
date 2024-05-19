@@ -32,7 +32,8 @@ import { ManageTeachersComponent } from './manage-teachers/manage-teachers.compo
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { ManageEnrolmentComponent } from './manage-enrolment/manage-enrolment.component';
 import { ManageGradeComponent } from './manage-grade/manage-grade.component';
-
+import { ManageClassFeeComponent } from './manage-class-fee/manage-class-fee.component';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 
 @NgModule({
@@ -47,6 +48,7 @@ import { ManageGradeComponent } from './manage-grade/manage-grade.component';
     ManageTeachersComponent,
     ManageEnrolmentComponent,
     ManageGradeComponent,
+    ManageClassFeeComponent,
   ],
   imports: [
     BrowserModule,
@@ -69,7 +71,8 @@ import { ManageGradeComponent } from './manage-grade/manage-grade.component';
     ConfirmDialogModule,
     InputNumberModule,
     OverlayPanelModule,
-    MessagesModule
+    MessagesModule,
+    MultiSelectModule
   ],
   providers: [ConfirmationService],
   bootstrap: [AppComponent]

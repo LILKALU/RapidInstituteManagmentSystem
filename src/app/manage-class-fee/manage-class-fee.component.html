@@ -1,0 +1,116 @@
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isLoading">
+    <div class="grid mt-6">
+        <div class="col-12 pl-6 pr-6">
+            <form  [formGroup]="selectedDataForm">
+                <p-dropdown  [options]="allStudents" [style]="{'width':'100%'}" formControlName="student" [filter]="true" filterBy="scode"  [showClear]="true" placeholder="Select Student" optionLabel="scode" optionValue="scode" (onChange)="getCourses()">
+                    <ng-template let-student pTemplate="item">
+                        {{ student.scode }} - {{student.fullName}}
+                    </ng-template>
+                </p-dropdown>
+            </form>
+        </div>
+    </div>
+    <div class="grid mt-6" *ngIf="isCourseDropdownVisible">
+        <div class="col-12 pl-6 pr-6">
+            <form  [formGroup]="selectedDataForm">
+                <p-dropdown  [options]="dropdownCourses" [style]="{'width':'100%'}" formControlName="course" [filter]="true" filterBy="code"  [showClear]="true" placeholder="Select Course" optionLabel="code" optionValue="code"  (onChange)="getClassFees()">
+                    <ng-template let-course pTemplate="item">
+                        ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
+                    </ng-template>
+                </p-dropdown>
+            </form>
+        </div>
+    </div>
+    <div class="grid mt-4 ml-4 mr-4" *ngIf="getCourse.value">
+        <div class="col-6"></div>
+        <div class="col-2">
+            <div class="grid">
+                <div class="col-1">
+                    <div class="div_size black_background"></div>
+                </div>
+                <div class="col-11 gap">Not Registered</div>
+            </div>
+             
+        </div>
+        <div class="col-2">
+            <div class="grid">
+                <div class="col-1">
+                    <div class="div_size green_background"></div>
+                </div>
+                <div class="col-11">Payed Month</div>
+            </div>
+             
+        </div>
+        <div class="col-2">
+            <div class="grid">
+                <div class="col-1">
+                    <div class="div_size red_background"></div>
+                </div>
+                <div class="col-11">Arrears Month</div>
+            </div>
+             
+        </div>
+    </div>
+    <div class="grid mt-4 ml-4 mr-4" *ngIf="getCourse.value">
+        <div class="col-1 border-solid border-color" *ngFor="let month of months" [class]="changeBackgroundColor(month.id)">{{month.name}}</div>
+    </div>
+
+    <div class="grid mt-6" *ngIf="getCourse.value">
+        <div class="col-10"></div>
+        <div class="col-2">
+            <button label="Pay Class Fee" pButton (click)="openMakePaymentPopup()"></button>
+        </div>
+    </div>
+
+    <p-dialog [(visible)]="isMakePaymentPopupOpen" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeClassFeePaymentsPopup()">
+        <ng-template pTemplate="header">
+            <div class="custom-header">
+              <h6>({{ selectedCourse.code }} - {{selectedCourse.teacher.fullName}}'s {{selectedCourse.grade.name}} {{selectedCourse.date}} {{selectedCourse.subject.name}} Class at {{selectedCourse.startTime}}) Payment</h6>
+            </div>
+          </ng-template>
+        <form [formGroup]="payingMonthForm">
+            <div class="grid">
+                <div class="col-12">
+                    <p-multiSelect [options]="payableMonths" formControlName="month" [style]="{width: '100%'}" optionLabel="name" appendTo="body" placeholder="Select Cities" (onChange)="getPayebleMonths()">
+                    </p-multiSelect>
+                </div>
+            </div>
+        </form>
+
+        <div class="grid mt-6" *ngIf="arrears.length > 0">
+            <div class="col-12">
+                <div class="grid" *ngFor="let month of arrears">
+                    <div class="col-4"></div>
+                    <div class="col-2">
+                        <h6>{{month.name}}</h6>
+                    </div>
+                    <div class="col-2">
+                        <h6>{{selectedCourse.classFeeAmount}}</h6>
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+                <div class="grid underline">
+                    <div class="col-4"></div>
+                    <div class="col-2"><h5>Total</h5></div>
+                    <div class="col-2"><h5>{{calculateTotal()}}</h5></div>
+                    <div class="col-4"></div>
+                </div>
+                <div class="grid mt-4">
+                    <div class="col-2"></div>
+                    <div class="col-4" [formGroup]="classFeeForm">
+                        <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
+                        <label for="payed">&nbsp; &nbsp; IS Payment Payed?</label>
+                    </div>
+                    <div class="col-4">
+                        <button pButton class="p-button-primary" (click)="proceddPayment()" [disabled]="!(getHasPaymentDone.value)">Save</button>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+            </div>
+        </div>
+    </p-dialog>
+</div>
