@@ -1,0 +1,161 @@
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isLoading">
+    <div class="grid pt-4 pl-3">
+        <div class="col-6">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Mark Attendance</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-6">
+            <div [formGroup]="selectAction">
+                <label for="createAction">View Attendance</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="action === 1">
+        <div class="grid mt-6">
+            <div class="col-12 pl-4 pr-6">
+                <form  [formGroup]="selectedCourseForm">
+                    <p-dropdown  [options]="dropdownCourses" [style]="{'width':'100%'}" formControlName="courseName" [filter]="true" filterBy="code" placeholder="Select Course" optionLabel="code" optionValue="code"  (onChange)="getStudentsInCourse()">
+                        <ng-template let-course pTemplate="item">
+                            ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
+                        </ng-template>
+                    </p-dropdown>
+                </form>
+            </div>
+        </div>
+        <div class="grid mt-6" *ngIf="getSelectedCourseForMark.value">
+            <div class="col-12">
+                <form [formGroup]="attendanceForm">
+                    <p-table  [value]="studentsInCourse" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20, 50]">
+                        <ng-template pTemplate="header">
+                            <th>Student Name</th>
+                            <th>Student Code</th>
+                            <th>Attend/Not Attend <br> {{thisFullYear}} - {{thisMonthId}} - {{thisDate}} </th>
+                        </ng-template>
+    
+                        <ng-template pTemplate="body" let-student>
+                            <tr>
+                                <td class="centerText">{{student.callingName}}</td>
+                                <td class="centerText">{{student.scode}}</td>
+                                <td class="centerText"><p-checkbox [binary]="true" formControlName="{{student.scode}}Attendance" ></p-checkbox></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid mt-6" *ngIf="getSelectedCourseForMark.value">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <p-toast></p-toast>
+                <button pButton class="p-button-success" (click)="submitOrUpdate()">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="action === 2">
+        <form  [formGroup]="searchAttendanceForm">
+            <div class="grid mt-6">
+                <div class="col-1"></div>
+                <div class="col-3 pl-4 pr-6">
+                    <p-dropdown  [options]="dropdownCourses" [style]="{'width':'100%'}" formControlName="courseName" [filter]="true" filterBy="code"  [showClear]="true" placeholder="Select Course" optionLabel="code" optionValue="code">
+                        <ng-template let-course pTemplate="item">
+                            ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+                <div class="col-3 pl-4 pr-6">
+                    <p-calendar view="year" formControlName="year" [style]="{'width':'100%'}" yearRange="2000:2024" [showClear]="true" [maxDate]="today" dateFormat="yy" placeholder="Select Year" (ngModelChange)="test()"></p-calendar>
+                </div>
+                <div class="col-3 pl-4 pr-6">
+                    <p-dropdown  [options]="allMonths" [style]="{'width':'100%'}" formControlName="month" [filter]="true" filterBy="name"  [showClear]="true" placeholder="Select Month" optionLabel="name" optionValue="id">
+                    </p-dropdown>
+                </div>
+                <div class="col-1 pl-4 pr-6">
+                    <button label="Search" pButton (click)="searchHall()" [disabled]="!searchAttendanceForm.valid"></button>
+                </div>
+                <div class="col-1"></div>
+            </div>
+        </form>
+
+        <!-- *ngIf="searchedAttenadancesAllData.length > 0" -->
+        <div class="grid mt-4">
+            <div class="col-12">
+                <form [formGroup]="filterDataForm">
+                    <p-table  [value]="searchedAttenadancesTableData" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th class="centerText">Name</th>
+                                <th class="centerText">Scode</th>
+                                <th class="centerText">Date</th>
+                                <th class="centerText">Is Attend</th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <div class="grid mt-1">
+                                        <div class="col-12 centerText">
+                                            <p-dropdown appendTo="body" formControlName="name" [options]="selectedCourseStudents" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Course" optionLabel="fullName" (onChange)="filterAttendanceData()">
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                </th>
+    
+                                <th>
+                                    <div class="grid mt-1">
+                                        <div class="col-12 centerText">
+                                            <p-dropdown appendTo="body" formControlName="scode" [options]="selectedCourseStudents" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Course" optionLabel="scode" (onChange)="filterAttendanceData()">
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                </th>
+                                
+                                <th>
+                                    <div class="grid mt-1">
+                                        <div class="col-12 centerText">
+                                            <p-dropdown appendTo="body" id="yearFilter" formControlName="date" [options]="dateFilterData" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Course" optionLabel="year" (onChange)="filterAttendanceData()">
+                                                <ng-template let-dateData pTemplate="item">
+                                                    {{ dateData.year }} - {{dateData.month.id}} - {{dateData.date}}
+                                                </ng-template>
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                </th>
+    
+                                <th>
+                                    <div class="grid mt-1">
+                                        <div class="col-12 centerText">
+                                            <p-dropdown appendTo="body" formControlName="isAttend" [options]="isAttendFilterData" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Course" (onChange)="filterAttendanceData()">
+                                            </p-dropdown>
+                                        </div>
+                                    </div>
+                                </th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-searchedAttenadance>
+                            <tr>
+                                <td class="centerText">{{searchedAttenadance.student.fullName}}</td>
+                                <td class="centerText">{{searchedAttenadance.student.scode}}</td>
+                                <td class="centerText">{{searchedAttenadance.year}} - {{searchedAttenadance.month.id}} - {{searchedAttenadance.date}}</td>
+                                <td class="centerText" *ngIf="searchedAttenadance.isAttend"><i class="fa-solid fa-circle-check fa-xl" style="color: #74C0FC;"></i></td>
+                                <td class="centerText" *ngIf="!searchedAttenadance.isAttend"><i class="fa-solid fa-circle-xmark fa-xl" style="color: #ff0000;"></i></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </form>
+            </div>
+        </div>
+        <div class="grid">
+            <div class="col-11"></div>
+            <div class="col-1">
+                <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+            </div>
+        </div>
+    </div>
+</div>

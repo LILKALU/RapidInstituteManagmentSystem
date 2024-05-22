@@ -38,8 +38,11 @@
         <button class="sideBarText ml-4" (click)="changeModule(9)">
             <i class="fa-solid fa-hand-holding-dollar"></i> &nbsp; Manage Class Fees
         </button><br><br>
+        <button class="sideBarText ml-4" (click)="changeModule(10)">
+            <i class="fa-solid fa-user-check"></i> &nbsp; Manage Student Attendance
+        </button><br><br>
     </div>
-    <div class="col-10">
+    <div class="col-10 content_area">
         <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
         <app-manage-student *ngIf="selectedModuleEnum === 2"></app-manage-student>
         <app-manage-course *ngIf="selectedModuleEnum === 3"></app-manage-course>
@@ -49,5 +52,6 @@
         <app-manage-enrolment *ngIf="selectedModuleEnum === 7"></app-manage-enrolment>
         <app-manage-grade *ngIf="selectedModuleEnum === 8"></app-manage-grade>
         <app-manage-class-fee *ngIf="selectedModuleEnum === 9"></app-manage-class-fee>
+        <app-manage-attendance *ngIf="selectedModuleEnum === 10"></app-manage-attendance>
     </div>
 </div>

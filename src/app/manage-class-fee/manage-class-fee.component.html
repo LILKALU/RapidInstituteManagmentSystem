@@ -4,7 +4,7 @@
 
 <div *ngIf="!isLoading">
     <div class="grid mt-6">
-        <div class="col-12 pl-6 pr-6">
+        <div class="col-6 pl-6 pr-6">
             <form  [formGroup]="selectedDataForm">
                 <p-dropdown  [options]="allStudents" [style]="{'width':'100%'}" formControlName="student" [filter]="true" filterBy="scode"  [showClear]="true" placeholder="Select Student" optionLabel="scode" optionValue="scode" (onChange)="getCourses()">
                     <ng-template let-student pTemplate="item">
@@ -13,9 +13,7 @@
                 </p-dropdown>
             </form>
         </div>
-    </div>
-    <div class="grid mt-6" *ngIf="isCourseDropdownVisible">
-        <div class="col-12 pl-6 pr-6">
+        <div class="col-6 pl-6 pr-6" *ngIf="isCourseDropdownVisible">
             <form  [formGroup]="selectedDataForm">
                 <p-dropdown  [options]="dropdownCourses" [style]="{'width':'100%'}" formControlName="course" [filter]="true" filterBy="code"  [showClear]="true" placeholder="Select Course" optionLabel="code" optionValue="code"  (onChange)="getClassFees()">
                     <ng-template let-course pTemplate="item">
@@ -25,6 +23,17 @@
             </form>
         </div>
     </div>
+    <!-- <div class="grid mt-6" *ngIf="isCourseDropdownVisible">
+        <div class="col-12 pl-6 pr-6">
+            <form  [formGroup]="selectedDataForm">
+                <p-dropdown  [options]="dropdownCourses" [style]="{'width':'100%'}" formControlName="course" [filter]="true" filterBy="code"  [showClear]="true" placeholder="Select Course" optionLabel="code" optionValue="code"  (onChange)="getClassFees()">
+                    <ng-template let-course pTemplate="item">
+                        ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
+                    </ng-template>
+                </p-dropdown>
+            </form>
+        </div>
+    </div> -->
     <div class="grid mt-4 ml-4 mr-4" *ngIf="getCourse.value">
         <div class="col-6"></div>
         <div class="col-2">

@@ -69,7 +69,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getStudents();
-    this.buildForm()
+    this.buildForm();
   }
 
   buildForm(){
@@ -258,6 +258,8 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
       this.getPayingMonths.patchValue(this.arrears);
     }
     this.isMakePaymentPopupOpen = true;
+    console.log(this.arrears);
+    
   }
 
   setPayableMonths(){
@@ -356,6 +358,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   }
 
   closeClassFeePaymentsPopup(){
+    this.getPayableMonths();
     this.isMakePaymentPopupOpen = false;
   }
 }

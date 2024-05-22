@@ -25,7 +25,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ManageCourseComponent } from './manage-course/manage-course.component';
 import { ManageHallComponent } from './manage-hall/manage-hall.component';
 import {InputNumberModule} from 'primeng/inputnumber';
-import {ConfirmationService} from 'primeng/api';
+import {ConfirmationService, MessageService} from 'primeng/api';
 import { MessagesModule } from 'primeng/messages';
 import { ManageSubjectComponent } from './manage-subject/manage-subject.component';
 import { ManageTeachersComponent } from './manage-teachers/manage-teachers.component';
@@ -34,6 +34,8 @@ import { ManageEnrolmentComponent } from './manage-enrolment/manage-enrolment.co
 import { ManageGradeComponent } from './manage-grade/manage-grade.component';
 import { ManageClassFeeComponent } from './manage-class-fee/manage-class-fee.component';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ManageAttendanceComponent } from './manage-attendance/manage-attendance.component';
+import { ToastModule } from 'primeng/toast';
 
 
 @NgModule({
@@ -49,6 +51,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
     ManageEnrolmentComponent,
     ManageGradeComponent,
     ManageClassFeeComponent,
+    ManageAttendanceComponent,
   ],
   imports: [
     BrowserModule,
@@ -65,6 +68,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
     DropdownModule,
     NgbModule,
     TableModule,
+    ToastModule,
     HttpClientModule,
     CardModule,
     CheckboxModule,
@@ -74,7 +78,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
     MessagesModule,
     MultiSelectModule
   ],
-  providers: [ConfirmationService],
+  providers: [ConfirmationService,MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

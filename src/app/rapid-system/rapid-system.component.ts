@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./rapid-system.component.css']
 })
 export class RapidSystemComponent {
-  selectedModuleEnum : number = 9;
+  selectedModuleEnum : number = 10;
 
   changeModule(moduleEnum : number){
     this.selectedModuleEnum = moduleEnum;
