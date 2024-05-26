@@ -23,6 +23,10 @@ import { AdAccountServiceService } from '../shared/services/ad-account-service.s
 import { GradeService } from '../shared/services/grade.service';
 import { MonthService } from '../shared/services/month.service';
 import { MonthVM } from '../shared/models/monthVM';
+import { ConfirmationService } from 'primeng/api';
+import { reciptTemplateDataVM } from '../shared/models/reciptTemplateDataVM';
+import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
+import { EnrolmentCourseService } from '../shared/services/enrolment-course.service';
 
 
 @Component({
@@ -43,10 +47,12 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   parentUpdateForm !: FormGroup;
   enrollmentForm !: FormGroup;
   studentStatus : number | undefined
+
   isStudentFormVisible : boolean = false;
   isAditionalInfo : boolean = false;
   isUpdateFormRedy : boolean = false;
   addmisionFee : number = 1300;
+  total : number =0;
   activeStepIndex : number = 0;
   updateActiveStepIndex : number = 0;
   courses : CourseVM[] = [];
@@ -65,11 +71,16 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   searchedParent : parentVM | undefined;
   additionalInfoPopUpData : studentVM | undefined;
   courseTimes : string[] = [];
+  enrolments : EnrolmentVM | undefined;
+  removeEnrolments : EnrolmentVM[]=[]; 
   enrollments : EnrolmentVM = {};
   isSearchParent : boolean = false;
   parentSearchForm !:FormGroup;
   isUpdating : boolean = false;
   isDeleting : boolean = false;
+  allEnrolmentCourses : EnrolmentCourseVM[]=[];
+  reciptTemplateData : reciptTemplateDataVM | undefined;
+  proceedClassFeePayment : ClassFeeVM | undefined;
   relationships : any[] = [{name:'Mother'},{name:'Father'},{name:'Sister'},{name:'Brother'},{name:'Grand Mother'},{name:'Grand Father'},{name:'Aunty'},{name:'Uncle'},{name:'Gardian'}]; 
   dates : any[] = [{date:"Monday"},{date:"Tuesday"},{date:"Wednesday"},{date:"Thursday"},{date:"Friday"},{date:"Saturday"},{date:"Sunday"}]
 
@@ -82,6 +93,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     { label: 'Parant Form'},
     { label: 'Student Enrolment'},
     { label: 'Student Payment'},
+    { label: 'Recipt'},
     { label: 'Login Details'}
   ];
 
@@ -104,6 +116,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   get getStudentCity(): AbstractControl { return this.studentDetailForm.get('city') as AbstractControl; }
   get getStudentCallingName(): AbstractControl { return this.studentDetailForm.get('callingName') as AbstractControl; }
   get getStudentSchool(): AbstractControl { return this.studentDetailForm.get('school') as AbstractControl; }
+  get getStudentEmail(): AbstractControl { return this.studentDetailForm.get('email') as AbstractControl; }
 
   //form controllers for the student detail update form 
   get getUpdateStudentFullName(): AbstractControl { return this.studentUpdateForm.get('fullName') as AbstractControl; }
@@ -116,6 +129,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   get getUpdateStudentCity(): AbstractControl { return this.studentUpdateForm.get('city') as AbstractControl; }
   get getUpdateStudentCallingName(): AbstractControl { return this.studentUpdateForm.get('callingName') as AbstractControl; }
   get getUpdateStudentSchool(): AbstractControl { return this.studentUpdateForm.get('school') as AbstractControl; }
+  get getUpdateStudentEmail(): AbstractControl { return this.studentUpdateForm.get('email') as AbstractControl; }
 
   //form controllers for the parent detail form
   get getParentFullName(): AbstractControl { return this.parentDetailForm.get('fullName') as AbstractControl; }
@@ -125,6 +139,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   get getParentRelationship(): AbstractControl { return this.parentDetailForm.get('relationship') as AbstractControl; }
   get getParentOccupation(): AbstractControl { return this.parentDetailForm.get('occupation') as AbstractControl; }
   get getParentContactNumber(): AbstractControl { return this.parentDetailForm.get('contactNumber') as AbstractControl; }
+  get getParentEmail(): AbstractControl { return this.parentDetailForm.get('email') as AbstractControl; }
 
   //form controllers for the parent detail form
   get getUpdateParentFullName(): AbstractControl { return this.parentUpdateForm.get('fullName') as AbstractControl; }
@@ -134,6 +149,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   get getUpdateParentRelationship(): AbstractControl { return this.parentUpdateForm.get('relationship') as AbstractControl; }
   get getUpdateParentOccupation(): AbstractControl { return this.parentUpdateForm.get('occupation') as AbstractControl; }
   get getUpdateParentContactNumber(): AbstractControl { return this.parentUpdateForm.get('contactNumber') as AbstractControl; }
+  get getUpdateParentEmail(): AbstractControl { return this.parentUpdateForm.get('email') as AbstractControl; }
 
   //form controllers for the parent search form
   get getNicNo(): AbstractControl { return this.parentSearchForm.get('nicNo') as AbstractControl; }
@@ -155,11 +171,13 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     private studentServices : StudentService,
     private formBuilder: FormBuilder,
     private enrolmentService : EnrolmentService,
+    private enrolmentCoursesService : EnrolmentCourseService,
     private classFeeService : ClassFeeService,
     private parentService : ParentService,
     private adAccountServiceService : AdAccountServiceService,
     private gradeServise : GradeService,
-    private monthService : MonthService
+    private monthService : MonthService,
+    private confirmationService: ConfirmationService
   ) {
   }
   
@@ -191,8 +209,10 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       city:['',Validators.required],
       district : ['',Validators.required],
       callingName:['',Validators.required],
-      school:['',Validators.required]
+      school:['',Validators.required],
+      email : ['',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]]
     });
+    
 
     this.studentUpdateForm = this.formBuilder.group({
       fullName : ['', Validators.required],
@@ -204,7 +224,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       city:['',Validators.required],
       district : ['',Validators.required],
       callingName:['',Validators.required],
-      school:['',Validators.required]
+      school:['',Validators.required],
+      email : ['',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]]
     });
 
     this.parentDetailForm = this.formBuilder.group({
@@ -214,7 +235,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       birthday:['',Validators.required],
       relationship:['',Validators.required],
       occupation: ['',Validators.required],
-      contactNumber : ['',Validators.required]
+      contactNumber : ['',Validators.required],
+      email : ['',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]]
     })
 
     this.parentUpdateForm = this.formBuilder.group({
@@ -224,7 +246,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       birthday:['',Validators.required],
       relationship:['',Validators.required],
       occupation: ['',Validators.required],
-      contactNumber : ['',Validators.required]
+      contactNumber : ['',Validators.required],
+      email : ['',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]]
     })
 
     this.enrollmentForm = this.formBuilder.group({
@@ -259,12 +282,12 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         this.isloaded = true;
         this.courses = data.content;
         console.log("courses" , this.courses);
-        this.getGrade();
+        this.getAllStudent();
       }
     });
 
     // this.subs.sink = this.enrolmentService
-    this.getAllStudent();
+    
   }
 
   getAllStudent(){
@@ -278,6 +301,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         console.log("student table data", this.studentAllData);
         console.log("student all data", this.studentTableData);
         this.studentTableData.reverse();
+        this.getGrade();
       }
     });
   }
@@ -302,7 +326,15 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       if(data){
         this.months = data.content;
         console.log("months" , this.months);
-        
+        this.getEnrolmentCourses()
+      }
+    })
+  }
+
+  getEnrolmentCourses(){
+    this.subs.sink = this.enrolmentCoursesService.getEnrolmentCourse().subscribe(data =>{
+      if(data && data.content){
+        this.allEnrolmentCourses = data.content;
       }
     })
   }
@@ -390,35 +422,97 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.activeStepIndex = this.activeStepIndex + 1;
   }
 
-  removeStudent(){
+  removeStudent(studentdata : studentVM){
     this.isDeleting = true;
     let student : studentVM;
     let delStudent : studentVM
-    student = this.additionalInfoPopUpData ? this.additionalInfoPopUpData : {};
+    student = studentdata ? studentdata : {};
     
     console.log(student);
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete',
+      accept: () => {
+        delStudent = {
+          ...student,
+          isActive : false
+        }
+        this.getEnrolmentByStudent(studentdata);
+        console.log(delStudent);
     
-    delStudent = {
-      ...student,
-      isActive : false
-    }
-
-    console.log(delStudent);
-
-    this.subs.sink = this.studentServices.removeStudent(delStudent).subscribe(data =>{
-      if(data){
-        this.isDeleting = false;
-        this.isAditionalInfo = false
-        this.studentAllData.forEach((element , index) => {
-          if(element.id == student.id){
-            this.studentAllData.splice(index,1);
-            this.studentTableData = this.studentAllData;
+        this.subs.sink = this.studentServices.removeStudent(delStudent).subscribe(data =>{
+          if(data){
+            this.isDeleting = false;
+            this.isAditionalInfo = false
+            this.studentAllData.forEach((element , index) => {
+              if(element.id == student.id){
+                this.studentAllData.splice(index,1);
+                this.studentTableData = this.studentAllData;
+              }
+            });
+            
           }
-        });
+        })
+        
       }
     })
     
     
+  }
+
+  getEnrolmentByStudent(studentdata : studentVM){
+    let selectedEnrolment : EnrolmentCourseVM[]=[];
+    let deletingEnrolment : EnrolmentCourseVM;
+    let count : number = 0;
+
+    selectedEnrolment = this.allEnrolmentCourses.filter(el => el && el.enrolment && el.enrolment.student && el.enrolment.student.id && studentdata && studentdata.id && studentdata.id == el.enrolment.student.id);
+
+    selectedEnrolment.forEach((element,index) => {
+      deletingEnrolment={
+        ...element,
+        isActive : false
+      }
+
+      selectedEnrolment.splice(index,1,deletingEnrolment);
+    });
+
+    this.subs.sink = this.enrolmentCoursesService.deleteCourses(selectedEnrolment).subscribe(data =>{
+      if(data && data.content){
+        console.log("deleted",data.content);
+      }
+    })
+  }
+
+  removeStudentEnrolments(){
+    let removeEnrolments : EnrolmentVM[] = []
+    let removeEnrolment : EnrolmentVM
+    let removeEnrolmentCourse : EnrolmentCourseVM;
+    let removeEnrolmentCourses : EnrolmentCourseVM[]=[];
+
+    this.removeEnrolments.forEach((element,index) => {
+      if(element.enrolmentCorseDTO){
+        removeEnrolmentCourses = element.enrolmentCorseDTO
+        removeEnrolmentCourses.forEach((ele,i) => {
+          removeEnrolmentCourse = {
+            ...ele,
+            isActive : false
+          }
+          removeEnrolmentCourses.splice(i,1,removeEnrolmentCourse);
+        });
+      }
+      removeEnrolment = {
+        ...element,
+        enrolmentCorseDTO : removeEnrolmentCourses
+      }
+      this.removeEnrolments.splice(index,1,removeEnrolment);
+    });
+
+    this.subs.sink = this.enrolmentService.addEnrolments(this.removeEnrolments).subscribe(data =>{
+      if(data){
+        console.log("Enrolments Removed" , data);
+        
+      }
+    })
+
   }
 
   updateNextClick(){
@@ -472,6 +566,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         occupation : this.getParentOccupation.value,
         contactNumber : this.getParentContactNumber.value,
         isActive : true,
+        email : this.getParentEmail.value
       }
     }else{
       parent = {
@@ -483,6 +578,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         occupation : this.getParentOccupation.value,
         contactNumber : this.getParentContactNumber.value,
         isActive : true,
+        email : this.getParentEmail.value
       };
     }
     
@@ -504,7 +600,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       address : address,
       parent : parent,
       school : this.getStudentSchool.value,
-      isAdmisionPaid : false
+      isAdmisionPaid : false,
+      email : this.getStudentEmail.value
     }
 
     console.log(student);
@@ -574,7 +671,63 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     }
 
     this.subs.sink = this.classFeeService.addStudentClassFees(classFee).subscribe(data =>{
-      if(data){
+      if(data && data.content && data.content.classFeeCourse){
+        this.proceedClassFeePayment = data.content;
+        let classFeeCourses : ClassFeeCourseVM[]=[]; 
+        let classFeeCourse : courseWiseMonths
+        let payingCourseWiseMonths : courseWiseMonths[]=[];
+        
+        classFeeCourses = data.content.classFeeCourse;
+        classFeeCourses.forEach(element => {
+          if(element.course){
+            let c = payingCourseWiseMonths.find(el => el.course && el.course.id && element && element.course && element.course.id && element.course.id == el.course.id);
+            if(c){
+              let index = payingCourseWiseMonths.indexOf(c);
+              if(element.month){
+                c.months?.push(element.month)
+                payingCourseWiseMonths.splice(index,1,c);
+              }
+            }else{
+              if(element.month){
+                let m : MonthVM[] = [];
+                m.push(element.month)
+                let name : string;
+                let ammount : number;
+                name = '('+element.course.code+') - ' + element.course.teacher.fullName + '\'s ' + element.course.grade.name + ' ' + element.course.date + ' ' + element.course.subject.name + ' Class at ' + element.course.startTime;
+                ammount = element.course.classFeeAmount;
+                classFeeCourse = {
+                  course : element.course,
+                  months : m,
+                  courseName:name,
+                  courseAmount : ammount
+                }
+                payingCourseWiseMonths.push(classFeeCourse);
+              }
+            }
+          }else{
+            if(element.month){
+              let m : MonthVM[] = [];
+              m.push(element.month)
+              let name : string = "Admision";
+              let ammount : number = this.addmisionFee;
+              classFeeCourse = {
+                course : element.course,
+                months : m,
+                courseName:name,
+                courseAmount : ammount
+              }
+              payingCourseWiseMonths.push(classFeeCourse);
+            }
+          }
+        });
+
+        this.reciptTemplateData = {
+          courseWiseMonths : payingCourseWiseMonths,
+          resiptNumber : data.content.reciptNumber,
+          student : data.content.student,
+          subTotal : this.total
+        }
+
         this.createStudentLoginDetails();
         this.activeStepIndex = this.activeStepIndex + 1;
       }
@@ -638,7 +791,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.enrolledCourses.forEach(element => {
       amount = amount+element.classFeeAmount;
     });
-
+    this.total = amount+this.addmisionFee;
     return amount+this.addmisionFee;
   }
 
@@ -679,6 +832,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         this.getParentOccupation.patchValue(data?.content?.occupation);
         this.getParentRelationship.patchValue(data?.content?.relationship);
         this.getParentTitle.patchValue(data?.content?.title);
+        this.getParentEmail.patchValue(data.content.email)
         this.isASearchedParent = true;
       }else{
         this.isASearchedParent = false;
@@ -713,6 +867,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       occupation : this.getUpdateParentOccupation.value,
       contactNumber : this.getUpdateParentContactNumber.value,
       isActive : true,
+      email : this.getUpdateParentEmail.value
     }
     
 
@@ -736,7 +891,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       school : this.getUpdateStudentSchool.value,
       isAdmisionPaid : false,
       id : this.additionalInfoPopUpData?.id,
-      scode : this.additionalInfoPopUpData?.scode
+      scode : this.additionalInfoPopUpData?.scode,
+      email : this.getUpdateStudentEmail.value
     }
 
     console.log(student);
@@ -759,27 +915,29 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToUpdateForm(){
-    console.log(this.additionalInfoPopUpData?.birthDay);
+  goToUpdateForm(studentdata : studentVM){
+    console.log(studentdata);
     
-    this.getUpdateStudentBirthday.patchValue(this.additionalInfoPopUpData?.birthDay);
-    this.getUpdateStudentCallingName.patchValue(this.additionalInfoPopUpData?.callingName);
-    this.getUpdateStudentCity.patchValue(this.additionalInfoPopUpData?.address?.city);
-    this.getUpdateStudentContactNumber.patchValue(this.additionalInfoPopUpData?.contactNumber);
-    this.getUpdateStudentDistrict.patchValue(this.additionalInfoPopUpData?.address?.district);
-    this.getUpdateStudentFullName.patchValue(this.additionalInfoPopUpData?.fullName);
-    this.getUpdateStudentGender.patchValue(this.additionalInfoPopUpData?.gender);
-    this.getUpdateStudentLane.patchValue(this.additionalInfoPopUpData?.address?.lane);
-    this.getUpdateStudentSchool.patchValue(this.additionalInfoPopUpData?.school);
-    this.getUpdateStudenthouseNo.patchValue(this.additionalInfoPopUpData?.address?.houseNo);
+    this.getUpdateStudentBirthday.patchValue(studentdata?.birthDay);
+    this.getUpdateStudentCallingName.patchValue(studentdata?.callingName);
+    this.getUpdateStudentCity.patchValue(studentdata?.address?.city);
+    this.getUpdateStudentContactNumber.patchValue(studentdata?.contactNumber);
+    this.getUpdateStudentDistrict.patchValue(studentdata?.address?.district);
+    this.getUpdateStudentFullName.patchValue(studentdata?.fullName);
+    this.getUpdateStudentGender.patchValue(studentdata?.gender);
+    this.getUpdateStudentLane.patchValue(studentdata?.address?.lane);
+    this.getUpdateStudentSchool.patchValue(studentdata?.school);
+    this.getUpdateStudenthouseNo.patchValue(studentdata?.address?.houseNo);
+    this.getUpdateStudentEmail.patchValue(studentdata.email)
 
-    this.getUpdateParentBirthaday.patchValue(this.additionalInfoPopUpData?.parent?.birthday);
-    this.getUpdateParentContactNumber.patchValue(this.additionalInfoPopUpData?.parent?.contactNumber);
-    this.getUpdateParentFullName.patchValue(this.additionalInfoPopUpData?.parent?.fullName);
-    this.getUpdateParentNIC.patchValue(this.additionalInfoPopUpData?.parent?.nic);
-    this.getUpdateParentOccupation.patchValue(this.additionalInfoPopUpData?.parent?.occupation);
-    this.getUpdateParentRelationship.patchValue(this.additionalInfoPopUpData?.parent?.relationship);
-    this.getUpdateParentTitle.patchValue(this.additionalInfoPopUpData?.parent?.title);
+    this.getUpdateParentBirthaday.patchValue(studentdata?.parent?.birthday);
+    this.getUpdateParentContactNumber.patchValue(studentdata?.parent?.contactNumber);
+    this.getUpdateParentFullName.patchValue(studentdata?.parent?.fullName);
+    this.getUpdateParentNIC.patchValue(studentdata?.parent?.nic);
+    this.getUpdateParentOccupation.patchValue(studentdata?.parent?.occupation);
+    this.getUpdateParentRelationship.patchValue(studentdata?.parent?.relationship);
+    this.getUpdateParentTitle.patchValue(studentdata?.parent?.title);
+    this.getUpdateParentEmail.patchValue(studentdata.parent?.email)
 
     console.log();
     

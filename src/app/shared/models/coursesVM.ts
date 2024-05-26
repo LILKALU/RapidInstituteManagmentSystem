@@ -15,4 +15,5 @@ export interface CourseVM{
     classFeeAmount : number;
     isActive : boolean;
     code ?: string;
+    styleClassName ?: string[];
 }

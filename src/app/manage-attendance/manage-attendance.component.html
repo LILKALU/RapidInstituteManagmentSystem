@@ -85,8 +85,7 @@
             </div>
         </form>
 
-        <!-- *ngIf="searchedAttenadancesAllData.length > 0" -->
-        <div class="grid mt-4">
+        <div class="grid mt-4" *ngIf="searchedAttenadancesAllData.length > 0">
             <div class="col-12">
                 <form [formGroup]="filterDataForm">
                     <p-table  [value]="searchedAttenadancesTableData" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
@@ -154,7 +153,7 @@
         <div class="grid">
             <div class="col-11"></div>
             <div class="col-1">
-                <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+                <button pButton class="p-button-secondary" (click)="reset()" *ngIf="searchedAttenadancesAllData.length">Reset</button>
             </div>
         </div>
     </div>

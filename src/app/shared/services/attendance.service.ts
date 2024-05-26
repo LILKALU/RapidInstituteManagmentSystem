@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { attendanceVM } from '../models/attendanceVM';
 import { attendancesResponseVM } from '../models/attendancesResponseVM';
+import { countResponseVM } from '../models/countResponseVM';
 import { Observable } from 'rxjs';
 import { CourseVM } from '../models/coursesVM';
 import { attendanceSearchVM } from '../models/attendanceSearchVM';
@@ -30,5 +31,9 @@ export class AttendanceService {
 
   updateAttendance(attendances : attendanceVM[]) : Observable<attendancesResponseVM>{
     return this.httpClient.put<attendancesResponseVM>(`${this.BaseURL}/updateattendance`,attendances);
+  }
+
+  getCountByCourseAndYearAndMonthAndDateAndStudent(attendanceSearch : attendanceSearchVM): Observable<countResponseVM>{
+    return this.httpClient.post<countResponseVM>(`${this.BaseURL}/getcountbycourseandyearandmonthandstudent`,attendanceSearch);
   }
 }

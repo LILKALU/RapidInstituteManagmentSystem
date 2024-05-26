@@ -8,4 +8,5 @@ export interface parentVM{
     occupation : string;
     contactNumber : string;
     isActive : boolean;
+    email ?: string;
 }

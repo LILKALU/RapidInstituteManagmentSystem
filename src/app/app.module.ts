@@ -36,6 +36,7 @@ import { ManageClassFeeComponent } from './manage-class-fee/manage-class-fee.com
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ManageAttendanceComponent } from './manage-attendance/manage-attendance.component';
 import { ToastModule } from 'primeng/toast';
+import { ReciptTemplateComponent } from './recipt-template/recipt-template.component';
 
 
 @NgModule({
@@ -52,6 +53,7 @@ import { ToastModule } from 'primeng/toast';
     ManageGradeComponent,
     ManageClassFeeComponent,
     ManageAttendanceComponent,
+    ReciptTemplateComponent,
   ],
   imports: [
     BrowserModule,
@@ -76,7 +78,7 @@ import { ToastModule } from 'primeng/toast';
     InputNumberModule,
     OverlayPanelModule,
     MessagesModule,
-    MultiSelectModule
+    MultiSelectModule,
   ],
   providers: [ConfirmationService,MessageService],
   bootstrap: [AppComponent]

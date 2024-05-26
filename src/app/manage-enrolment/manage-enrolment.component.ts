@@ -17,6 +17,8 @@ import { ClassFeeCourseVM } from '../shared/models/classFeeCourseVM';
 import { ClassFeeService } from '../shared/services/class-fee.service';
 import { MonthService } from '../shared/services/month.service';
 import { MonthVM } from '../shared/models/monthVM';
+import { reciptTemplateDataVM } from '../shared/models/reciptTemplateDataVM';
+import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
 
 @Component({
   selector: 'app-manage-enrolment',
@@ -39,14 +41,17 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   isEnrolDialogVisible : boolean = false;
   isStudentGetting : boolean = false;
   classFeeForm !: FormGroup;
+  filterDataForm !: FormGroup
   months : MonthVM[] = [];
   searchedStudent : studentVM | undefined;
   enrollments : EnrolmentVM = {};
   activeStepIndex : number = 0;
+  reciptTemplateData : reciptTemplateDataVM | undefined;
   courseStudent : CourseStudentVM[] = []
   steps = [
     { label: 'Student Enrolment'},
     { label: 'Student Payment'},
+    { label: 'Recipt'},
   ];
 
   get getScode(): AbstractControl { return this.enrolmentForm.get('scode') as AbstractControl; }
@@ -251,9 +256,36 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     }
 
     this.subs.sink = this.classFeeService.addStudentClassFees(classFee).subscribe(data =>{
-      if(data){
-        this.activeStepIndex = this.activeStepIndex + 0;
-        this.closeCourseCreationPopup();
+      if(data && data.content && data.content.reciptNumber){
+        let courseWiseMonths : courseWiseMonths[] = [];
+        let name : string;
+        let ammount : number;
+        ammount = this.enrolingCourse?.classFeeAmount ? this.enrolingCourse?.classFeeAmount : 0;
+        name = '('+ this.enrolingCourse?.code +') - ' + this.enrolingCourse?.teacher.fullName + '\'s ' + this.enrolingCourse?.grade.name + ' ' + this.enrolingCourse?.date + ' ' + this.enrolingCourse?.subject.name + ' Class at ' + this.enrolingCourse?.startTime;
+        let courseWiseMonth : courseWiseMonths | undefined;
+        let months : MonthVM[]=[];
+        if(month){
+          months.push(month)
+        }
+
+        courseWiseMonth = {
+          course : this.enrolingCourse,
+          courseAmount : this.enrolingCourse?.classFeeAmount,
+          courseName : name,
+          months : months
+        }
+        courseWiseMonths.push(courseWiseMonth);
+
+        this.reciptTemplateData = {
+          courseWiseMonths : courseWiseMonths,
+          resiptNumber : data.content.reciptNumber,
+          student : this.searchedStudent,
+          subTotal : ammount
+        }
+        
+
+        this.activeStepIndex = this.activeStepIndex + 1;
+        
       }
     })
   }

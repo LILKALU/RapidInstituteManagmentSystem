@@ -14,5 +14,5 @@ export interface studentVM{
     parent ?: parentVM;
     school ?: string;
     isAdmisionPaid ?: boolean;
-    
+    email ?: string;
 }

@@ -11,34 +11,34 @@
 <div class="grid">
     <div class="col-2 sideBar mt-3">
         <br>
-        <button class="sideBarText ml-4" (click)="changeModule(1)">
+        <button (click)="changeModule(1)" [ngClass]="{ 'selected_fontColor ml-4': selectedModuleEnum == 1, 'sideBarText ml-4': selectedModuleEnum != 1 }">
             <i class="fa-solid fa-house"></i> &nbsp; Dashboard
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(2)">
+        <button (click)="changeModule(2)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 2, 'sideBarText ml-4': selectedModuleEnum != 2 }">
             <i class="fa-solid fa-user-graduate"></i> &nbsp; Manage Student
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(3)">
+        <button  (click)="changeModule(3)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 3, 'sideBarText ml-4': selectedModuleEnum != 3 }">
             <i class="fa-solid fa-users-rectangle"></i> &nbsp; Manage Course
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(4)">
+        <button  (click)="changeModule(4)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 4, 'sideBarText ml-4': selectedModuleEnum != 4 }">
             <i class="fa-solid fa-building-columns"></i> &nbsp; Manage Hall
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(5)">
+        <button  (click)="changeModule(5)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 5, 'sideBarText ml-4': selectedModuleEnum != 5 }">
             <i class="fa-solid fa-book-open"></i> &nbsp; Manage Subjects
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(6)">
+        <button  (click)="changeModule(6)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 6, 'sideBarText ml-4': selectedModuleEnum != 6 }">
             <i class="fa-solid fa-person-chalkboard"></i> &nbsp; Manage Teachers
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(7)">
+        <button  (click)="changeModule(7)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 7, 'sideBarText ml-4': selectedModuleEnum != 7 }">
             <i class="fa-solid fa-right-to-bracket"></i> &nbsp; Manage Enrolment
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(8)">
+        <button  (click)="changeModule(8)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 8, 'sideBarText ml-4': selectedModuleEnum != 8 }">
             <i class="fa-solid fa-award"></i> &nbsp; Manage Grades
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(9)">
+        <button  (click)="changeModule(9)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 9, 'sideBarText ml-4': selectedModuleEnum != 9 }">
             <i class="fa-solid fa-hand-holding-dollar"></i> &nbsp; Manage Class Fees
         </button><br><br>
-        <button class="sideBarText ml-4" (click)="changeModule(10)">
+        <button  (click)="changeModule(10)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 10, 'sideBarText ml-4': selectedModuleEnum != 10 }">
             <i class="fa-solid fa-user-check"></i> &nbsp; Manage Student Attendance
         </button><br><br>
     </div>

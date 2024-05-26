@@ -93,6 +93,12 @@
                 </div>
             </div>
             <div class="grid pt-5">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                    <label For="email"><span class="Requied ">* </span>Email</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
                 <div class="col-11"></div>
                 <div class="col-1">
                     <button label="Next" pButton severity="info" [disabled]="!studentDetailForm.valid" (click)="nextClick()"></button>
@@ -118,14 +124,14 @@
             <div class="grid">
                 <div class="col-12 p-float-label">
                     <input type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
-                    <label for="parentName">Parent Name</label>
+                    <label for="parentName"><span class="Requied ">* </span>Parent Name</label>
                 </div>
             </div>
     
             <div class="grid pt-5">
                 <div class="col-4 p-float-label">
                     <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
-                    <label for="title">Title</label>
+                    <label for="title"><span class="Requied ">* </span>Title</label>
                 </div>
     
                 <div class="col-4 p-float-label">
@@ -142,7 +148,7 @@
             <div class="grid pt-5">
                 <div class="col-4 p-float-label" *ngIf="relationships">
                     <p-dropdown  [showClear]="true" appendTo="body"inputId="relationship" [options]="relationships" optionLabel="name"  placeholder="Relationship" [style]="{'width':'100%'}" formControlName="relationship"></p-dropdown>
-                    <label for="relationship">Relationship</label>
+                    <label for="relationship"><span class="Requied ">* </span>Relationship</label>
                 </div>
     
                 <div class="col-4 p-float-label">
@@ -153,6 +159,12 @@
                 <div class="col-4 p-float-label">
                     <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
                     <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                    <label for="email"><span class="Requied ">* </span>Email</label>
                 </div>
             </div>
     
@@ -267,8 +279,18 @@
             </div>
             <div class="col-2"></div>
         </div>
-        <!-- student login details -->
+        <!-- payment recipt -->
         <div class="grid pt-5" *ngIf="activeStepIndex == 4">
+            <app-recipt-template [reciptTemplateDataVM]="reciptTemplateData"></app-recipt-template>
+        </div>
+        <div class="grid pt-5" *ngIf="activeStepIndex == 4">
+            <div class="col-8"></div>
+            <div class="col-4">
+                <button label="Next" pButton severity="info" (click)="nextClick()"></button>
+            </div>
+        </div>
+        <!-- student login details -->
+        <div class="grid pt-5" *ngIf="activeStepIndex == 5">
             <div class="col-2"></div>
             <div class="col-8">
                 <div class="grid">
@@ -276,13 +298,13 @@
                         <h6>Student UserCode : {{adAccountDetails.userCode}}</h6>
                     </div>
                     <div class="col-6">
-                        <h6>Student Password : {{adAccountDetails.passWord}}</h6>
+                        <h6>Student Password : student@1234</h6>
                     </div>
                 </div>
             </div>
             <div class="col-2"></div>
         </div>
-        <div class="grid" *ngIf="activeStepIndex == 4">
+        <div class="grid" *ngIf="activeStepIndex == 5">
             <div class="col-10"></div>
             <div class="col-2">
                 <button pButton class="p-button-info" (click)="closeQuickStudentCreationPopup()">Close</button>
@@ -296,29 +318,23 @@
             <p-table  [value]="studentTableData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
                 <ng-template pTemplate="header" >
                     <th>Scode</th>
-                    <th>Full Name</th>
                     <th>Calling Name</th>
-                    <th>Birthday</th>
-                    <th>Gender</th>
                     <th>Contact Number</th>
-                    <th>School</th>
                     <th>Address</th>
                     <th>Aditional Info</th>
+                    <th>Action Button</th>
                 </ng-template>
 
                 <ng-template pTemplate="body" let-studentdata>
                     <tr>
                         <td class="centerText">{{studentdata?.scode}}</td>
-                        <td class="centerText">{{studentdata?.fullName}}</td>
                         <td class="centerText">{{studentdata?.callingName}}</td>
-                        <td class="centerText">{{studentdata?.birthDay}}</td>
-                        <td class="centerText">{{studentdata?.gender}}</td>
                         <td class="centerText">{{studentdata?.contactNumber}}</td>
-                        <td class="centerText">{{studentdata?.school}}</td>
                         <td class="centerText">{{studentdata?.address?.houseNo}},{{studentdata?.address?.lane}},{{studentdata?.address?.city}},{{studentdata?.address?.district}}</td>
-                        <td>
+                        <td class="centerText">
                             <i class="fa-solid fa-arrow-up-right-from-square pl-6" (click)="openAditionalInfo(studentdata)"></i>
                         </td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="goToUpdateForm(studentdata)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="removeStudent(studentdata)"></i></td>
                     </tr>
                 </ng-template>
             </p-table><br>
@@ -335,6 +351,18 @@
 <!-- aditional info popup -->
 <p-dialog header="Aditional Info" [(visible)]="isAditionalInfo" [style]="{width: '50vw'}" [modal]="true">
     <div class="grid">
+        <div class="col-6">
+            <p-card header="Student Card">
+                <h6>Full Name : {{additionalInfoPopUpData?.fullName}} </h6><br>
+                <h6>Scode: {{additionalInfoPopUpData?.scode}} </h6><br>
+                <h6>Address : {{additionalInfoPopUpData?.address?.houseNo}},{{additionalInfoPopUpData?.address?.lane ? additionalInfoPopUpData?.address?.lane + ',' : ''}} {{additionalInfoPopUpData?.address?.city}}, {{additionalInfoPopUpData?.address?.district}} </h6><br>
+                <h6>Birthday : {{additionalInfoPopUpData?.birthDay}} </h6><br>
+                <h6>Contact Number : {{additionalInfoPopUpData?.contactNumber}} </h6><br>
+                <h6>Gender : {{additionalInfoPopUpData?.gender}} </h6><br>
+                <h6>School : {{additionalInfoPopUpData?.school}} </h6><br>
+            </p-card>
+            
+        </div>
         <div class="col-6">
             <p-card header="Parent Card">
                 <h6>Name : {{additionalInfoPopUpData?.parent?.fullName}}</h6><br>
@@ -364,21 +392,6 @@
                     </div>
                 </div> -->
             </p-card>
-        </div>
-        <div class="col-6">
-            <p-card>
-                <div class="grid">
-                    <div class="col-6 pl-6">
-                        <button  pButton class="p-button-success" (click)="goToUpdateForm()">Update Student</button>
-                    </div>
-                    <div class="col-6">
-                        <button  pButton class="p-button-danger" (click)="removeStudent()">Delete Student</button>
-                    </div>
-                </div>
-            </p-card>
-            <div *ngIf="isDeleting" class="loading">
-                <img src="../../assets/giphy.gif" alt="" srcset="" class="deletingGif">
-            </div>
         </div>
     </div>
 </p-dialog>
@@ -450,6 +463,12 @@
                 <label For="district"><span class="Requied ">* </span>District</label>
             </div>
         </div>
+        <div class="grid">
+            <div class="col-12 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                <label For="email"><span class="Requied ">* </span>Email</label>
+            </div>
+        </div>
         <div class="grid pt-5">
             <div class="col-11"></div>
             <div class="col-1">
@@ -463,19 +482,19 @@
         <div class="grid">
             <div class="col-12 p-float-label">
                 <input type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
-                <label for="parentName">Parent Name</label>
+                <label for="parentName"><span class="Requied ">* </span>Parent Name</label>
             </div>
         </div>
 
         <div class="grid pt-5">
             <div class="col-4 p-float-label">
                 <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
-                <label for="title">Title</label>
+                <label for="title"><span class="Requied ">* </span>Title</label>
             </div>
 
             <div class="col-4 p-float-label">
                 <input type="text" pInputText class="inputsStyle" id="NIC" formControlName="NIC">
-                <label for="NIC">NIC No</label>
+                <label for="NIC"><span class="Requied ">* </span>NIC No</label>
             </div>
 
             <div class="col-4 p-float-label">
@@ -487,17 +506,23 @@
         <div class="grid pt-5">
             <div class="col-4 p-float-label" *ngIf="relationships">
                 <p-dropdown  [showClear]="true" appendTo="body"inputId="relationship" [options]="relationships" optionLabel="name"  placeholder="Relationship" [style]="{'width':'100%'}" formControlName="relationship"></p-dropdown>
-                <label for="relationship">Relationship</label>
+                <label for="relationship"><span class="Requied ">* </span>Relationship</label>
             </div>
 
             <div class="col-4 p-float-label">
                 <input type="text" pInputText class="inputsStyle" id="occupation" formControlName="occupation">
-                <label for="occupation">Occupation</label>
+                <label for="occupation"><span class="Requied ">* </span>Occupation</label>
             </div>
 
             <div class="col-4 p-float-label">
                 <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
                 <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+            </div>
+        </div>
+        <div class="grid">
+            <div class="col-12 p-float-label">
+                <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                <label for="email"><span class="Requied ">* </span>Email</label>
             </div>
         </div>
 
@@ -517,7 +542,11 @@
     </div>
 </p-dialog>
 
+<p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
 
+<div *ngIf="isDeleting" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="deletingGif">
+</div>
 
 <div *ngIf="!isloaded" class="loading">
     <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">

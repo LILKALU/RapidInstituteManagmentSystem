@@ -21,7 +21,23 @@ a{
     color: aliceblue;
     text-decoration: none;
     border: none;
-    font-size: large;
+    font-size: medium;
     cursor: pointer;
     text-align: start;
+}
+
+.red_background{
+    background-color: #ef4444;
+}
+
+.selected_fontColor{
+    color: aliceblue;
+    background-color: transparent;
+    text-decoration: none;
+    border: none;
+    font-size: 125%;
+    cursor: pointer;
+    text-align: start;
+    margin-left: 5%;
+    font-weight: bolder;
 }

@@ -22,4 +22,8 @@ export class EnrolmentCourseService {
   deleteCourse(enrolmentCourse :EnrolmentCourseVM) : Observable<EnrolmentsCourseResponse> {
     return this.httpClient.put<EnrolmentsCourseResponse>(`${this.BaseURL}/deleteenrolmentcourse`,enrolmentCourse);
   }
+
+  deleteCourses(enrolmentCourse :EnrolmentCourseVM[]) : Observable<EnrolmentsCoursesResponse> {
+    return this.httpClient.put<EnrolmentsCoursesResponse>(`${this.BaseURL}/deleteenrolmentcourses`,enrolmentCourse);
+  }
 }

@@ -7,4 +7,5 @@ export interface ClassFeeVM{
     student ?: studentVM;
     date ?: string;
     classFeeCourse ?: ClassFeeCourseVM[];
+    reciptNumber ?: string;
 }

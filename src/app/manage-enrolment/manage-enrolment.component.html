@@ -23,10 +23,15 @@
                         </div>
                     </ng-template>
                     <ng-template pTemplate="header">
-                        <th>SCode</th>
-                        <th>Student Name</th>
-                        <th>Enrolled Date</th>
-                        <th>Action</th>
+                        <tr>
+                            <th>SCode</th>
+                            <th>Student Name</th>
+                            <th>Enrolled Date</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr>
+                            
+                        </tr>
                     </ng-template>
                     <ng-template  pTemplate="body" let-studentCourse>
                         <tr>
@@ -60,10 +65,12 @@
                         </div>
                     </ng-template>
                     <ng-template pTemplate="header">
-                        <th>SCode</th>
-                        <th>Student Name</th>
-                        <th>Enrolled Date</th>
-                        <th>Action</th>
+                        <tr>
+                            <th>SCode</th>
+                            <th>Student Name</th>
+                            <th>Enrolled Date</th>
+                            <th>Action</th>
+                        </tr>
                     </ng-template>
                     <ng-template  pTemplate="body" let-studentCourse>
                         <tr>
@@ -80,6 +87,7 @@
     <p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
     <p-dialog header="Student Enrol Form" [(visible)]="isEnrolDialogVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeCourseCreationPopup()">
         <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex"></p-steps>
+        <!-- student enrolment form -->
         <form [formGroup]="enrolmentForm" class="mt-4" *ngIf="activeStepIndex == 0">
             <div class="grid pt-5">
                 <div class="col-8 p-float-label">
@@ -160,6 +168,21 @@
             </div>
             <div class="col-2"></div>
         </div>
+
+        <!-- payement recipt -->
+        <div *ngIf="activeStepIndex == 2">
+            <div class="grid pt-5" >
+                <app-recipt-template [reciptTemplateDataVM]="reciptTemplateData"></app-recipt-template>
+            </div>
+    
+            <div class="grid pt-5">
+                <div class="col-10"></div>
+                <div class="col-2">
+                    <button pButton class="p-button-info" (click)="closeCourseCreationPopup()">Finish</button>
+                </div>
+            </div>
+        </div>
+
     </p-dialog>
 </div>
 

@@ -15,11 +15,16 @@
         </div>
         <div class="col-6 pl-6 pr-6" *ngIf="isCourseDropdownVisible">
             <form  [formGroup]="selectedDataForm">
-                <p-dropdown  [options]="dropdownCourses" [style]="{'width':'100%'}" formControlName="course" [filter]="true" filterBy="code"  [showClear]="true" placeholder="Select Course" optionLabel="code" optionValue="code"  (onChange)="getClassFees()">
+                <p-multiSelect [options]="dropdownCourses" formControlName="course" [style]="{width: '100%'}" optionLabel="code" appendTo="body" placeholder="Select Courses" (onPanelHide)="getClassFees()">
                     <ng-template let-course pTemplate="item">
                         ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
                     </ng-template>
-                </p-dropdown>
+                </p-multiSelect>
+                <!-- <p-dropdown  [options]="dropdownCourses" [style]="{'width':'100%'}" formControlName="course" [filter]="true" filterBy="code"  [showClear]="true" placeholder="Select Course" optionLabel="code" optionValue="code"  (onChange)="getClassFees()">
+                    <ng-template let-course pTemplate="item">
+                        ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
+                    </ng-template>
+                </p-dropdown> -->
             </form>
         </div>
     </div>
@@ -34,7 +39,7 @@
             </form>
         </div>
     </div> -->
-    <div class="grid mt-4 ml-4 mr-4" *ngIf="getCourse.value">
+    <div class="grid mt-4 ml-4 mr-4" *ngIf="updatedCourses.length>0">
         <div class="col-6"></div>
         <div class="col-2">
             <div class="grid">
@@ -64,11 +69,27 @@
              
         </div>
     </div>
-    <div class="grid mt-4 ml-4 mr-4" *ngIf="getCourse.value">
-        <div class="col-1 border-solid border-color" *ngFor="let month of months" [class]="changeBackgroundColor(month.id)">{{month.name}}</div>
+    <div *ngIf="updatedCourses.length>0">
+        <div class="grid mt-4 ml-4 mr-4" *ngFor="let course of updatedCourses">
+            <div class="col-12">
+                ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
+            </div>
+            <div class="col-1 border-solid border-color selectable" *ngFor="let month of months" [class]="setClass(course , month)" (click)="isMonthSelectableForPayment(course , month) && selectPyingMonths(month , course)">{{month.name}}</div>
+        </div>
+    </div>
+    <div *ngIf="payingCourseWiseMonths.length>0" class="mt-4">
+        <p class="line">&nbsp;</p>
+    </div>
+    <div *ngIf="payingCourseWiseMonths.length>0">
+        <div class="grid mt-4 ml-4 mr-4" *ngFor="let payingCourseWiseMonth of payingCourseWiseMonths">
+            <div class="col-12" *ngIf="payingCourseWiseMonth.months && payingCourseWiseMonth.months?.length">
+                ({{ payingCourseWiseMonth.course?.code }}) - {{payingCourseWiseMonth.course?.teacher?.fullName}}'s {{payingCourseWiseMonth.course?.grade?.name}} {{payingCourseWiseMonth.course?.date}} {{payingCourseWiseMonth.course?.subject?.name}} Class at {{payingCourseWiseMonth.course?.startTime}}
+            </div>
+            <div class="col-1 border-solid border-color" *ngFor="let month of payingCourseWiseMonth.months">{{month.name}} &nbsp; <i class="fa-solid fa-xmark" style="color: #ff0000;" (click)="removeFromPayingList(payingCourseWiseMonth, month)"></i></div>
+        </div>
     </div>
 
-    <div class="grid mt-6" *ngIf="getCourse.value">
+    <div class="grid mt-6" *ngIf="payingCourseWiseMonths.length>0">
         <div class="col-10"></div>
         <div class="col-2">
             <button label="Pay Class Fee" pButton (click)="openMakePaymentPopup()"></button>
@@ -76,50 +97,45 @@
     </div>
 
     <p-dialog [(visible)]="isMakePaymentPopupOpen" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeClassFeePaymentsPopup()">
-        <ng-template pTemplate="header">
-            <div class="custom-header">
-              <h6>({{ selectedCourse.code }} - {{selectedCourse.teacher.fullName}}'s {{selectedCourse.grade.name}} {{selectedCourse.date}} {{selectedCourse.subject.name}} Class at {{selectedCourse.startTime}}) Payment</h6>
+        <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex"></p-steps>
+        <div *ngIf="activeStepIndex == 0">
+            <div class="grid mt-4">
+                <div class="col-4 centerText"><h5>Course Name</h5></div>
+                <div class="col-4 centerText"><h5>Month</h5></div>
+                <div class="col-4 centerText"><h5>Amount</h5></div>
             </div>
-          </ng-template>
-        <form [formGroup]="payingMonthForm">
-            <div class="grid">
-                <div class="col-12">
-                    <p-multiSelect [options]="payableMonths" formControlName="month" [style]="{width: '100%'}" optionLabel="name" appendTo="body" placeholder="Select Cities" (onChange)="getPayebleMonths()">
-                    </p-multiSelect>
-                </div>
-            </div>
-        </form>
 
-        <div class="grid mt-6" *ngIf="arrears.length > 0">
-            <div class="col-12">
-                <div class="grid" *ngFor="let month of arrears">
-                    <div class="col-4"></div>
-                    <div class="col-2">
-                        <h6>{{month.name}}</h6>
+            <div class="grid" *ngFor="let payingCourseWiseMonth of payingCourseWiseMonths">
+                <div class="col-12">
+                    <div class="grid  mt-4" *ngFor="let month of payingCourseWiseMonth.months">
+                        <div class="col-4 centerText">
+                            ({{ payingCourseWiseMonth.course?.code }}) - {{payingCourseWiseMonth.course?.teacher?.fullName}}'s {{payingCourseWiseMonth.course?.grade?.name}} {{payingCourseWiseMonth.course?.date}} {{payingCourseWiseMonth.course?.subject?.name}} Class at {{payingCourseWiseMonth.course?.startTime}}
+                        </div>
+                        <div class="col-4 centerText">{{month.name}}</div>
+                        <div class="col-4 centerText">{{payingCourseWiseMonth.course?.classFeeAmount}}</div>
                     </div>
-                    <div class="col-2">
-                        <h6>{{selectedCourse.classFeeAmount}}</h6>
-                    </div>
-                    <div class="col-4"></div>
-                </div>
-                <div class="grid underline">
-                    <div class="col-4"></div>
-                    <div class="col-2"><h5>Total</h5></div>
-                    <div class="col-2"><h5>{{calculateTotal()}}</h5></div>
-                    <div class="col-4"></div>
-                </div>
-                <div class="grid mt-4">
-                    <div class="col-2"></div>
-                    <div class="col-4" [formGroup]="classFeeForm">
-                        <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
-                        <label for="payed">&nbsp; &nbsp; IS Payment Payed?</label>
-                    </div>
-                    <div class="col-4">
-                        <button pButton class="p-button-primary" (click)="proceddPayment()" [disabled]="!(getHasPaymentDone.value)">Save</button>
-                    </div>
-                    <div class="col-2"></div>
                 </div>
             </div>
+
+            <div class="grid mt-6">
+                <div class="col-8 centerText"><h4>Total</h4></div>
+                <div class="col-4 centerText underline"><h4>{{findTotalAmount()}}</h4></div>
+            </div>
+
+            <div class="grid mt-6">
+                <div class="col-3"></div>
+                <div class="col-3" [formGroup]="classFeeForm">
+                    <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
+                    <label for="payed">&nbsp; &nbsp; IS Payment Payed?</label>
+                </div>
+                <div class="col-3">
+                    <button pButton class="p-button-primary" (click)="proceddPayment()" [disabled]="!(getHasPaymentDone.value)">Save and Next</button>
+                </div>
+                <div class="col-3"></div>
+            </div>
+        </div>
+        <div *ngIf="activeStepIndex == 1" class="mt-6">
+            <app-recipt-template [reciptTemplateDataVM]="reciptTemplateData"></app-recipt-template>
         </div>
     </p-dialog>
 </div>

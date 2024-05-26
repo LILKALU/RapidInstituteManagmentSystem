@@ -9,6 +9,10 @@
     background-color: #16a34a;
 }
 
+.selectable{
+    cursor: pointer;
+}
+
 .red_background{
     background-color: #ef4444;
 }
@@ -20,6 +24,11 @@
 
 .empty_background{
     background-color: transparent;
+}
+
+.line{
+    background-color: #1e293b;
+    font-size: 2px;
 }
 
 .div_size{

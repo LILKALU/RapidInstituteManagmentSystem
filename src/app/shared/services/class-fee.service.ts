@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { ClassFeeVM } from '../models/classFeeVM';
 import { classFeeResponse } from '../models/classFeeResponse';
 import { classFeesResponse } from '../models/classfeesResponse';
+import { studentWiseCoursesVM } from '../models/studentWiseCourseVM';
 
 @Injectable({
   providedIn: 'root'
@@ -20,5 +21,13 @@ export class ClassFeeService {
 
   getStudentClassFees(): Observable<classFeesResponse>{
     return this.httpClient.get<classFeesResponse>(`${this.BaseURL}/getclassfee`)
+  }
+
+  findFirstByStudentAndCourse(studentWiseCourses : studentWiseCoursesVM): Observable<classFeeResponse>{
+    return this.httpClient.post<classFeeResponse>(`${this.BaseURL}/findfirstbystudentandcourse`,studentWiseCourses);
+  }
+
+  findLastByStudentAndCourse(studentWiseCourses : studentWiseCoursesVM): Observable<classFeeResponse>{
+    return this.httpClient.post<classFeeResponse>(`${this.BaseURL}/findlastbystudentandcourse`,studentWiseCourses);
   }
 }
