@@ -1,0 +1,105 @@
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isLoading">
+    <div class="grid pt-4 pl-3">
+        <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search An Action</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="createAction">Create An Action</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div>
+        <div class="col-4">
+            <button label="Create A Action" pButton *ngIf="action === 2" (click)="openAppIconForm(true)"></button>
+            <div class="grid pt-4" *ngIf="action == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" appCapitalizeEachWord id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Action</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" pButton (click)="searchAction()" [disabled]="!searchForm.valid"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid mt-6">
+        <div class="col-12">
+            <p-table  [value]="tableAction" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header">
+                    <th>Name</th>
+                    <th>Action</th>
+                </ng-template>
+                <ng-template pTemplate="body" let-action>
+                    <tr>
+                        <td class="centerText">{{action.name}}</td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(action)"></i>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteAction(action)"></i></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+            <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+        </div>
+    </div>
+
+    <p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
+    <p-dialog header="App Icon creation Form" [(visible)]="isActionFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeAppIconCreatePopup()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+        <form [formGroup]="actionCreationForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" appCapitalizeEachWord id="name" formControlName="name">
+                    <label For="name"><span class="Requied ">* </span>Action Name</label>
+                </div>
+            </div>
+            <div class="grid mt-4">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!actionCreationForm.valid" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-dialog header="App Icon creation Form" [(visible)]="isActionUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeAppIconUpdatePopup()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+        <form [formGroup]="actionUpdateForm">
+            <div class="grid">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" appCapitalizeEachWord id="name" formControlName="name">
+                    <label For="name"><span class="Requied ">* </span>Action Name</label>
+                </div>
+            </div>
+            <div class="grid mt-4">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!actionUpdateForm.valid" (click)="updateClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+</div>

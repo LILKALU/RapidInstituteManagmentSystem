@@ -13,7 +13,7 @@ a{
 
 .sideBar{
     background-image: linear-gradient(to bottom, rgb(0, 225, 255) , rgb(255, 0, 255)) !important;
-    height: 640px;
+    height: auto;
 }
 
 .sideBarText{

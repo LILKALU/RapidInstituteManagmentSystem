@@ -37,6 +37,10 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ManageAttendanceComponent } from './manage-attendance/manage-attendance.component';
 import { ToastModule } from 'primeng/toast';
 import { ReciptTemplateComponent } from './recipt-template/recipt-template.component';
+import { ManageRoleComponent } from './manage-role/manage-role.component';
+import { CapitalizeEachWordDirective } from './directives/capitalize-each-word.directive';
+import { AppIconsComponent } from './app-icons/app-icons.component';
+import { ManageActionComponent } from './manage-action/manage-action.component';
 
 
 @NgModule({
@@ -54,6 +58,10 @@ import { ReciptTemplateComponent } from './recipt-template/recipt-template.compo
     ManageClassFeeComponent,
     ManageAttendanceComponent,
     ReciptTemplateComponent,
+    ManageRoleComponent,
+    CapitalizeEachWordDirective,
+    AppIconsComponent,
+    ManageActionComponent,
   ],
   imports: [
     BrowserModule,

@@ -41,6 +41,15 @@
         <button  (click)="changeModule(10)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 10, 'sideBarText ml-4': selectedModuleEnum != 10 }">
             <i class="fa-solid fa-user-check"></i> &nbsp; Manage Student Attendance
         </button><br><br>
+        <button  (click)="changeModule(11)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 11, 'sideBarText ml-4': selectedModuleEnum != 11 }">
+            <i class="fa-solid fa-users-gear"></i> &nbsp; Manage User Roles
+        </button><br><br>
+        <button  (click)="changeModule(12)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 12, 'sideBarText ml-4': selectedModuleEnum != 12 }">
+            <i class="fa-solid fa-atom"></i> &nbsp; Manage App Icons
+        </button><br><br>
+        <button  (click)="changeModule(13)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 13, 'sideBarText ml-4': selectedModuleEnum != 13 }">
+            <i class="fa-solid fa-screwdriver-wrench"></i> &nbsp; Manage Actions
+        </button><br><br>
     </div>
     <div class="col-10 content_area">
         <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
@@ -53,5 +62,8 @@
         <app-manage-grade *ngIf="selectedModuleEnum === 8"></app-manage-grade>
         <app-manage-class-fee *ngIf="selectedModuleEnum === 9"></app-manage-class-fee>
         <app-manage-attendance *ngIf="selectedModuleEnum === 10"></app-manage-attendance>
+        <app-manage-role *ngIf="selectedModuleEnum === 11"></app-manage-role>
+        <app-app-icons *ngIf="selectedModuleEnum === 12"></app-app-icons>
+        <app-manage-action *ngIf="selectedModuleEnum === 13"></app-manage-action>
     </div>
 </div>
