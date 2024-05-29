@@ -1,69 +1,44 @@
-<div class="grid">
-    <div class="col-12 background-navbar">
-        <div class="grid">
-            <div class="col-11"></div>
-            <div class="col-1">
-                <a href="#" class="navbarText">Login</a>
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+<div *ngIf="!isLoading">
+    <div class="grid">
+        <div class="col-12 background-navbar">
+            <div class="grid">
+                <div class="col-11"></div>
+                <div class="col-1">
+                    <a href="#" class="navbarText">Login</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<div class="grid">
-    <div class="col-2 sideBar mt-3">
-        <br>
-        <button (click)="changeModule(1)" [ngClass]="{ 'selected_fontColor ml-4': selectedModuleEnum == 1, 'sideBarText ml-4': selectedModuleEnum != 1 }">
-            <i class="fa-solid fa-house"></i> &nbsp; Dashboard
-        </button><br><br>
-        <button (click)="changeModule(2)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 2, 'sideBarText ml-4': selectedModuleEnum != 2 }">
-            <i class="fa-solid fa-user-graduate"></i> &nbsp; Manage Student
-        </button><br><br>
-        <button  (click)="changeModule(3)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 3, 'sideBarText ml-4': selectedModuleEnum != 3 }">
-            <i class="fa-solid fa-users-rectangle"></i> &nbsp; Manage Course
-        </button><br><br>
-        <button  (click)="changeModule(4)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 4, 'sideBarText ml-4': selectedModuleEnum != 4 }">
-            <i class="fa-solid fa-building-columns"></i> &nbsp; Manage Hall
-        </button><br><br>
-        <button  (click)="changeModule(5)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 5, 'sideBarText ml-4': selectedModuleEnum != 5 }">
-            <i class="fa-solid fa-book-open"></i> &nbsp; Manage Subjects
-        </button><br><br>
-        <button  (click)="changeModule(6)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 6, 'sideBarText ml-4': selectedModuleEnum != 6 }">
-            <i class="fa-solid fa-person-chalkboard"></i> &nbsp; Manage Teachers
-        </button><br><br>
-        <button  (click)="changeModule(7)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 7, 'sideBarText ml-4': selectedModuleEnum != 7 }">
-            <i class="fa-solid fa-right-to-bracket"></i> &nbsp; Manage Enrolment
-        </button><br><br>
-        <button  (click)="changeModule(8)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 8, 'sideBarText ml-4': selectedModuleEnum != 8 }">
-            <i class="fa-solid fa-award"></i> &nbsp; Manage Grades
-        </button><br><br>
-        <button  (click)="changeModule(9)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 9, 'sideBarText ml-4': selectedModuleEnum != 9 }">
-            <i class="fa-solid fa-hand-holding-dollar"></i> &nbsp; Manage Class Fees
-        </button><br><br>
-        <button  (click)="changeModule(10)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 10, 'sideBarText ml-4': selectedModuleEnum != 10 }">
-            <i class="fa-solid fa-user-check"></i> &nbsp; Manage Student Attendance
-        </button><br><br>
-        <button  (click)="changeModule(11)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 11, 'sideBarText ml-4': selectedModuleEnum != 11 }">
-            <i class="fa-solid fa-users-gear"></i> &nbsp; Manage User Roles
-        </button><br><br>
-        <button  (click)="changeModule(12)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 12, 'sideBarText ml-4': selectedModuleEnum != 12 }">
-            <i class="fa-solid fa-atom"></i> &nbsp; Manage App Icons
-        </button><br><br>
-        <button  (click)="changeModule(13)" [ngClass]="{ 'selected_fontColor sideBarText ml-4': selectedModuleEnum == 13, 'sideBarText ml-4': selectedModuleEnum != 13 }">
-            <i class="fa-solid fa-screwdriver-wrench"></i> &nbsp; Manage Actions
-        </button><br><br>
-    </div>
-    <div class="col-10 content_area">
-        <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
-        <app-manage-student *ngIf="selectedModuleEnum === 2"></app-manage-student>
-        <app-manage-course *ngIf="selectedModuleEnum === 3"></app-manage-course>
-        <app-manage-hall *ngIf="selectedModuleEnum === 4"></app-manage-hall>
-        <app-manage-subject *ngIf="selectedModuleEnum === 5"></app-manage-subject>
-        <app-manage-teachers *ngIf="selectedModuleEnum === 6"></app-manage-teachers>
-        <app-manage-enrolment *ngIf="selectedModuleEnum === 7"></app-manage-enrolment>
-        <app-manage-grade *ngIf="selectedModuleEnum === 8"></app-manage-grade>
-        <app-manage-class-fee *ngIf="selectedModuleEnum === 9"></app-manage-class-fee>
-        <app-manage-attendance *ngIf="selectedModuleEnum === 10"></app-manage-attendance>
-        <app-manage-role *ngIf="selectedModuleEnum === 11"></app-manage-role>
-        <app-app-icons *ngIf="selectedModuleEnum === 12"></app-app-icons>
-        <app-manage-action *ngIf="selectedModuleEnum === 13"></app-manage-action>
+    <div class="grid">
+        <div class="col-2 sideBar mt-3">
+            <br>
+            <div *ngFor="let appIcon of appIcons">
+                <button 
+                    (click)="changeModule(appIcon.id)"
+                    [ngClass]="{ 'selected_fontColor ml-4': selectedModuleEnum == appIcon.id, 'sideBarText ml-4': selectedModuleEnum != appIcon.id }"
+                >
+                <i [className]="appIcon.icon"></i> &nbsp; {{appIcon.name}}
+                </button><br><br>
+            </div>
+        </div>
+        <div class="col-10 content_area">
+            <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
+            <app-manage-student *ngIf="selectedModuleEnum === 2"></app-manage-student>
+            <app-manage-course *ngIf="selectedModuleEnum === 3"></app-manage-course>
+            <app-manage-hall *ngIf="selectedModuleEnum === 4"></app-manage-hall>
+            <app-manage-subject *ngIf="selectedModuleEnum === 5"></app-manage-subject>
+            <app-manage-teachers *ngIf="selectedModuleEnum === 6"></app-manage-teachers>
+            <app-manage-enrolment *ngIf="selectedModuleEnum === 7"></app-manage-enrolment>
+            <app-manage-grade *ngIf="selectedModuleEnum === 8"></app-manage-grade>
+            <app-manage-class-fee *ngIf="selectedModuleEnum === 9"></app-manage-class-fee>
+            <app-manage-attendance *ngIf="selectedModuleEnum === 10"></app-manage-attendance>
+            <app-manage-role *ngIf="selectedModuleEnum === 11"></app-manage-role>
+            <app-app-icons *ngIf="selectedModuleEnum === 12"></app-app-icons>
+            <app-manage-action *ngIf="selectedModuleEnum === 13"></app-manage-action>
+            <app-manage-privilage *ngIf="selectedModuleEnum === 14"></app-manage-privilage>
+        </div>
     </div>
 </div>

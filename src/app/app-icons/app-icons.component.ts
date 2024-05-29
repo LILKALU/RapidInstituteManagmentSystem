@@ -18,7 +18,7 @@ export class AppIconsComponent implements OnInit, OnDestroy {
   appIconCreationForm !:FormGroup;
   appIconUpdateForm !:FormGroup;
   private subs = new SubSink();
-  action : number =1;
+  action : number =2;
   isCreateAppIconsFormButtonVisible: boolean = false
   isAppIconFormVisible : boolean = false;
   isAppIconUpdateFormVisible : boolean = false;
@@ -107,7 +107,7 @@ export class AppIconsComponent implements OnInit, OnDestroy {
 
   buildForm(){
     this.selectAction = this.formBuilder.group({
-      action : [1 , Validators.required]
+      action : [2 , Validators.required]
     });
 
     this.searchForm = this.formBuilder.group({

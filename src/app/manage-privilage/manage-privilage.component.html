@@ -1,0 +1,204 @@
+<div *ngIf="isLoading">
+</div>
+
+<div *ngIf="!isLoading">
+    <div class="grid pt-4 pl-3">
+        <!-- <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search A Privilage</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div> -->
+        <!-- <div class="col-4">
+            <div [formGroup]="selectAction">
+                <label for="createAction">Create A Privilage</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div> -->
+        <div class="col-4"></div>
+        <div class="col-4"></div>
+        <div class="col-4">
+            <button label="Create A Privilage" pButton *ngIf="action === 2" (click)="openPrivilageForm(true)"></button>
+            <!-- <div class="grid pt-4" *ngIf="action == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" appCapitalizeEachWord id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Privilage</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" pButton (click)="searchRole()" [disabled]="!searchForm.valid"></button>
+                </div>
+            </div> -->
+        </div>
+    </div>
+
+    <div class="grid mt-4">
+        <div class="col-12">
+            <form [formGroup]="filterDataForm">
+                <p-table  [value]="tableprivilages" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th class="centerText">Role</th>
+                            <th class="centerText">App Icon</th>
+                            <th class="centerText">Privilage</th>
+                            <th class="centerText">Action</th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <div class="grid mt-1">
+                                    <div class="col-12 centerText">
+                                        <p-dropdown appendTo="body" formControlName="role" [options]="roles" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Role" optionLabel="name" (onChange)="filterAttendanceData()">
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                            </th>
+
+                            <th>
+                                <div class="grid mt-1">
+                                    <div class="col-12 centerText">
+                                        <p-dropdown appendTo="body" formControlName="appIcon" [options]="appIcons" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select App Icon" optionLabel="name" (onChange)="filterAttendanceData()">
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                            </th>
+                            
+                            <th>
+                                <div class="grid mt-1">
+                                    <div class="col-12 centerText">
+                                        <p-dropdown appendTo="body" formControlName="action" [options]="actions" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select App Icon" optionLabel="name" (onChange)="filterAttendanceData()">
+                                        </p-dropdown>
+                                    </div>
+                                </div>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-privilage>
+                        <tr>
+                            <td class="centerText">{{privilage.role.name}}</td>
+                            <td class="centerText">{{privilage.appIcon.name}}</td>
+                            <td class="centerText">{{privilage.action.name}}</td>
+                            <td class="centerText"> <i class="fa-solid fa-trash delete-color" (click)="deletePrivilage(privilage)"></i></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </form>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+            <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+        </div>
+    </div>
+
+    <p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
+    <p-dialog header="Privilage creation Form" [(visible)]="isPrivilageFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closePrivilagesCreatePopup()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+
+        <form [formGroup]="privilageCreationForm">
+            <div class="grid">
+                <div class="col-3">
+                    <p-dropdown [options]="roles" optionLabel="name" appendTo="body" placeholder="Role" [style]="{'width':'100%'}" class="inputsStyle" formControlName="role" (onBlur)="setCreateAppIcon()"></p-dropdown>
+                </div>
+                <div class="col-3">
+                    <p-dropdown *ngIf="isAppIconsVisible && getPrivilageCreationRole.value" [options]="appIcons" optionLabel="name" appendTo="body" placeholder="App Icon" [style]="{'width':'100%'}" class="inputsStyle" formControlName="appIcon" (onBlur)="setCreateActions()"></p-dropdown>
+                </div>
+                <div class="col-3">
+                    <p-multiSelect *ngIf="isActionsVisible && getPrivilageCreationAppIcon.value" [options]="actions" formControlName="action" [style]="{width: '100%'}" optionLabel="name" appendTo="body" placeholder="Select Actions"></p-multiSelect>
+                </div>
+                <div class="col-3">
+                    <button pButton class="p-button-primary" *ngIf="privilageCreationForm.valid" (click)="addCreatePrivilage()" [disabled]="!privilageCreationForm.valid">Add Class</button>
+                </div>
+            </div>
+            <div class="grid" *ngIf="privilages.length > 0">
+                <div class="col-12">
+                    <p-table  [value]="privilages" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                        <ng-template pTemplate="header">
+                            <th>Role</th>
+                            <th>App Icon</th>
+                            <th>Privilages</th>
+                            <th>Action</th>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-privilageData>
+                            <tr>
+                                <td class="centerText">{{privilageData.role.name}}</td>
+                                <td class="centerText">{{privilageData.appIcon.name}}</td>
+                                <td class="centerText">{{privilageData.action.name}}</td>
+                                <td class="centerText"><i class="fa-solid fa-trash delete-color" (click)="remove(privilageData)"></i></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div class="grid mt-4" *ngIf="privilages.length > 0">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!(privilages.length > 0)" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-dialog header="Privilage creation Form" [(visible)]="isPrivilageUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closePrivilagesUpdatePopup()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+
+        <form [formGroup]="privilageUpdateForm">
+            <div class="grid">
+                <div class="col-3">
+                    <p-dropdown [options]="roles" optionLabel="name" appendTo="body" placeholder="Role" [style]="{'width':'100%'}" class="inputsStyle" formControlName="role" (onBlur)="setCreateAppIcon()"></p-dropdown>
+                </div>
+                <div class="col-3">
+                    <p-dropdown *ngIf="isAppIconsVisible && getPrivilageUpdateRole.value" [options]="appIcons" optionLabel="name" appendTo="body" placeholder="App Icon" [style]="{'width':'100%'}" class="inputsStyle" formControlName="appIcon" (onBlur)="setCreateActions()"></p-dropdown>
+                </div>
+                <div class="col-3">
+                    <p-multiSelect *ngIf="isActionsVisible && getPrivilageUpdateAppIcon.value" [options]="actions" formControlName="action" [style]="{width: '100%'}" optionLabel="name" appendTo="body" placeholder="Select Actions"></p-multiSelect>
+                </div>
+                <div class="col-3">
+                    <button pButton class="p-button-primary" *ngIf="privilageUpdateForm.valid" (click)="addUpdatePrivilage()" [disabled]="!privilageUpdateForm.valid">Add Class</button>
+                </div>
+            </div>
+            <div class="grid" *ngIf="privilages.length > 0">
+                <div class="col-12">
+                    <p-table  [value]="privilages" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                        <ng-template pTemplate="header">
+                            <th>Role</th>
+                            <th>App Icon</th>
+                            <th>Privilages</th>
+                            <th>Action</th>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-privilageData>
+                            <tr>
+                                <td class="centerText">{{privilageData.role.name}}</td>
+                                <td class="centerText">{{privilageData.appIcon.name}}</td>
+                                <td class="centerText">{{privilageData.action.name}}</td>
+                                <td class="centerText"><i class="fa-solid fa-trash delete-color" (click)="remove(privilageData)"></i></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+            <div class="grid mt-4" *ngIf="privilages.length > 0">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!(privilages.length > 0)" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    
+</div>

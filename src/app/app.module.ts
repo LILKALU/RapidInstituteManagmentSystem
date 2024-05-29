@@ -41,6 +41,7 @@ import { ManageRoleComponent } from './manage-role/manage-role.component';
 import { CapitalizeEachWordDirective } from './directives/capitalize-each-word.directive';
 import { AppIconsComponent } from './app-icons/app-icons.component';
 import { ManageActionComponent } from './manage-action/manage-action.component';
+import { ManagePrivilageComponent } from './manage-privilage/manage-privilage.component';
 
 
 @NgModule({
@@ -62,6 +63,7 @@ import { ManageActionComponent } from './manage-action/manage-action.component';
     CapitalizeEachWordDirective,
     AppIconsComponent,
     ManageActionComponent,
+    ManagePrivilageComponent,
   ],
   imports: [
     BrowserModule,

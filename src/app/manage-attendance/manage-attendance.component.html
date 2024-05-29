@@ -100,7 +100,7 @@
                                 <th>
                                     <div class="grid mt-1">
                                         <div class="col-12 centerText">
-                                            <p-dropdown appendTo="body" formControlName="name" [options]="selectedCourseStudents" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Course" optionLabel="fullName" (onChange)="filterAttendanceData()">
+                                            <p-dropdown appendTo="body" formControlName="name" [options]="selectedCourseStudents" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Student" optionLabel="fullName" (onChange)="filterAttendanceData()">
                                             </p-dropdown>
                                         </div>
                                     </div>
@@ -109,7 +109,7 @@
                                 <th>
                                     <div class="grid mt-1">
                                         <div class="col-12 centerText">
-                                            <p-dropdown appendTo="body" formControlName="scode" [options]="selectedCourseStudents" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Course" optionLabel="scode" (onChange)="filterAttendanceData()">
+                                            <p-dropdown appendTo="body" formControlName="scode" [options]="selectedCourseStudents" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Scode" optionLabel="scode" (onChange)="filterAttendanceData()">
                                             </p-dropdown>
                                         </div>
                                     </div>
@@ -118,7 +118,7 @@
                                 <th>
                                     <div class="grid mt-1">
                                         <div class="col-12 centerText">
-                                            <p-dropdown appendTo="body" id="yearFilter" formControlName="date" [options]="dateFilterData" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Course" optionLabel="year" (onChange)="filterAttendanceData()">
+                                            <p-dropdown appendTo="body" id="yearFilter" formControlName="date" [options]="dateFilterData" [style]="{'width':'50%'}"  [showClear]="true" placeholder="Select Date" optionLabel="year" (onChange)="filterAttendanceData()">
                                                 <ng-template let-dateData pTemplate="item">
                                                     {{ dateData.year }} - {{dateData.month.id}} - {{dateData.date}}
                                                 </ng-template>
