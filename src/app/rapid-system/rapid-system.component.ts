@@ -1,7 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { SubSink } from 'subsink';
 import { appIconVM } from '../shared/models/appIconVM';
 import { AppIconService } from '../shared/services/app-icon.service';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
 
 @Component({
   selector: 'app-rapid-system',
@@ -9,13 +12,19 @@ import { AppIconService } from '../shared/services/app-icon.service';
   styleUrls: ['./rapid-system.component.css']
 })
 export class RapidSystemComponent implements OnInit, OnDestroy {
-  selectedModuleEnum : number = 14;
+  selectedModuleEnum : number = 1;
   private subs = new SubSink();
   appIcons : appIconVM[]=[]
   isLoading : boolean = false;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
+  name : string | undefined;
+
+  @Output() isLogout = new EventEmitter<boolean>();
 
   constructor(
-    private appIconService : AppIconService,
+    private appIconService : AppIconService, 
+    private localStorageService : LocalStorageService
   ){}
 
   changeModule(moduleEnum : number=0){
@@ -28,6 +37,16 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // this.buildForm();
+    this.getLoginData()
+    this.isLogout.emit(false);
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+    this.name = this.logedDetails?.fullName.split(" ")[0];
     this.getAppIcons()
   }
 
@@ -40,5 +59,18 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     })
+  }
+
+  isAllowed(appIconId : number = 0):boolean{
+    if(this.privilages.filter(el => el && el.appIcon && el.appIcon.id == appIconId).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  logout(){
+    this.localStorageService.removeItem('login')
+    this.isLogout.emit(true);
   }
 }

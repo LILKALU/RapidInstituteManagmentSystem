@@ -1,3 +1,5 @@
+import { roleVM } from "./roleVM";
+
 export interface teacherVM{
     id ?: number;
     tcode ?: string;
@@ -8,4 +10,5 @@ export interface teacherVM{
     isActive ?: boolean;
 	contactNumber ?: string;
 	email ?: string;
+    role ?: roleVM
 }

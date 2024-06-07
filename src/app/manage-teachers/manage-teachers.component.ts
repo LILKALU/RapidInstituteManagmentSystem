@@ -6,6 +6,8 @@ import { TeacherService } from '../shared/services/teacher.service';
 import { AdAccountServiceService } from '../shared/services/ad-account-service.service';
 import { ADAccountVM } from '../shared/models/adAccountVM';
 import { ConfirmationService } from 'primeng/api';
+import { RoleService } from '../shared/services/role.service';
+import { roleVM } from '../shared/models/roleVM';
 
 @Component({
   selector: 'app-manage-teachers',
@@ -26,6 +28,7 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
   isTeacherFormVisible : boolean = false;
   isTeacherUpdateFormVisible : boolean = false;
   selectedTeacher : teacherVM = {}
+  role : roleVM|undefined
   teacherCreationForm !:FormGroup;
   teacherUpdateForm !:FormGroup;
 
@@ -55,7 +58,8 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private teachersService : TeacherService,
     private adAccountService : AdAccountServiceService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private roleService : RoleService
   ){}
 
   ngOnInit(): void {
@@ -104,7 +108,16 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
         this.teachersAllData = data.content;
         this.teachersTabelData = this.teachersAllData;
         this.teachersTabelData.reverse();
+        this.getRole();
         this.isloading = false;
+      }
+    })
+  }
+
+  getRole(){
+    this.subs.sink = this.roleService.getRoles().subscribe(data =>{
+      if(data && data.content){
+        this.role = data.content.find(el => el.id && el.id == 4);
       }
     })
   }
@@ -134,7 +147,8 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
       id : this.selectedTeacher.id,
       isActive : this.selectedTeacher.isActive,
       tcode : this.selectedTeacher.tcode,
-      title : this.getUpdateTeacherTitle.value
+      title : this.getUpdateTeacherTitle.value,
+      role : this.selectedTeacher.role
     }
 
     this.subs.sink = this.teachersService.updateTeacher(teacher).subscribe(data =>{
@@ -167,7 +181,8 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
       fullName : this.getRegisterTeacherFullName.value,
       highestQulification : this.getRegisterTeacherHighestQuli.value,
       title : this.getRegisterTeacherTitle.value,
-      isActive : true
+      isActive : true,
+      role : this.role
     }
 
     this.subs.sink = this.teachersService.addTeacher(teacher).subscribe(data => {

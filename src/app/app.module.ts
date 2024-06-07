@@ -42,6 +42,10 @@ import { CapitalizeEachWordDirective } from './directives/capitalize-each-word.d
 import { AppIconsComponent } from './app-icons/app-icons.component';
 import { ManageActionComponent } from './manage-action/manage-action.component';
 import { ManagePrivilageComponent } from './manage-privilage/manage-privilage.component';
+import { ManageOtherEmployeeComponent } from './manage-other-employee/manage-other-employee.component';
+import { LoginPageComponent } from './login-page/login-page.component';
+import { PasswordModule } from 'primeng/password';
+// import { LoginPageComponent } from './login-page/login-page.component';
 
 
 @NgModule({
@@ -64,6 +68,9 @@ import { ManagePrivilageComponent } from './manage-privilage/manage-privilage.co
     AppIconsComponent,
     ManageActionComponent,
     ManagePrivilageComponent,
+    ManageOtherEmployeeComponent,
+    LoginPageComponent,
+    // LoginPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -89,6 +96,7 @@ import { ManagePrivilageComponent } from './manage-privilage/manage-privilage.co
     OverlayPanelModule,
     MessagesModule,
     MultiSelectModule,
+    PasswordModule
   ],
   providers: [ConfirmationService,MessageService],
   bootstrap: [AppComponent]

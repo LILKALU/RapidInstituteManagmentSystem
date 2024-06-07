@@ -1,0 +1,95 @@
+
+<div *ngIf="isloading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isloading">
+    <div class="grid pt-4 pl-3">
+        <div class="col-2">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search An Employee</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-2">
+            <div [formGroup]="selectAction">
+                <label for="createAction">Add An Employee</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div>
+        <div class="col-4 left-margin-color">
+            <button label="Add an Employee" pButton *ngIf="action === 2" (click)="openEmployeeForm(true)"></button>
+            <div class="grid pt-4" *ngIf="action == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search An Employee</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" [disabled]="!searchForm.valid" pButton (click)="searchEmployee()"></button>
+                </div>
+            </div>
+        </div>
+        <div class="col-3"></div>
+        <div class="col-1">
+            <i class="fa-solid fa-bell fa-2xl" style="color: #FFD43B;" (click)="op.toggle($event)"></i>
+            <span class="noticount p-1">5</span>
+            <p-overlayPanel #op>
+                <p>Mr. Sarasa Ask a leave On this Saturday</p>
+                <div class="grid">
+                    <div class="col-3"><p class="acceptreq">Accept</p></div>
+                    <div class="col-3"><p class="acceptreq">Reject</p></div>
+                </div>
+            </p-overlayPanel>
+        </div>
+    </div><br><br><br>
+
+    <p-dialog header="Teacher Registration Form" [(visible)]="isEmployeeFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeDialog()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+
+        <form [formGroup]="employeeCreationForm">
+
+            <div class="grid">
+                <div class="col-4 p-float-label">
+                    <p-dropdown  [showClear]="true" appendTo="body"inputId="role" [options]="roles" optionLabel="name" optionValue="id"  placeholder="Role" [style]="{'width':'100%'}" formControlName="role"></p-dropdown>
+                    <label for="role"><span class="Requied ">* </span>Roles</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="fullName" formControlName="fullName">
+                    <label For="fullName"><span class="Requied ">* </span>Full Name</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                    <label For="title"><span class="Requied ">* </span>Title</label>
+                </div>
+                
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                    <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+                </div>
+
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                    <label For="email"><span class="Requied ">* </span>Email</label>
+                </div>
+            </div>
+
+            <div class="grid mt-4">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!employeeCreationForm.valid" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+</div>

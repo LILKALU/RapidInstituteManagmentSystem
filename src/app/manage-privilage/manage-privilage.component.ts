@@ -275,6 +275,7 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
             index = this.allprivilages.indexOf(selectedPrivilage);
             delPrivilage = data.content
             this.allprivilages.splice(index,1);
+            this.filterAttendanceData();
             this.isLoading = false;
           }
         })
@@ -295,6 +296,7 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
 
   closePrivilagesCreatePopup(){
     this.privilageCreationForm.reset();
+    this.isPrivilageFormVisible = false;
     this.privilages = [];
   }
 
@@ -313,6 +315,7 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
           });
           this.tableprivilages = this.allprivilages;
           console.log(data.content);
+          this.closePrivilagesCreatePopup();
           this.isLoading =false;
         }
       })

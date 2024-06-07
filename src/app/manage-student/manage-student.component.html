@@ -1,12 +1,12 @@
 <div *ngIf="isloaded">
     <div class="grid pt-4 pl-3">
-        <div class="col-4">
+        <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectStudentStatus">
                 <label for="ExsistingStudentStatus">Existing Student</label><br><br>
                 <p-radioButton value=1 inputId="ExsistingStudentStatus" formControlName="studentStatus" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
-        <div class="col-4">
+        <div class="col-4" *ngIf="isActionAllowed(1)">
             <div [formGroup]="selectStudentStatus">
                 <label for="NewstudentStatus">New Student</label><br><br>
                 <p-radioButton value=2 inputId="NewstudentStatus" formControlName="studentStatus" (click)="loadTheContent()"></p-radioButton>
@@ -310,10 +310,10 @@
                 <button pButton class="p-button-info" (click)="closeQuickStudentCreationPopup()">Close</button>
             </div>
         </div>
-        
+    
     </p-dialog>
     <br><br><br>
-    <div class="grid">
+    <div class="grid" *ngIf="isActionAllowed(7)">
         <div class="col-12">
             <p-table  [value]="studentTableData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
                 <ng-template pTemplate="header" >
@@ -322,7 +322,7 @@
                     <th>Contact Number</th>
                     <th>Address</th>
                     <th>Aditional Info</th>
-                    <th>Action Button</th>
+                    <th *ngIf="isActionAllowed(2) || isActionAllowed(4)">Action Button</th>
                 </ng-template>
 
                 <ng-template pTemplate="body" let-studentdata>
@@ -334,7 +334,7 @@
                         <td class="centerText">
                             <i class="fa-solid fa-arrow-up-right-from-square pl-6" (click)="openAditionalInfo(studentdata)"></i>
                         </td>
-                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="goToUpdateForm(studentdata)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="removeStudent(studentdata)"></i></td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="goToUpdateForm(studentdata)" *ngIf="isActionAllowed(2)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="removeStudent(studentdata)" *ngIf="isActionAllowed(4)"></i></td>
                     </tr>
                 </ng-template>
             </p-table><br>

@@ -41,3 +41,14 @@ a{
     margin-left: 5%;
     font-weight: bolder;
 }
+
+.option{
+    background-color: transparent;
+    text-decoration: none;
+    border: none;
+    font-size: 100%;
+    cursor: pointer;
+    text-align: start;
+    margin-left: 5%;
+    font-weight: bolder;
+}

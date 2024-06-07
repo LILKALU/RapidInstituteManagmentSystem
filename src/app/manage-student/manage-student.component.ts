@@ -27,6 +27,11 @@ import { ConfirmationService } from 'primeng/api';
 import { reciptTemplateDataVM } from '../shared/models/reciptTemplateDataVM';
 import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
 import { EnrolmentCourseService } from '../shared/services/enrolment-course.service';
+import { roleVM } from '../shared/models/roleVM';
+import { RoleService } from '../shared/services/role.service';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
 
 
 @Component({
@@ -78,9 +83,12 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   parentSearchForm !:FormGroup;
   isUpdating : boolean = false;
   isDeleting : boolean = false;
+  role : roleVM|undefined
   allEnrolmentCourses : EnrolmentCourseVM[]=[];
   reciptTemplateData : reciptTemplateDataVM | undefined;
   proceedClassFeePayment : ClassFeeVM | undefined;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
   relationships : any[] = [{name:'Mother'},{name:'Father'},{name:'Sister'},{name:'Brother'},{name:'Grand Mother'},{name:'Grand Father'},{name:'Aunty'},{name:'Uncle'},{name:'Gardian'}]; 
   dates : any[] = [{date:"Monday"},{date:"Tuesday"},{date:"Wednesday"},{date:"Thursday"},{date:"Friday"},{date:"Saturday"},{date:"Sunday"}]
 
@@ -177,7 +185,9 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     private adAccountServiceService : AdAccountServiceService,
     private gradeServise : GradeService,
     private monthService : MonthService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private roleService : RoleService,
+    private localStorageService : LocalStorageService
   ) {
   }
   
@@ -186,8 +196,16 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForm();
     this.subscriptions();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
   buildForm(){
@@ -275,6 +293,14 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     }
   }
 
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == 2 && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
   subscriptions(){
     this.isloaded = false;
     this.subs.sink = this.courseServices.getCourses().subscribe(data =>{
@@ -292,18 +318,29 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
   getAllStudent(){
     this.isloaded = false;
-    this.subs.sink = this.studentServices.getStudent().subscribe(data =>{
-      if(data){
-        console.log("student data", data);
+    if(this.logedDetails && this.logedDetails.usercode && this.logedDetails.id && this.logedDetails.usercode.charAt(0) == 'T'){
+      this.subs.sink = this.studentServices.getStudentByTeacherId(this.logedDetails.id).subscribe(data =>{
         this.isloaded = true;
         this.studentAllData = data.content;
+        this.studentAllData = this.studentAllData.filter(el => el.isActive == true)
         this.studentTableData = data.content;
-        console.log("student table data", this.studentAllData);
-        console.log("student all data", this.studentTableData);
         this.studentTableData.reverse();
         this.getGrade();
-      }
-    });
+      })
+    }else{
+      this.subs.sink = this.studentServices.getStudent().subscribe(data =>{
+        if(data){
+          console.log("student data", data);
+          this.isloaded = true;
+          this.studentAllData = data.content;
+          this.studentTableData = data.content;
+          console.log("student table data", this.studentAllData);
+          console.log("student all data", this.studentTableData);
+          this.studentTableData.reverse();
+          this.getGrade();
+        }
+      });
+    }
   }
 
   getGrade(){
@@ -335,6 +372,15 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.subs.sink = this.enrolmentCoursesService.getEnrolmentCourse().subscribe(data =>{
       if(data && data.content){
         this.allEnrolmentCourses = data.content;
+        this.getRole();
+      }
+    })
+  }
+
+  getRole(){
+    this.subs.sink = this.roleService.getRoles().subscribe(data =>{
+      if(data && data.content){
+        this.role = data.content.find(el => el.id && el.id == 1);
       }
     })
   }
@@ -601,7 +647,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       parent : parent,
       school : this.getStudentSchool.value,
       isAdmisionPaid : false,
-      email : this.getStudentEmail.value
+      email : this.getStudentEmail.value,
+      role : this.role
     }
 
     console.log(student);
@@ -892,7 +939,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       isAdmisionPaid : false,
       id : this.additionalInfoPopUpData?.id,
       scode : this.additionalInfoPopUpData?.scode,
-      email : this.getUpdateStudentEmail.value
+      email : this.getUpdateStudentEmail.value,
+      role : this.role
     }
 
     console.log(student);

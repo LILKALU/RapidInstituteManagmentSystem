@@ -4,6 +4,9 @@ import { SubSink } from 'subsink';
 import { HallVM } from '../shared/models/hallVM';
 import { HallServiceService } from '../shared/services/hall-service.service';
 import { ConfirmationService } from 'primeng/api';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
 
 @Component({
   selector: 'app-manage-hall',
@@ -28,6 +31,8 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   newHall : HallVM = {}
   hallAllData : HallVM[] = [];
   hallTableData : HallVM[] = [];
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -53,7 +58,8 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private hallService : HallServiceService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private localStorageService : LocalStorageService
   ){}
 
   ngOnDestroy(): void {
@@ -63,6 +69,22 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.buildForm();
     this.subscription();
+    this.getLoginData();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == 3 && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   buildForm(){

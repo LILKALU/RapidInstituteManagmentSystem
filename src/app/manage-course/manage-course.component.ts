@@ -16,6 +16,9 @@ import { timeSlotsResponse } from '../shared/models/timeSlotsResponseVM';
 import { TimeSlotService } from '../shared/services/time-slot.service';
 import { timeSlotVM } from '../shared/models/timeSlotVM';
 import { ConfirmationService } from 'primeng/api';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 
 @Component({
   selector: 'app-manage-course',
@@ -68,6 +71,8 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
   isCourseFormVisible : boolean = false;
   isUpdateFormVisible : boolean = false;
   isHallSelecting : boolean = false;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -104,7 +109,8 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     private hallService : HallServiceService,
     private courseService : CourseService,
     private timeSlotService : TimeSlotService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private localStorageService : LocalStorageService
   ){}
 
   ngOnDestroy(): void {
@@ -112,8 +118,24 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getLoginData()
     this.buildForm();
     this.getMasterData();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == 3 && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   getMasterData(){

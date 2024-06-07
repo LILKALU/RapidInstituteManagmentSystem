@@ -1,1 +1,3 @@
-<app-rapid-system></app-rapid-system>
+ <app-login-page (isLogginSuccess)="login($event)" *ngIf="!isLoginSuccess"></app-login-page>
+
+ <app-rapid-system (isLogout)="logout($event)" *ngIf="isLoginSuccess"></app-rapid-system>

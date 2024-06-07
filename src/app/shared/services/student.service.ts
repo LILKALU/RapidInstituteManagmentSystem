@@ -36,6 +36,10 @@ export class StudentService {
     return this.httpClient.get<studentAllResponseVM>(`${this.BaseURL}/getstudents`);
   }
 
+  getStudentByTeacherId(teacherId : number):Observable<studentAllResponseVM>{
+    return this.httpClient.get<studentAllResponseVM>(`${this.BaseURL}/getstudentsbyteacherid/${teacherId}`);
+  }
+
   getStudentByScode(scode : string) : Observable<studentResponseVM>{
     return this.httpClient.get<studentResponseVM>(`${this.BaseURL}/getstudentbyscode/${scode}`);
   }

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ADAccountResponseVM } from '../models/adAccountResponseVM';
 import { ADAccountVM } from '../models/adAccountVM';
+import { loginDetailsResponseVM } from '../models/loginDetailsResponseVM';
 
 @Injectable({
   providedIn: 'root'
@@ -15,5 +16,9 @@ export class AdAccountServiceService {
 
   createUserAccount(adAccountVM : ADAccountVM) : Observable<ADAccountResponseVM>{
     return this.httpClient.post<ADAccountResponseVM>(`${this.BaseURL}/createuseraccount`,adAccountVM);
+  }
+
+  login(adAccountVM : ADAccountVM) : Observable<loginDetailsResponseVM>{
+    return this.httpClient.post<loginDetailsResponseVM>(`${this.BaseURL}/checklogin`,adAccountVM);
   }
 }

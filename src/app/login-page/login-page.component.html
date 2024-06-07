@@ -1,0 +1,55 @@
+<div class="banner-img">
+    <div class="container">
+        <div class="left-side">
+            <div class="grid">
+                <div class="col-5"></div>
+                <div class="col-2 mt-3">
+                    <img src="../../assets/transparentLogo.png" alt="Rapid Logo" width="100px" height="80px">
+                </div>
+                <div class="col-5"></div>
+            </div>
+
+            <div class="grid">
+                <div class="col-12 business-name">
+                    <br>
+                    <span>RAPID INSTITUTE - BANDARAGAMA</span><br>
+                    <span>Inspiring Student Community</span>
+                </div>
+            </div>
+        </div>
+        <div class="right-side">
+            <div class="grid mt-3">
+                <div class="col-3"></div>
+                <div class="col-6">
+                    <div class="login-content">
+                        <span>LOGIN</span>
+                    </div>
+                </div>
+                <div class="col-3"></div>
+            </div>
+            <div  class="login-data">
+                <div class="grid ml-3 mr-3 mt-7">
+                    <div class="col-12 p-float-label" [formGroup]="loginForm">
+                        <input type="text" pInputText class="inputsStyle" id="userName" formControlName="userName" autocomplete="off"> 
+                        <label For="userName">Enter Your User Code</label>
+                    </div>
+                </div>
+                <div class="grid ml-3 mr-3 mt-7">
+                    <div class="col-12 p-float-label" [formGroup]="loginForm">
+                        <input type="password" pInputText class="inputsStyle" id="password" formControlName="password"> 
+                        <label For="password">Enter Your Password</label>
+                    </div>
+                </div>
+                <div class="grid ml-3 mr-3 mt-7">
+                    <div class="col-3">
+                        <button label="Reset" class="p-button-secondary" pButton (click)="login()"></button>
+                    </div>
+                    <div class="col-6"></div>
+                    <div class="col-3">
+                        <button label="Log In" class="p-button-success" [disabled]="!loginForm.valid" pButton (click)="login()"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 import { addressVM } from "./addressVM";
 import { parentVM } from "./parentVM";
+import { roleVM } from "./roleVM";
 
 export interface studentVM{
     id ?: number;
@@ -15,4 +16,5 @@ export interface studentVM{
     school ?: string;
     isAdmisionPaid ?: boolean;
     email ?: string;
+    role ?: roleVM;
 }

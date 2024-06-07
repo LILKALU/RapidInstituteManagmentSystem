@@ -114,7 +114,7 @@
                     <p-multiSelect *ngIf="isActionsVisible && getPrivilageCreationAppIcon.value" [options]="actions" formControlName="action" [style]="{width: '100%'}" optionLabel="name" appendTo="body" placeholder="Select Actions"></p-multiSelect>
                 </div>
                 <div class="col-3">
-                    <button pButton class="p-button-primary" *ngIf="privilageCreationForm.valid" (click)="addCreatePrivilage()" [disabled]="!privilageCreationForm.valid">Add Class</button>
+                    <button pButton class="p-button-primary" *ngIf="privilageCreationForm.valid" (click)="addCreatePrivilage()" [disabled]="!privilageCreationForm.valid">Add Privilages</button>
                 </div>
             </div>
             <div class="grid" *ngIf="privilages.length > 0">
@@ -147,7 +147,7 @@
         </form>
     </p-dialog>
 
-    <p-dialog header="Privilage creation Form" [(visible)]="isPrivilageUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closePrivilagesUpdatePopup()">
+    <p-dialog header="Privilage Update Form" [(visible)]="isPrivilageUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closePrivilagesUpdatePopup()">
         <div class="grid">
             <div class="col-10"></div>
             <div class="col-2">
