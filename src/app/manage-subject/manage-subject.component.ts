@@ -4,6 +4,10 @@ import { SubjectService } from '../shared/services/subject.service';
 import { SubSink } from 'subsink';
 import { SubjectVM } from '../shared/models/subjectVM';
 import { ConfirmationService } from 'primeng/api';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-subject',
@@ -13,6 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 export class ManageSubjectComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
+  appIconId : number = 5
   isloading : boolean = false;
   isUpdating: boolean = false;
   subjectTableData: SubjectVM[] = [];
@@ -27,6 +32,8 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
   isSubjectFormVisible : boolean = false;
   isUpdateFormVisible : boolean = false;
   subjectsAllData : SubjectVM[] = [];
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -49,16 +56,34 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private subjectservice : SubjectService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForm();
     this.getsubjects();
   }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   buildForm(){
@@ -187,16 +212,28 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
   }
 
   getsubjects(){
-    this.isloading = true;
-    this.subs.sink = this.subjectservice.getSubjects().subscribe(data =>{
-      if(data){
-        this.subjectsAllData = data.content;
-        this.subjectTableData = this.subjectsAllData
-        this.subjectTableData.reverse();
-        console.log(this.subjectsAllData);
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.isloading = true;
+        this.subs.sink = this.subjectservice.getSubjects().subscribe(data =>{
+          if(data){
+            this.subjectsAllData = data.content;
+            this.subjectTableData = this.subjectsAllData
+            this.subjectTableData.reverse();
+            console.log(this.subjectsAllData);
+          }
+          this.isloading = false;
+        })
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
       }
-      this.isloading = false;
-    })
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
   }
 
   loadTheContent(){

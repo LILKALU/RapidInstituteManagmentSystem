@@ -18,7 +18,7 @@
                             </div>
                             <div class="mt-3">
                                 <i class="fa-solid fa-key option"></i>
-                                <button class="option">Chnage Password</button>
+                                <button class="option">Change Password</button>
                                 <button class="option"></button>
                                 <button class="option"></button>
                             </div>
@@ -34,16 +34,16 @@
             <div *ngFor="let appIcon of appIcons">
                 <div *ngIf="isAllowed(appIcon.id)">
                     <button 
-                    (click)="changeModule(appIcon.id)"
-                    [ngClass]="{ 'selected_fontColor ml-4': selectedModuleEnum == appIcon.id, 'sideBarText ml-4': selectedModuleEnum != appIcon.id }"
-                    >
+                    (click)="changeModule(appIcon.id , appIcon.name)"
+                    [ngClass]="{ 'selected_fontColor ml-4': selectedModuleEnum == appIcon.id, 'sideBarText ml-4': selectedModuleEnum != appIcon.id }">
                     <i [className]="appIcon.icon"></i> &nbsp; {{appIcon.name}}
                     </button><br><br>
                 </div>
             </div>
         </div>
         <div class="col-10 content_area">
-            <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
+            <router-outlet ></router-outlet>
+            <!-- <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
             <app-manage-student *ngIf="selectedModuleEnum === 2"></app-manage-student>
             <app-manage-course *ngIf="selectedModuleEnum === 3"></app-manage-course>
             <app-manage-hall *ngIf="selectedModuleEnum === 4"></app-manage-hall>
@@ -57,7 +57,7 @@
             <app-manage-other-employee *ngIf="selectedModuleEnum === 12"></app-manage-other-employee>
             <app-app-icons *ngIf="selectedModuleEnum === 13"></app-app-icons>
             <app-manage-action *ngIf="selectedModuleEnum === 14"></app-manage-action>
-            <app-manage-privilage *ngIf="selectedModuleEnum === 15"></app-manage-privilage>
+            <app-manage-privilage *ngIf="selectedModuleEnum === 15"></app-manage-privilage> -->
         </div>
     </div>
 </div>

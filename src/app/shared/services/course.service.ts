@@ -18,6 +18,10 @@ export class CourseService {
     return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcourses`)
   }
 
+  getCoursesByTeacherId(teacherId : number) : Observable<CourseResponse> {
+    return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcoursesbyteacherid/${teacherId}`)
+  }
+
   createCourse(course :CourseVM) : Observable<CourseResponses> {
     return this.httpClient.post<CourseResponses>(`${this.BaseURL}/addcourse`,course);
   }

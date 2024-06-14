@@ -8,6 +8,10 @@ import { roleVM } from '../shared/models/roleVM';
 import { OtherEmployeeService } from '../shared/services/other-employee.service';
 import { otherEmployeeVM } from '../shared/models/oterEmployeeVM';
 import { ADAccountVM } from '../shared/models/adAccountVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-other-employee',
@@ -17,6 +21,7 @@ import { ADAccountVM } from '../shared/models/adAccountVM';
 export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
 
   private subs = new SubSink();
+  appIconId : number = 12
   isloading : boolean = false;
   selectAction !: FormGroup;
   searchForm !: FormGroup;
@@ -28,6 +33,8 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
   roles : roleVM[] = [];
   otherEmployeeLoginData : ADAccountVM | undefined
   newlyAddedOtherEmployee : otherEmployeeVM | undefined;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
   // teachersAllData : teacherVM[] = [];
   // teachersTabelData : teacherVM[] = [];
 
@@ -49,16 +56,51 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
     private roleService : RoleService,
     private otherEmployeeService : OtherEmployeeService,
     private adAccountService : AdAccountServiceService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForms()
-    this.getEmployee()
+    this.subscription();
   }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+  }
+
+  subscription(){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.isloading = true
+        this.getEmployee();
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   getEmployee(){
@@ -70,6 +112,7 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
       if(data && data.content){
         let roles = data.content;
         this.roles = roles.filter(el => el.id == 2 || el.id == 3 || el.id == 5);
+        this.isloading = false
       }
     })
   }

@@ -5,13 +5,13 @@
 
 <div *ngIf="!isloading">
     <div class="grid pt-4 pl-3">
-        <div class="col-2">
+        <div class="col-2" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">
                 <label for="searchAction">Search An Employee</label><br><br>
                 <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
-        <div class="col-2">
+        <div class="col-2" *ngIf="isActionAllowed(1)">
             <div [formGroup]="selectAction">
                 <label for="createAction">Add An Employee</label><br><br>
                 <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
@@ -19,8 +19,7 @@
             </div>
         </div>
         <div class="col-4 left-margin-color">
-            <button label="Add an Employee" pButton *ngIf="action === 2" (click)="openEmployeeForm(true)"></button>
-            <div class="grid pt-4" *ngIf="action == 1">
+            <div class="grid pt-4" *ngIf="action == 1 && isActionAllowed(1)">
                 <div class="col-8 p-float-label" [formGroup]="searchForm">
                     <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
                     <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search An Employee</label>

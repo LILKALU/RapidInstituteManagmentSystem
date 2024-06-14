@@ -4,6 +4,10 @@ import { ConfirmationService } from 'primeng/api';
 import { SubSink } from 'subsink';
 import { RoleService } from '../shared/services/role.service';
 import { roleVM } from '../shared/models/roleVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-role',
@@ -13,6 +17,7 @@ import { roleVM } from '../shared/models/roleVM';
 export class ManageRoleComponent implements OnInit, OnDestroy {
 
   isLoading : boolean = false;
+  appIconId : number = 11
   selectAction !: FormGroup;
   searchForm !: FormGroup;
   roleCreationForm !:FormGroup;
@@ -29,6 +34,8 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
   deletingRole : roleVM | undefined;
   updatedRole : roleVM | undefined;
   deletedRole : roleVM | undefined;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -45,7 +52,9 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private roleService : RoleService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnDestroy(): void {
@@ -53,8 +62,40 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForm();
-    this.getRoles()
+    this.subscriptions()
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  subscriptions(){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.getRoles()
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
   }
 
   getRoles(){

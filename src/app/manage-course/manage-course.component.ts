@@ -19,6 +19,7 @@ import { ConfirmationService } from 'primeng/api';
 import { LocalStorageService } from '../shared/services/local-storage.service';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-course',
@@ -28,6 +29,7 @@ import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 export class ManageCourseComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
+  appIconId : number = 3
   isLoading : boolean = false;
   selectAction !: FormGroup;
   searchForm !: FormGroup;
@@ -110,7 +112,8 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     private courseService : CourseService,
     private timeSlotService : TimeSlotService,
     private confirmationService: ConfirmationService,
-    private localStorageService : LocalStorageService
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnDestroy(): void {
@@ -131,7 +134,7 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
   }
 
   isActionAllowed(action : number):boolean{
-    if(this.privilages.filter(el => el.appIcon.id == 3 && el.action.id == action).length > 0){
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
       return true;
     }else{
       return false;
@@ -139,8 +142,21 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
   }
 
   getMasterData(){
-    this.isLoading = true;
-    this.getTeachersDetails();
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+
+      if(isprivilageHave){
+        this.isLoading = true;
+        this.getTeachersDetails();
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
   }
 
   getTeachersDetails(){
@@ -180,16 +196,28 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
   }
 
   getCourseDetails(){
-    this.subs.sink = this.courseService.getCourses().subscribe(data =>{
-      if(data){
-        this.coursesAllData = data.content;
-        console.log("initCourset",this.coursesAllData);
-        this.coursesTableData = this.coursesAllData
-        this.coursesTableData.reverse()
-        this.isLoading = false;
-        this.getTimeSlots();
-      }
-    })
+    if(this.logedDetails && this.logedDetails.id && this.logedDetails.usercode && this.logedDetails.usercode.charAt(0) == 'T'){
+      this.subs.sink = this.courseService.getCoursesByTeacherId(this.logedDetails.id).subscribe(data =>{
+        if(data){
+          this.coursesAllData = data.content;
+          this.coursesTableData = this.coursesAllData
+          this.coursesTableData.reverse()
+          this.isLoading = false;
+          this.getTimeSlots();
+        }
+      })
+    }else{
+      this.subs.sink = this.courseService.getCourses().subscribe(data =>{
+        if(data){
+          this.coursesAllData = data.content;
+          console.log("initCourset",this.coursesAllData);
+          this.coursesTableData = this.coursesAllData
+          this.coursesTableData.reverse()
+          this.isLoading = false;
+          this.getTimeSlots();
+        }
+      })
+    }
   }
 
   getTimeSlots(){

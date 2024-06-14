@@ -4,22 +4,22 @@
 
 <div *ngIf="!isLoading">
     <div class="grid pt-4 pl-3">
-        <div class="col-4">
+        <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">
                 <label for="searchAction">Search An App Icon</label><br><br>
                 <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
         <div class="col-4">
-            <div [formGroup]="selectAction">
+            <div [formGroup]="selectAction" *ngIf="isActionAllowed(1)">
                 <label for="createAction">Create An App Icon</label><br><br>
                 <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
                 
             </div>
         </div>
         <div class="col-4">
-            <button label="Create A App Icon" pButton *ngIf="action === 2" (click)="openAppIconForm(true)"></button>
-            <div class="grid pt-4" *ngIf="action == 1">
+            <button label="Create A App Icon" pButton *ngIf="action === 2 && isActionAllowed(1)" (click)="openAppIconForm(true)"></button>
+            <div class="grid pt-4" *ngIf="action == 1 && isActionAllowed(3)">
                 <div class="col-8 p-float-label" [formGroup]="searchForm">
                     <input type="text" pInputText class="inputsStyle" appCapitalizeEachWord id="searchValue" formControlName="searchValue"> 
                     <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A App Icon</label>
@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <div class="grid mt-6">
+    <div class="grid mt-6" *ngIf="isActionAllowed(7)">
         <div class="col-12">
             <p-table  [value]="tableAppIcons" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="20" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
                 <ng-template pTemplate="header">
@@ -45,13 +45,13 @@
                         <td class="centerText">{{appIconData.name}}</td>
                         <td class="centerText"><i [className]="appIconData.icon"></i></td>
                         <td class="centerText">{{appIconData.icon}}</td>
-                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(appIconData)"></i>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteAppIcon(appIconData)"></i></td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(appIconData)" *ngIf="isActionAllowed(2)"></i>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteAppIcon(appIconData)" *ngIf="isActionAllowed(4)"></i></td>
                     </tr>
                 </ng-template>
             </p-table>
         </div>
     </div>
-    <div class="grid">
+    <div class="grid" *ngIf="isActionAllowed(7)">
         <div class="col-11"></div>
         <div class="col-1">
             <button pButton class="p-button-secondary" (click)="reset()">Reset</button>

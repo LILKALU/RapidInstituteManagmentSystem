@@ -5,14 +5,14 @@
 
 <div *ngIf="!isloading">
     <div class="grid pt-4 pl-3">
-        <div class="col-4">
+        <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">
                 <label for="searchAction">Search A Subject</label><br><br>
                 <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
         <div class="col-4">
-            <div [formGroup]="selectAction">
+            <div [formGroup]="selectAction" *ngIf="isActionAllowed(1)">
                 <label for="createAction">Create A Subject</label><br><br>
                 <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
                 
@@ -32,7 +32,7 @@
         </div>
     </div><br><br><br>
 
-    <div class="grid pl-3 pr-3" >
+    <div class="grid pl-3 pr-3" *ngIf="isActionAllowed(7)">
         <div class="col-12">
             <p-table  [value]="subjectTableData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
                 <ng-template pTemplate="header" >
@@ -52,7 +52,7 @@
                         <td class="centerText">{{subject.secondTermModuleCount}}</td>
                         <td class="centerText">{{subject.thirdTermModuleCount}}</td>
                         <td class="centerText">{{subject.thirdTermModuleCount + subject.secondTermModuleCount + subject.firstTermModuleCount}}</td>
-                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(subject)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteHall(subject)"></i></td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(subject)" *ngIf="isActionAllowed(2)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteHall(subject)" *ngIf="isActionAllowed(4)"></i></td>
                     </tr>
                 </ng-template>
             </p-table>

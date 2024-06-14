@@ -8,6 +8,10 @@ import { ADAccountVM } from '../shared/models/adAccountVM';
 import { ConfirmationService } from 'primeng/api';
 import { RoleService } from '../shared/services/role.service';
 import { roleVM } from '../shared/models/roleVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-teachers',
@@ -17,6 +21,7 @@ import { roleVM } from '../shared/models/roleVM';
 export class ManageTeachersComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
+  appIconId : number = 6
   isloading : boolean = false;
   selectAction !: FormGroup;
   searchForm !: FormGroup;
@@ -31,6 +36,8 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
   role : roleVM|undefined
   teacherCreationForm !:FormGroup;
   teacherUpdateForm !:FormGroup;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -59,16 +66,34 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     private teachersService : TeacherService,
     private adAccountService : AdAccountServiceService,
     private confirmationService: ConfirmationService,
-    private roleService : RoleService
+    private roleService : RoleService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForms()
     this.getTeachers()
   }
 
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   buildForms(){
@@ -102,16 +127,30 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
   }
 
   getTeachers(){
-    this.isloading = true;
-    this.subs.sink = this.teachersService.getTeachers().subscribe(data => {
-      if(data){
-        this.teachersAllData = data.content;
-        this.teachersTabelData = this.teachersAllData;
-        this.teachersTabelData.reverse();
-        this.getRole();
-        this.isloading = false;
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.isloading = true;
+        this.subs.sink = this.teachersService.getTeachers().subscribe(data => {
+          if(data){
+            this.teachersAllData = data.content;
+            this.teachersTabelData = this.teachersAllData;
+            this.teachersTabelData.reverse();
+            this.getRole();
+            this.isloading = false;
+          }
+        })
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
       }
-    })
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
+
+    
   }
 
   getRole(){

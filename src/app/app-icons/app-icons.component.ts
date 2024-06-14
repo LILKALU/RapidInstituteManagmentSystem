@@ -4,6 +4,10 @@ import { ConfirmationService } from 'primeng/api';
 import { SubSink } from 'subsink';
 import { AppIconService } from '../shared/services/app-icon.service';
 import { appIconVM } from '../shared/models/appIconVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-app-icons',
@@ -13,6 +17,7 @@ import { appIconVM } from '../shared/models/appIconVM';
 export class AppIconsComponent implements OnInit, OnDestroy {
 
   isLoading : boolean = false;
+  appIconId : number = 13
   selectAction !: FormGroup;
   searchForm !: FormGroup;
   appIconCreationForm !:FormGroup;
@@ -26,7 +31,8 @@ export class AppIconsComponent implements OnInit, OnDestroy {
   selectedAppIcone : appIconVM|undefined;
   allAppIcons : appIconVM[]=[]
   tableAppIcons : appIconVM[]=[]
-  
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -45,7 +51,9 @@ export class AppIconsComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private appIconService : AppIconService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnDestroy(): void {
@@ -53,8 +61,41 @@ export class AppIconsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForm();
-    this.getAppIcons()
+    this.subscription();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  subscription(){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.isLoading = true
+        this.getAppIcons();
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
   }
 
   getAppIcons(){

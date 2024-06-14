@@ -22,6 +22,10 @@ import { courseWiseClassFeeResponseVM } from '../shared/models/courseWiseClassFe
 import { courseWiseClassFeeVM } from '../shared/models/courseWiseClassFeeVM';
 import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
 import { reciptTemplateDataVM } from '../shared/models/reciptTemplateDataVM';
+import { Router } from '@angular/router';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
 
 @Component({
   selector: 'app-manage-class-fee',
@@ -31,6 +35,7 @@ import { reciptTemplateDataVM } from '../shared/models/reciptTemplateDataVM';
 export class ManageClassFeeComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
+  appIconId : number = 9
   today = new Date();
   thisMonth : number = this.today.getMonth() + 1;
   thisYear : number = this.today.getFullYear();
@@ -64,6 +69,8 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   selectedCourse!: CourseVM; 
   subTotal : number = 0;
   reciptTemplateData : reciptTemplateDataVM | undefined;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
   test : any[] = [];
 
   steps = [
@@ -81,14 +88,14 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
 
   constructor(
     private formBuilder: FormBuilder,
-    private confirmationService: ConfirmationService,
     private courseService : CourseService,
     private enrolmentCourseService : EnrolmentCourseService,
     private studentServices : StudentService,
     private classFeeService : ClassFeeService,
     private classFeeCourseService : ClassFeeCourseService,
     private monthService : MonthService,
-    private attendanceService : AttendanceService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnDestroy(): void {
@@ -96,8 +103,24 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getStudents();
+    this.getLoginData();
+    this.subscriptions();
     this.buildForm();
+  }
+  
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   buildForm(){
@@ -113,6 +136,22 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     this.classFeeForm = this.formBuilder.group({
       hasPaymentDone:['',Validators.required]
     })
+  }
+
+  subscriptions(){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.getStudents();
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
   }
 
   getStudents(){

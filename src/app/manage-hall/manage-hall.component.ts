@@ -7,6 +7,7 @@ import { ConfirmationService } from 'primeng/api';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-hall',
@@ -17,6 +18,7 @@ export class ManageHallComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   isLoading : boolean = false;
+  appIconId : number = 4
   selectAction !: FormGroup;
   searchForm !: FormGroup;
   hallCreationForm !: FormGroup;
@@ -59,7 +61,8 @@ export class ManageHallComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private hallService : HallServiceService,
     private confirmationService: ConfirmationService,
-    private localStorageService : LocalStorageService
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnDestroy(): void {
@@ -67,9 +70,9 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForm();
     this.subscription();
-    this.getLoginData();
   }
 
   getLoginData(){
@@ -80,7 +83,7 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   }
 
   isActionAllowed(action : number):boolean{
-    if(this.privilages.filter(el => el.appIcon.id == 3 && el.action.id == action).length > 0){
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
       return true;
     }else{
       return false;
@@ -129,17 +132,30 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   }
 
   subscription(){
-    this.isLoading = true;
-    this.subs.sink = this.hallService.getHalls().subscribe(data =>{
-      if(data){
-        this.isLoading = false;
-        this.hallAllData = data.content;
-        this.hallTableData = this.hallAllData;
-        this.hallTableData.reverse();
-        console.log(this.hallTableData);
-        
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.isLoading = true;
+        this.subs.sink = this.hallService.getHalls().subscribe(data =>{
+          if(data){
+            this.isLoading = false;
+            this.hallAllData = data.content;
+            this.hallTableData = this.hallAllData;
+            this.hallTableData.reverse();
+            console.log(this.hallTableData);
+            
+          }
+        })
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
       }
-    })
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
+    
   }
 
   openHallForm(hallFormVisibility : boolean){

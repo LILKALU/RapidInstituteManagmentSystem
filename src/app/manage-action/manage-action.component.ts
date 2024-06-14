@@ -4,6 +4,10 @@ import { ConfirmationService } from 'primeng/api';
 import { SubSink } from 'subsink';
 import { actionVM } from '../shared/models/actionVM';
 import { ActionService } from '../shared/services/action.service';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-action',
@@ -13,6 +17,7 @@ import { ActionService } from '../shared/services/action.service';
 export class ManageActionComponent  implements OnInit, OnDestroy{
 
   isLoading : boolean = false;
+  appIconId : number = 14
   private subs = new SubSink();
   selectAction !: FormGroup;
   searchForm !: FormGroup;
@@ -26,6 +31,8 @@ export class ManageActionComponent  implements OnInit, OnDestroy{
   allAction : actionVM[] = [] 
   updatingAction : actionVM | undefined;
   tableAction : actionVM[] = [] 
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -42,7 +49,9 @@ export class ManageActionComponent  implements OnInit, OnDestroy{
   constructor(
     private formBuilder: FormBuilder,
     private actionService : ActionService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnDestroy(): void {
@@ -50,8 +59,16 @@ export class ManageActionComponent  implements OnInit, OnDestroy{
   }
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForm();
     this.getActions()
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
   buildForm(){
@@ -73,18 +90,40 @@ export class ManageActionComponent  implements OnInit, OnDestroy{
   }
 
   getActions(){
-    this.subs.sink = this.actionService.getActions().subscribe(data =>{
-      if(data && data.content){
-        this.allAction = data.content;
-        this.tableAction = this.allAction;
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.isLoading = true;
+        this.subs.sink = this.actionService.getActions().subscribe(data =>{
+          if(data && data.content){
+            this.allAction = data.content;
+            this.tableAction = this.allAction;
+            this.isLoading = false;
+          }
+        })
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
       }
-    })
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
   }
 
   loadTheContent(){
     this.action = parseInt(this.getAction.value);
     if(this.action === 1){
       this.isCreateActionFormButtonVisible = false;
+    }
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
     }
   }
 

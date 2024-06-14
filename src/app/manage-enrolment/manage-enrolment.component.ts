@@ -19,6 +19,10 @@ import { MonthService } from '../shared/services/month.service';
 import { MonthVM } from '../shared/models/monthVM';
 import { reciptTemplateDataVM } from '../shared/models/reciptTemplateDataVM';
 import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-enrolment',
@@ -28,6 +32,7 @@ import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
 export class ManageEnrolmentComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
+  appIconId : number = 7
   today = new Date();
   isLoading : boolean = false;
   leftSideCourses : CourseVM[] = [];
@@ -48,6 +53,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   activeStepIndex : number = 0;
   reciptTemplateData : reciptTemplateDataVM | undefined;
   courseStudent : CourseStudentVM[] = []
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
   steps = [
     { label: 'Student Enrolment'},
     { label: 'Student Payment'},
@@ -67,6 +74,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     private enrolmentService : EnrolmentService, 
     private classFeeService : ClassFeeService,
     private monthService : MonthService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
   ngOnDestroy(): void {
@@ -74,7 +83,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.getCourses();
+    this.getLoginData();
+    this.subscriptions();
     this.buildForm();
   }
 
@@ -88,23 +98,73 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     })
   }
 
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  subscriptions(){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.getCourses();
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
+  }
+
   getCourses(){
     this.isLoading = true;
-    this.subs.sink = this.courseService.getCourses().subscribe(data =>{
-      if(data){
-        this.allCourses = data.content
-        this.allCourses.forEach(element => {
-          let courseId : number;
-          courseId = element.id ? element.id : -1;
-          if(courseId % 2 === 0){
-            this.leftSideCourses.push(element);
-          }else{
-            this.rightSideCourses.push(element);
-          }
-        });
-      }
-      this.getEnrolments()
-    })
+    if(this.logedDetails && this.logedDetails.id && this.logedDetails.usercode && this.logedDetails.usercode.charAt(0) == 'T'){
+      this.subs.sink = this.courseService.getCoursesByTeacherId(this.logedDetails.id).subscribe(data =>{
+        if(data){
+          this.allCourses = data.content
+          this.allCourses.forEach(element => {
+            let courseId : number;
+            courseId = element.id ? element.id : -1;
+            if(courseId % 2 === 0){
+              this.leftSideCourses.push(element);
+            }else{
+              this.rightSideCourses.push(element);
+            }
+          });
+        }
+        this.getEnrolments();
+      })
+    }else{
+      this.subs.sink = this.courseService.getCourses().subscribe(data =>{
+        if(data){
+          this.allCourses = data.content
+          this.allCourses.forEach(element => {
+            let courseId : number;
+            courseId = element.id ? element.id : -1;
+            if(courseId % 2 === 0){
+              this.leftSideCourses.push(element);
+            }else{
+              this.rightSideCourses.push(element);
+            }
+          });
+        }
+        
+        this.getEnrolments();
+      })
+    }
   }
 
   getEnrolments(){

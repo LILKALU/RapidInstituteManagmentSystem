@@ -5,6 +5,7 @@ import { AppIconService } from '../shared/services/app-icon.service';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rapid-system',
@@ -24,11 +25,13 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
 
   constructor(
     private appIconService : AppIconService, 
-    private localStorageService : LocalStorageService
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
 
-  changeModule(moduleEnum : number=0){
+  changeModule(moduleEnum : number=0 , appIconeName : string = ''){
     this.selectedModuleEnum = moduleEnum;
+    this.router.navigate([`/${appIconeName}`]);
   }
 
   ngOnDestroy(): void {
@@ -72,5 +75,6 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
   logout(){
     this.localStorageService.removeItem('login')
     this.isLogout.emit(true);
+    this.router.navigate([''])
   }
 }

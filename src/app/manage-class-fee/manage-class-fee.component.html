@@ -3,7 +3,7 @@
 </div>
 
 <div *ngIf="!isLoading">
-    <div class="grid mt-6">
+    <div class="grid mt-6" *ngIf="isActionAllowed(3)">
         <div class="col-6 pl-6 pr-6">
             <form  [formGroup]="selectedDataForm">
                 <p-dropdown  [options]="allStudents" [style]="{'width':'100%'}" formControlName="student" [filter]="true" filterBy="scode"  [showClear]="true" placeholder="Select Student" optionLabel="scode" optionValue="scode" (onChange)="getCourses()">
@@ -39,7 +39,7 @@
             </form>
         </div>
     </div> -->
-    <div class="grid mt-4 ml-4 mr-4" *ngIf="updatedCourses.length>0">
+    <div class="grid mt-4 ml-4 mr-4" *ngIf="updatedCourses.length>0 && isActionAllowed(7)">
         <div class="col-6"></div>
         <div class="col-2">
             <div class="grid">
@@ -69,7 +69,7 @@
              
         </div>
     </div>
-    <div *ngIf="updatedCourses.length>0">
+    <div *ngIf="updatedCourses.length>0 && isActionAllowed(7)">
         <div class="grid mt-4 ml-4 mr-4" *ngFor="let course of updatedCourses">
             <div class="col-12">
                 ({{ course.code }}) - {{course.teacher.fullName}}'s {{course.grade.name}} {{course.date}} {{course.subject.name}} Class at {{course.startTime}}
@@ -80,7 +80,7 @@
     <div *ngIf="payingCourseWiseMonths.length>0" class="mt-4">
         <p class="line">&nbsp;</p>
     </div>
-    <div *ngIf="payingCourseWiseMonths.length>0">
+    <div *ngIf="payingCourseWiseMonths.length>0 && isActionAllowed(1)">
         <div class="grid mt-4 ml-4 mr-4" *ngFor="let payingCourseWiseMonth of payingCourseWiseMonths">
             <div class="col-12" *ngIf="payingCourseWiseMonth.months && payingCourseWiseMonth.months?.length">
                 ({{ payingCourseWiseMonth.course?.code }}) - {{payingCourseWiseMonth.course?.teacher?.fullName}}'s {{payingCourseWiseMonth.course?.grade?.name}} {{payingCourseWiseMonth.course?.date}} {{payingCourseWiseMonth.course?.subject?.name}} Class at {{payingCourseWiseMonth.course?.startTime}}
@@ -89,7 +89,7 @@
         </div>
     </div>
 
-    <div class="grid mt-6" *ngIf="payingCourseWiseMonths.length>0">
+    <div class="grid mt-6" *ngIf="payingCourseWiseMonths.length>0 && isActionAllowed(1)">
         <div class="col-10"></div>
         <div class="col-2">
             <button label="Pay Class Fee" pButton (click)="openMakePaymentPopup()"></button>

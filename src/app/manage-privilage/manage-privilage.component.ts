@@ -19,6 +19,7 @@ import { ConfirmationService } from 'primeng/api';
 export class ManagePrivilageComponent implements OnInit, OnDestroy {
 
   isLoading : boolean = false;
+  appIconId : number = 15
   selectAction !: FormGroup;
   searchForm !: FormGroup;
   privilageCreationForm !:FormGroup;

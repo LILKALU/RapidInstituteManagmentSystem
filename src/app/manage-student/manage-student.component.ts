@@ -32,6 +32,7 @@ import { RoleService } from '../shared/services/role.service';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -43,6 +44,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   today = new Date();
+  appIconId : number = 2
   selectStudentStatus !: FormGroup;
   studentDetailForm !: FormGroup;
   studentUpdateForm !: FormGroup;
@@ -187,7 +189,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     private monthService : MonthService,
     private confirmationService: ConfirmationService,
     private roleService : RoleService,
-    private localStorageService : LocalStorageService
+    private localStorageService : LocalStorageService,
+    private router : Router
   ) {
   }
   
@@ -294,7 +297,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   isActionAllowed(action : number):boolean{
-    if(this.privilages.filter(el => el.appIcon.id == 2 && el.action.id == action).length > 0){
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
       return true;
     }else{
       return false;
@@ -302,15 +305,27 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   subscriptions(){
-    this.isloaded = false;
-    this.subs.sink = this.courseServices.getCourses().subscribe(data =>{
-      if(data){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
         this.isloaded = true;
-        this.courses = data.content;
-        console.log("courses" , this.courses);
-        this.getAllStudent();
+        this.subs.sink = this.courseServices.getCourses().subscribe(data =>{
+          if(data){
+            this.isloaded = true;
+            this.courses = data.content;
+            console.log("courses" , this.courses);
+            this.getAllStudent();
+          }
+        });
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
       }
-    });
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
 
     // this.subs.sink = this.enrolmentService
     
@@ -320,7 +335,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.isloaded = false;
     if(this.logedDetails && this.logedDetails.usercode && this.logedDetails.id && this.logedDetails.usercode.charAt(0) == 'T'){
       this.subs.sink = this.studentServices.getStudentByTeacherId(this.logedDetails.id).subscribe(data =>{
-        this.isloaded = true;
+        this.isloaded = false;
         this.studentAllData = data.content;
         this.studentAllData = this.studentAllData.filter(el => el.isActive == true)
         this.studentTableData = data.content;
@@ -381,6 +396,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.subs.sink = this.roleService.getRoles().subscribe(data =>{
       if(data && data.content){
         this.role = data.content.find(el => el.id && el.id == 1);
+        this.isloaded = true;
       }
     })
   }

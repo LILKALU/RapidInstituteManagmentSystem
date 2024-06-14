@@ -4,6 +4,10 @@ import { ConfirmationService } from 'primeng/api';
 import { SubSink } from 'subsink';
 import { GradeService } from '../shared/services/grade.service';
 import { GradeVM } from '../shared/models/gradeVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-grade',
@@ -13,6 +17,7 @@ import { GradeVM } from '../shared/models/gradeVM';
 export class ManageGradeComponent implements OnInit, OnDestroy {
   
   private subs = new SubSink();
+  appIconId : number = 8
   isLoading : boolean = false;
   selectAction !: FormGroup
   isCreateGradeFormButtonVisible : boolean = false;
@@ -28,6 +33,8 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
   deletedGrade : GradeVM | undefined;
   updatingGrade : GradeVM | undefined;
   updatedGrade : GradeVM | undefined;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
 
   // get action value
@@ -45,7 +52,9 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private confirmationService: ConfirmationService,
-    private gradeService : GradeService
+    private gradeService : GradeService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
   
   ngOnDestroy(): void {
@@ -53,8 +62,40 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.getLoginData();
     this.buildForm();
-    this.getGrades();
+    this.subscriptions();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  subscriptions(){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.getGrades();
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
   }
 
   getGrades(){

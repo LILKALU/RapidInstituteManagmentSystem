@@ -14,6 +14,10 @@ import { AttendanceService } from '../shared/services/attendance.service';
 import { attendanceSearchVM } from '../shared/models/attendanceSearchVM';
 import { MessageService } from 'primeng/api';
 import { dateVM } from '../shared/models/dateVM';
+import { loginDetailsVM } from '../shared/models/loginDetailsVM';
+import { privilagesVM } from '../shared/models/privilagesVM';
+import { LocalStorageService } from '../shared/services/local-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-attendance',
@@ -23,6 +27,7 @@ import { dateVM } from '../shared/models/dateVM';
 export class ManageAttendanceComponent implements OnInit, OnDestroy{
   
   today = new Date();
+  appIconId : number = 10
   thisMonthId : number = this.today.getMonth() + 1;
   thisFullYear : number = this.today.getFullYear();
   thisDate : number = this.today.getDate();
@@ -52,6 +57,8 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
   action : number = 1;
   isAttendFilterData : string[] = ["Attend","Not Attend"];
   isUpdateForm : boolean = false;
+  logedDetails : loginDetailsVM | undefined;
+  privilages : privilagesVM[] = [];
 
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
 
@@ -65,15 +72,6 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
   get getFormFilterScode(): AbstractControl { return this.filterDataForm.get('scode') as AbstractControl; }
   get getFormFilterDate(): AbstractControl { return this.filterDataForm.get('date') as AbstractControl; }
   get getFormFilterIsAttend(): AbstractControl { return this.filterDataForm.get('isAttend') as AbstractControl; }
-  
-  ngOnInit(): void {
-    this.buildForm();
-    this.getCourses();
-  }
-
-  ngOnDestroy(): void {
-    this.subs.unsubscribe();
-  }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -81,8 +79,52 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
     private enrolmentCourseService : EnrolmentCourseService,
     private monthService : MonthService,
     private attendanceService : AttendanceService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private localStorageService : LocalStorageService,
+    private router : Router
   ){}
+
+  ngOnInit(): void {
+    this.getLoginData();
+    this.buildForm();
+    this.subscriptions();
+  }
+
+  
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
+  }
+
+  getLoginData(){
+    let loginData : any = this.localStorageService.getItem('login');
+    this.logedDetails = JSON.parse(loginData)
+    console.log("this.logedDetails",this.logedDetails);
+    this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+  }
+
+  isActionAllowed(action : number):boolean{
+    if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  subscriptions(){
+    let isprivilageHave : boolean;
+    if(this.logedDetails){
+      isprivilageHave = (this.logedDetails.privilagesDTO.filter(el => el.appIcon.id == this.appIconId).length > 0) ? true : false;
+      if(isprivilageHave){
+        this.getCourses();
+      }else{
+        alert('Not Allowed');
+        this.router.navigate(['Dashboard']);
+      }
+    }else{
+      alert('You are not logged in');
+      this.router.navigate(['login']);
+    }
+  }
 
   buildForm(){
     this.selectedCourseForm = this.formBuilder.group({

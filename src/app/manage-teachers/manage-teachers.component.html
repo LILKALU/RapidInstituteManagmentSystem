@@ -5,17 +5,16 @@
 
 <div *ngIf="!isloading">
     <div class="grid pt-4 pl-3">
-        <div class="col-2">
+        <div class="col-2" *ngIf="isActionAllowed(7)">
             <div [formGroup]="selectAction">
                 <label for="searchAction">Search A Teacher</label><br><br>
                 <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
         <div class="col-2">
-            <div [formGroup]="selectAction">
+            <div [formGroup]="selectAction" *ngIf="isActionAllowed(1)">
                 <label for="createAction">Add A Teacher</label><br><br>
                 <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
-                
             </div>
         </div>
         <div class="col-4 left-margin-color">
@@ -44,7 +43,7 @@
         </div>
     </div><br><br><br>
 
-    <div class="grid pl-3 pr-3" >
+    <div class="grid pl-3 pr-3" *ngIf="isActionAllowed(7)">
         <div class="col-12">
             <p-table  [value]="teachersTabelData" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
                 <ng-template pTemplate="header" >
@@ -64,7 +63,7 @@
                         <td class="centerText">{{teacher.birthday}}</td>
                         <td class="centerText">{{teacher.contactNumber}}</td>
                         <td class="centerText">{{teacher.email}}</td>
-                        <td class="centerText"><i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(teacher)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteTeacher(teacher)"></i></td>
+                        <td class="centerText"><i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(teacher)" *ngIf="isActionAllowed(2)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteTeacher(teacher)" *ngIf="isActionAllowed(4)"></i></td>
                     </tr>
                 </ng-template>
             </p-table>

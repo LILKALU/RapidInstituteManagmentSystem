@@ -5,19 +5,19 @@
 <div *ngIf="!isLoading">
     <div class="grid pt-4 pl-3">
         <div class="col-6">
-            <div [formGroup]="selectAction">
+            <div [formGroup]="selectAction" *ngIf="isActionAllowed(1)">
                 <label for="searchAction">Mark Attendance</label><br><br>
                 <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
-        <div class="col-6">
+        <div class="col-6" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">
                 <label for="createAction">View Attendance</label><br><br>
                 <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
     </div>
-    <div *ngIf="action === 1">
+    <div *ngIf="action === 1 && isActionAllowed(1)">
         <div class="grid mt-6">
             <div class="col-12 pl-4 pr-6">
                 <form  [formGroup]="selectedCourseForm">
@@ -60,7 +60,7 @@
         </div>
     </div>
 
-    <div *ngIf="action === 2">
+    <div *ngIf="action === 2 && isActionAllowed(3)">
         <form  [formGroup]="searchAttendanceForm">
             <div class="grid mt-6">
                 <div class="col-1"></div>

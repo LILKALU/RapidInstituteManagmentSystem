@@ -1,12 +1,12 @@
 <div *ngIf="!isLoading">
     <div class="grid pt-4 pl-3">
-        <div class="col-4">
+        <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">
                 <label for="searchAction">Search A Grade</label><br><br>
                 <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
-        <div class="col-4">
+        <div class="col-4" *ngIf="isActionAllowed(1)">
             <div [formGroup]="selectAction">
                 <label for="createAction">Create A Grade</label><br><br>
                 <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
@@ -26,20 +26,20 @@
         </div>
     </div>
 
-    <div class="grid mt-6">
+    <div class="grid mt-6" *ngIf="isActionAllowed(7)">
         <div class="col-12">
             <p-table  [value]="tableGrades" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
                 <ng-template pTemplate="header">
                     <th>Grade Code</th>
                     <th>Grade</th>
-                    <th>Action</th>
+                    <th *ngIf="isActionAllowed(2) || isActionAllowed(4)">Action</th>
                 </ng-template>
 
                 <ng-template pTemplate="body" let-gradeData>
                     <tr>
                         <td class="centerText">{{gradeData.code}}</td>
                         <td class="centerText">{{gradeData.name}}</td>
-                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(gradeData)"></i>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteGrade(gradeData)"></i></td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(gradeData)" *ngIf="isActionAllowed(2)"></i>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteGrade(gradeData)" *ngIf="isActionAllowed(4)"></i></td>
                     </tr>
                 </ng-template>
             </p-table>
