@@ -204,7 +204,6 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   }
 
   getClassFees(){
-    
     this.selectedCourses = [];
     // this.isLoading = true;
     let selectedStudent : studentVM;
@@ -458,24 +457,26 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
           }
           this.arrears.push(m);
           arrears.push(m);
-          let cw : courseWiseMonths;
-          let name : string;
-          let ammount : number;
-          name = '('+course.code+') - ' + course.teacher.fullName + '\'s ' + course.grade.name + ' ' + course.date + ' ' + course.subject.name + ' Class at ' + course.startTime;
-          ammount = course.classFeeAmount;
-          cw = {
-            course : course,
-            months : arrears,
-            courseName : name,
-            courseAmount : ammount
-          }
-          this.payingCourseWiseMonths.push(cw);
           styleClasses.push('red_background')
         }else{
           styleClasses.push('empty_background')
         }
         
       });
+
+      let cw : courseWiseMonths;
+        let name : string;
+        let ammount : number;
+        name = '('+course.code+') - ' + course.teacher.fullName + '\'s ' + course.grade.name + ' ' + course.date + ' ' + course.subject.name + ' Class at ' + course.startTime;
+        ammount = course.classFeeAmount;
+        cw = {
+          course : course,
+          months : arrears,
+          courseName : name,
+          courseAmount : ammount
+        }
+        this.payingCourseWiseMonths.push(cw);
+        
       c = {
         ...course,
         styleClassName : styleClasses
@@ -734,6 +735,8 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
                 this.updatedCourses.splice(index,1,course);
               }
             });
+
+            this.payingCourseWiseMonths = []
           }
           
           this.activeStepIndex = this.activeStepIndex + 1;

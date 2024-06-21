@@ -1,5 +1,5 @@
 export interface MonthVM {
     id ?: number;
-    name : string;
+    name ?: string;
     diabled ?: boolean;
 }

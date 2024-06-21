@@ -1,0 +1,179 @@
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isLoading">
+    <div class="grid pt-4 pl-3">
+        <div class="col-4" *ngIf="isActionAllowed(1)">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search a Payment</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+
+        <div class="col-4" *ngIf="isActionAllowed(1)">
+            <div [formGroup]="selectAction">
+                <label for="createAction">Make A Payment</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+
+        <div class="col-4">
+            <div class="grid pt-4" *ngIf="action == 1 && isActionAllowed(3)">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" appCapitalizeEachWord id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Recipt Number</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" pButton (click)="searchPayment()" [disabled]="!searchForm.valid"></button>
+                </div>
+            </div>
+            <button label="Make a Payment" pButton *ngIf="action === 2" (click)="openPaymentForm()"></button>
+            
+        </div>
+    </div>
+
+    <div class="grid mt-6">
+        <div class="col-12" *ngIf="isActionAllowed(7)">
+            <p-table  [value]="tablePayments" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header">
+                    <th>Recipt Number</th>
+                    <th>Teacher</th>
+                    <th>Course</th>
+                    <th>Month</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </ng-template>
+                <ng-template pTemplate="body" let-payement>
+                    <tr>
+                        <td class="centerText">{{payement.reciptNumber}}</td>
+                        <td class="centerText">{{payement.teacher.fullName}}</td>
+                        <td class="centerText">({{payement.course?.code}}) - {{payement.course?.grade?.name}} {{payement.course?.date}} {{payement.course?.subject?.name}} Class at {{payement.course?.startTime}}</td>
+                        <td class="centerText">{{payement.month.name}}</td>
+                        <td class="centerText">{{payement.amount}}</td>
+                        <td class="centerText">{{payement.date}}</td>
+                        <!-- <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(roleData)" *ngIf="isActionAllowed(2)"></i>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteGrade(roleData)" *ngIf="isActionAllowed(4)"></i></td> -->
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+            <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+        </div>
+    </div>
+
+    <p-dialog header="Payment Form" [(visible)]="isPaymentFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closePaymentPopup()">
+        <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex"></p-steps>
+        <div *ngIf="activeStepIndex == 0">
+            <form [formGroup]="paymentForm">
+                <div class="grid mt-6">
+                    <div class="col-4">
+                        <p-dropdown [options]="allTeachers" optionLabel="fullName" optionValue="id" appendTo="body" placeholder="Teacher" [style]="{'width':'100%'}" class="inputsStyle" formControlName="teacherid"></p-dropdown>
+                    </div>
+                    <div class="col-4">
+                        <p-dropdown [options]="allMonths" optionLabel="name" optionValue="id" appendTo="body" placeholder="Month" [style]="{'width':'100%'}" class="inputsStyle" formControlName="monthid"></p-dropdown>
+                    </div>
+                    <div class="col-4">
+                        <button pButton class="p-button-primary" (click)="getPaymentDetails()" [disabled]="!paymentForm.valid">Search</button>
+                    </div>
+                </div>
+            </form>
+    
+            <div *ngIf="isNothingEarn">
+                <div class="grid ml-8 mt-6">
+                    <h6>Nothing Earn On This Month</h6>
+                </div>
+            </div>
+    
+            <div  *ngIf="courseWisePayments.length>0 && !isNothingEarn">
+                <div class="grid ml-8 mt-6">
+                    <div class="col-6"><h5>Course</h5></div>
+                    <div class="col-3 centerText"><h5>Student Count</h5></div>
+                    <div class="col-3 centerText"><h5>Amount</h5></div>
+                </div>
+                <div class="grid ml-2" *ngFor="let courseWisePayment of courseWisePayments">
+                    <div class="col-6 centerText">
+                        <h6>
+                            ({{courseWisePayment.course?.code}}) - {{courseWisePayment.course?.grade?.name}} {{courseWisePayment.course?.date}} {{courseWisePayment.course?.subject?.name}} Class at {{courseWisePayment.course?.startTime}}
+                        </h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            {{courseWisePayment.studentCount}}
+                        </h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            {{courseWisePayment.amount}}
+                        </h6>
+                    </div>
+                </div>
+                <div class="grid ml-2 mt-6">
+                    <div class="col-6 centerText">
+                        <h6>Total</h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            &nbsp;
+                        </h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            {{total}}
+                        </h6>
+                    </div>
+                </div>
+                <div class="grid ml-2">
+                    <div class="col-6 centerText">
+                        <h6>Institute Payment</h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            &nbsp;
+                        </h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            {{institutePayment}}
+                        </h6>
+                    </div>
+                </div>
+                <div class="grid ml-2">
+                    <div class="col-6 centerText">
+                        <h6>Net Salary</h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            &nbsp;
+                        </h6>
+                    </div>
+                    <div class="col-3 centerText">
+                        <h6>
+                            {{netPayment}}
+                        </h6>
+                    </div>
+                </div>
+    
+                <div class="grid mt-6" *ngIf="!isPaymentPayed">
+                    <div class="col-3"></div>
+                    <div class="col-3" [formGroup]="teacherPayemntForm">
+                        <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
+                        <label for="payed">&nbsp; &nbsp; Is Payment Payed?</label>
+                    </div>
+                    <div class="col-3" >
+                        <button pButton class="p-button-primary" (click)="proceddPayment()" [disabled]="!(getHasPaymentDone.value)">Save and Next</button>
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="activeStepIndex == 1">
+            <app-teacher-payment-recpit-template [reciptTemplateDataVM]="teacherPaymentReciptData"></app-teacher-payment-recpit-template>
+        </div>
+    </p-dialog>
+    
+</div>

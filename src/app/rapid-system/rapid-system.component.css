@@ -1,9 +1,21 @@
 .background-navbar{
     background-image: linear-gradient(to right, rgb(0, 225, 255) , rgb(255, 0, 255)) !important;
+    z-index: 1000;
 }
 
 a{
     text-decoration: none;
+}
+
+.content_area {
+    height: 100%;
+    overflow-y: auto;
+    /* padding: 10px; */
+}
+
+.main-container {
+    height: calc(100vh - 50px); 
+    display: flex;
 }
 
 .navbarText{
@@ -13,7 +25,10 @@ a{
 
 .sideBar{
     background-image: linear-gradient(to bottom, rgb(0, 225, 255) , rgb(255, 0, 255)) !important;
-    height: auto;
+    height: 100%;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
 }
 
 .sideBarText{

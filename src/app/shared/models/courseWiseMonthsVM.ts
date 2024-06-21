@@ -6,4 +6,5 @@ export interface courseWiseMonths{
     courseName ?: string;
     courseAmount ?: number;
     months ?: MonthVM[];
+    studentCount ?: number;
 }

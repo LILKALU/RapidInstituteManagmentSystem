@@ -45,6 +45,10 @@ import { ManagePrivilageComponent } from './manage-privilage/manage-privilage.co
 import { ManageOtherEmployeeComponent } from './manage-other-employee/manage-other-employee.component';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { PasswordModule } from 'primeng/password';
+import { ManageSalaryPaymentsComponent } from './manage-salary-payments/manage-salary-payments.component';
+import { ChartModule } from 'primeng/chart';
+import { TeacherPaymentRecpitTemplateComponent } from './teacher-payment-recpit-template/teacher-payment-recpit-template.component';
+import { ManageNotificationComponent } from './manage-notification/manage-notification.component';
 // import { LoginPageComponent } from './login-page/login-page.component';
 
 
@@ -70,6 +74,9 @@ import { PasswordModule } from 'primeng/password';
     ManagePrivilageComponent,
     ManageOtherEmployeeComponent,
     LoginPageComponent,
+    ManageSalaryPaymentsComponent,
+    TeacherPaymentRecpitTemplateComponent,
+    ManageNotificationComponent,
     // LoginPageComponent,
   ],
   imports: [
@@ -96,7 +103,8 @@ import { PasswordModule } from 'primeng/password';
     OverlayPanelModule,
     MessagesModule,
     MultiSelectModule,
-    PasswordModule
+    PasswordModule,
+    ChartModule
   ],
   providers: [ConfirmationService,MessageService],
   bootstrap: [AppComponent]

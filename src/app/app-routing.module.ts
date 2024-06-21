@@ -16,24 +16,30 @@ import { AppIconsComponent } from './app-icons/app-icons.component';
 import { ManageActionComponent } from './manage-action/manage-action.component';
 import { ManagePrivilageComponent } from './manage-privilage/manage-privilage.component';
 import { LoginPageComponent } from './login-page/login-page.component';
+import { AuthGuard } from './shared/guard/guards/auth.guard';
+import { ManageSalaryPaymentsComponent } from './manage-salary-payments/manage-salary-payments.component';
+import { ManageNotificationComponent } from './manage-notification/manage-notification.component';
 
 const routes: Routes = [
   {path : "login", component: LoginPageComponent},
-  {path : "Dashboard", component: DashboardComponent},
-  {path : "Manage Student", component: ManageStudentComponent},
-  {path : "Manage Course", component: ManageCourseComponent},
-  {path : "Manage Hall", component: ManageHallComponent},
-  {path : "Manage Subjects", component: ManageSubjectComponent},
-  {path : "Manage Teachers", component: ManageTeachersComponent},
-  {path : "Manage Enrolment", component: ManageEnrolmentComponent},
-  {path : "Manage Grades", component: ManageGradeComponent},
-  {path : "Manage Class Fees", component: ManageClassFeeComponent},
-  {path : "Manage Student Attendance", component: ManageAttendanceComponent},
-  {path : "Manage User Roles", component: ManageRoleComponent},
-  {path : "Manage Other Employee", component: ManageOtherEmployeeComponent},
-  {path : "Manage App Icons", component: AppIconsComponent},
-  {path : "Manage Actions", component: ManageActionComponent},
-  {path : "Manage Privileges", component: ManagePrivilageComponent}
+  {path : "Dashboard", component: DashboardComponent, canActivate : [AuthGuard]},
+  {path : "Manage Student", component: ManageStudentComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Course", component: ManageCourseComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Hall", component: ManageHallComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Subjects", component: ManageSubjectComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Teachers", component: ManageTeachersComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Enrolment", component: ManageEnrolmentComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Grades", component: ManageGradeComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Class Fees", component: ManageClassFeeComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Student Attendance", component: ManageAttendanceComponent ,canActivate : [AuthGuard]},
+  {path : "Manage User Roles", component: ManageRoleComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Other Employee", component: ManageOtherEmployeeComponent ,canActivate : [AuthGuard]},
+  {path : "Manage App Icons", component: AppIconsComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Actions", component: ManageActionComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Privileges", component: ManagePrivilageComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Salary Payment", component: ManageSalaryPaymentsComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Notification", component: ManageNotificationComponent ,canActivate : [AuthGuard]},
+  {path: '', redirectTo: 'Dashboard', pathMatch: 'full'}
 ];
 
 @NgModule({

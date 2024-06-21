@@ -1,0 +1,64 @@
+<div class="grid">
+    <div class="col-10"></div>
+    <div class="col-2">
+        <button pButton class="p-button-primary" (click)="generatePDF()">Download and Send</button>
+    </div>
+</div>
+
+<div class="receipt-container p-mt-5 p-p-3">
+    <div class="receipt-header p-d-flex p-flex-column p-ai-center">
+      <img class="logo" src="../../favicon.ico" alt="logo">
+      <h1>Rapid Institute</h1>
+      <p>No - 45</p>
+      <p>Bandaragama</p>
+      <p>Phone: (077) 883-8787</p>
+    </div>
+    
+    <div class="customer-details p-d-flex p-jc-between p-mb-4">
+      <div>
+        <h4>{{reciptTemplateDataVM?.resiptNumber}}</h4>
+        <p>Date: {{ today | date }}</p>
+      </div>
+      <div class="mt-3">
+        <h4>Teacher Details</h4>
+        <p>{{reciptTemplateDataVM?.teacher?.title}}. {{reciptTemplateDataVM?.teacher?.fullName}}</p>
+        <p>{{reciptTemplateDataVM?.teacher?.contactNumber}}</p>
+      </div>
+    </div>
+  
+    <p-table [value]="courseWisePayment" class="p-mb-4">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Course</th>
+          <th>Months</th>
+          <th>Student Count</th>
+          <th>Total</th>
+          <th class="text-red-600">Institute Payment (-25%)</th>
+          <th>Payment</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-coursePayment>
+        <tr>
+          <td>({{coursePayment.course?.code}}) - {{coursePayment.course?.grade?.name}} {{coursePayment.course?.date}} {{coursePayment.course?.subject?.name}} Class at {{coursePayment.course?.startTime}}</td>
+          <td>{{month?.name}} </td>
+          <td>{{coursePayment.studentCount}}</td>
+          <td>{{coursePayment.studentCount * coursePayment.course.classFeeAmount}}</td>
+          <td class="text-red-600">{{(coursePayment.studentCount * coursePayment.course.classFeeAmount)*25/100}}</td>
+          <td>{{(coursePayment.studentCount * coursePayment.course.classFeeAmount)*75/100}}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  
+    <div class="totals p-d-flex p-jc-end p-mt-4">
+      <div class="p-d-flex p-flex-column">
+        <div class="p-d-flex p-jc-between">
+          <strong>Total:</strong>
+          <strong>{{ reciptTemplateDataVM?.total }}</strong>
+        </div>
+        <div class="p-d-flex p-jc-between">
+          <strong>Net Payment:</strong>
+          <strong>{{ reciptTemplateDataVM?.netPayment }}</strong>
+        </div>
+      </div>
+    </div>
+</div>

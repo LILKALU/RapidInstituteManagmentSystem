@@ -11,4 +11,5 @@ export interface otherEmployeeVM{
     contactNumber ?: string;
     email ?: string;
     role ?: roleVM
+    isActive ?: boolean;
 }

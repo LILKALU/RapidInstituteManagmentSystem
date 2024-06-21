@@ -1,1 +1,71 @@
-<p>dashboard works!</p>
+<div *ngIf="!isLoading">
+    <div *ngIf="logedDetails && logedDetails.usercode && (logedDetails.usercode.startsWith('A') || logedDetails.usercode.startsWith('M'))">
+        <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-4">
+                <p-card header="Student Count" class="student-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-user-graduate iconsize"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{studentCount}}</span>
+                        </div>
+                    </div>
+                </p-card>
+                
+            </div>
+            <div class="col-4">
+                <p-card header="Course Count" class="course-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-users-rectangle iconsizestudent"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{courseCount}}</span>
+                        </div>
+                    </div>
+                </p-card>
+                
+            </div>
+            <div class="col-4">
+                <p-card header="Teacher Count" class="teacher-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-person-chalkboard iconsize"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{teacherCount}}</span>
+                        </div>
+                    </div>
+                </p-card>
+                
+            </div>
+        </div>
+
+        <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-6">
+                <div class="card">
+                    <p-chart type="bar" [data]="classFeeChartData" [options]="basicOptions" />
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <p-chart type="bar" [data]="teacherPaymentChartData" [options]="basicOptions" />
+                </div>
+            </div>
+        </div>
+        <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-6">
+                <div class="card">
+                    <p-chart type="bar" [data]="profitChartData" [options]="basicOptions" />
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="text-center text-2xl font-semibold mt-3 mb-3">Class Wise Student Count</div>
+                    <p-chart type="pie" [data]="studentCountByCourseChartData" [options]="basicOptionsForPie" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

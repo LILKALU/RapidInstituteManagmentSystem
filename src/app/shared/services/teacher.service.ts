@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { TeachersResponse } from '../models/teachersResponse';
 import { teacherVM } from '../models/teachersVM';
 import { TeacherResponse } from '../models/teacherResposeVM';
+import { courseWisePaymentsResponseVM } from '../models/courseWisePaymentsResponseVM';
 
 @Injectable({
   providedIn: 'root'
@@ -30,5 +31,9 @@ export class TeacherService {
 
   deleteTeacher(teacher : teacherVM) : Observable<TeacherResponse>{
     return this.httpClient.put<TeacherResponse>(`${this.BaseURL}/deleteteacher`,teacher);
+  }
+
+  getCourseWisePayments(teacherId : number, monthId : number) : Observable<courseWisePaymentsResponseVM>{
+    return this.httpClient.get<courseWisePaymentsResponseVM>(`${this.BaseURL}/getteacherearningsformonthbycoursewise/${teacherId}/${monthId}`);
   }
 }

@@ -39,7 +39,6 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // this.buildForm();
     this.getLoginData()
     this.isLogout.emit(false);
   }
@@ -75,6 +74,6 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
   logout(){
     this.localStorageService.removeItem('login')
     this.isLogout.emit(true);
-    this.router.navigate([''])
+    this.router.navigate(['login']);
   }
 }

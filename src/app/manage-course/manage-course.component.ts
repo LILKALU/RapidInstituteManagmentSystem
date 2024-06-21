@@ -898,5 +898,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
   }
   reset(){
     this.coursesTableData = this.coursesAllData
+    this.getSearchValue.reset();
   }
 }

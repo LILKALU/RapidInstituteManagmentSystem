@@ -19,6 +19,11 @@
             </div>
         </div>
         <div class="col-4 left-margin-color">
+            <div class="grid">
+                <div class="ml-8">
+                    <button label="Create A Hall" pButton *ngIf="action === 2" (click)="openEmployeeForm(true)"></button>
+                </div>
+            </div>
             <div class="grid pt-4" *ngIf="action == 1 && isActionAllowed(1)">
                 <div class="col-8 p-float-label" [formGroup]="searchForm">
                     <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
@@ -42,6 +47,39 @@
             </p-overlayPanel>
         </div>
     </div><br><br><br>
+
+    <div class="grid pt-5" *ngIf="isActionAllowed(7)">
+        <div class="col-12">
+            <p-table  [value]="tableOtherEmployees" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
+                <ng-template pTemplate="header">
+                    <th>Full Name</th>
+                    <th>Code</th>
+                    <th>Position</th>
+                    <th>Phone Number</th>
+                    <th>Email Address</th>
+                    <th>Action</th>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-otherEmpData>
+                    <tr>
+                        <td class="centerText">{{otherEmpData.fullName}}</td>
+                        <td class="centerText">{{getCode(otherEmpData)}}</td>
+                        <td class="centerText">{{getPosition(otherEmpData)}}</td>
+                        <td class="centerText">{{otherEmpData.contactNumber}}</td>
+                        <td class="centerText">{{otherEmpData.email}}</td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(otherEmpData)" *ngIf="isActionAllowed(2)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteHall(otherEmpData)" *ngIf="isActionAllowed(4)"></i></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-11"></div>
+        <div class="col-1">
+            <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+        </div>
+    </div>
 
     <p-dialog header="Teacher Registration Form" [(visible)]="isEmployeeFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeDialog()">
         <div class="grid">
@@ -91,4 +129,55 @@
             </div>
         </form>
     </p-dialog>
+
+    <p-dialog header="Teacher Update Form" [(visible)]="isEmployeeFormUpdateVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeUpdateDialog()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+
+        <form [formGroup]="employeeUpdateForm">
+
+            <div class="grid">
+                <div class="col-4 p-float-label">
+                    <p-dropdown  [showClear]="true" appendTo="body" inputId="role" [options]="roles" optionLabel="name" optionValue="id"  placeholder="Role" [style]="{'width':'100%'}" formControlName="role"></p-dropdown>
+                    <label for="role"><span class="Requied ">* </span>Roles</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-12 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="fullName" formControlName="fullName">
+                    <label For="fullName"><span class="Requied ">* </span>Full Name</label>
+                </div>
+            </div>
+            <div class="grid pt-5">
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                    <label For="title"><span class="Requied ">* </span>Title</label>
+                </div>
+                
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
+                    <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
+                </div>
+
+                <div class="col-4 p-float-label">
+                    <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
+                    <label For="email"><span class="Requied ">* </span>Email</label>
+                </div>
+            </div>
+
+            <div class="grid mt-4">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!employeeUpdateForm.valid" (click)="updateClick()"></button>
+                </div>
+            </div>
+        </form>
+    </p-dialog>
+
+    <p-confirmDialog header="Delete Confirmation" icon="pi pi-exclamation-triangle" [style]="{width: '50vw'}"></p-confirmDialog>
 </div>

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { ClassFeeCourseVM } from '../models/classFeeCourseVM';
 import { classFeeCourseResponseVM } from '../models/classFeeCourseResponseVM';
 import { courseWiseClassFeeResponseVM } from '../models/courseWiseClassFeeResponseVM';
+import { monthWiseIncomesResponseVM } from '../models/monthWiseIncomeResponseVM';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,10 @@ export class ClassFeeCourseService {
 
   findFirstByStudentAndCourse(studentWiseCourses : studentWiseCoursesVM[]): Observable<courseWiseClassFeeResponseVM>{
     return this.httpClient.post<courseWiseClassFeeResponseVM>(`${this.BaseURL}/findfirstbystudentandcourse`,studentWiseCourses);
+  }
+
+  getMonthWiseIncomes() :Observable<monthWiseIncomesResponseVM>{
+    return this.httpClient.get<monthWiseIncomesResponseVM>(`${this.BaseURL}/getstudentclassfeegroupbycourse`);
   }
 
 }

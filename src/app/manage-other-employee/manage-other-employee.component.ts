@@ -29,12 +29,15 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
   employeeCreationForm !:FormGroup;
   employeeUpdateForm !:FormGroup;
   isEmployeeFormVisible : boolean = false;
-  isTeacherUpdateFormVisible : boolean = false;
+  isEmployeeFormUpdateVisible : boolean = false;
   roles : roleVM[] = [];
   otherEmployeeLoginData : ADAccountVM | undefined
   newlyAddedOtherEmployee : otherEmployeeVM | undefined;
+  allOtherEmployees : otherEmployeeVM[] =[];
+  tableOtherEmployees : otherEmployeeVM[] =[];
   logedDetails : loginDetailsVM | undefined;
   privilages : privilagesVM[] = [];
+  updatingEmployee : otherEmployeeVM | undefined;
   // teachersAllData : teacherVM[] = [];
   // teachersTabelData : teacherVM[] = [];
 
@@ -50,6 +53,13 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
     get getEmployeeCreationTitle(): AbstractControl { return this.employeeCreationForm.get('title') as AbstractControl; }
     get getEmployeeCreationContactNumber(): AbstractControl { return this.employeeCreationForm.get('contactNumber') as AbstractControl; }
     get getEmployeeCreationEmail(): AbstractControl { return this.employeeCreationForm.get('email') as AbstractControl; }
+
+    // get employee register value
+    get getEmployeeCreationUpdateRole(): AbstractControl { return this.employeeUpdateForm.get('role') as AbstractControl; }
+    get getEmployeeCreationUpdateFullName(): AbstractControl { return this.employeeUpdateForm.get('fullName') as AbstractControl; }
+    get getEmployeeCreationUpdateTitle(): AbstractControl { return this.employeeUpdateForm.get('title') as AbstractControl; }
+    get getEmployeeCreationUpdateContactNumber(): AbstractControl { return this.employeeUpdateForm.get('contactNumber') as AbstractControl; }
+    get getEmployeeCreationUpdateEmail(): AbstractControl { return this.employeeUpdateForm.get('email') as AbstractControl; }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -104,7 +114,13 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
   }
 
   getEmployee(){
-    this.getRoles()
+    this.subs.sink = this.otherEmployeeService.getOtherEmployees().subscribe(data =>{
+      if(data && data.content){
+        this.allOtherEmployees = data.content;
+        this.tableOtherEmployees = this.allOtherEmployees;
+        this.getRoles()
+      }
+    })
   }
 
   getRoles(){
@@ -154,11 +170,135 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
   }
 
   searchEmployee(){
-    // this.teachersTabelData = this.teachersAllData.filter(el => el.tcode == this.getSearchValue.value)
+    this.tableOtherEmployees = this.allOtherEmployees.filter(el => el.fcode == this.getSearchValue.value || el.syscode == this.getSearchValue.value || el.mcode == this.getSearchValue.value)
+  }
+
+  reset(){
+    this.tableOtherEmployees = this.allOtherEmployees;
   }
 
   closeDialog(){
+    this.employeeCreationForm.reset();
+    this.isEmployeeFormVisible = false;
+  }
 
+  closeUpdateDialog(){
+    this.employeeUpdateForm.reset();
+    this.isEmployeeFormUpdateVisible = false;
+  }
+
+  openUpdateForm(otherEmpData : otherEmployeeVM){
+    this.getEmployeeCreationUpdateContactNumber.patchValue(otherEmpData.contactNumber);
+    this.getEmployeeCreationUpdateEmail.patchValue(otherEmpData.email);
+    this.getEmployeeCreationUpdateFullName.patchValue(otherEmpData.fullName);
+    this.getEmployeeCreationUpdateRole.patchValue(otherEmpData.roleId);
+    this.getEmployeeCreationUpdateTitle.patchValue(otherEmpData.title)
+
+    this.updatingEmployee = otherEmpData;
+    this.isEmployeeFormUpdateVisible = true;
+  }
+
+  getCode(otherEmpData : otherEmployeeVM): string{
+    if(otherEmpData.fcode){
+      return otherEmpData.fcode
+    }else if(otherEmpData.syscode){
+      return otherEmpData.syscode
+    }else if(otherEmpData.mcode){
+      return otherEmpData.mcode
+    }else{
+      return ''
+    }
+  }
+
+  getPosition(otherEmpData : otherEmployeeVM): string{
+    if(otherEmpData.fcode){
+      return 'Front Desk Officer'
+    }else if(otherEmpData.syscode){
+      return 'System Administrator'
+    }else if(otherEmpData.mcode){
+      return 'Manager'
+    }else{
+      return ''
+    }
+  }
+
+  updateClick(){
+    this.isloading = true;
+    let otherEmployee : otherEmployeeVM;
+
+    otherEmployee = {
+      id : this.updatingEmployee?.id,
+      contactNumber : this.getEmployeeCreationUpdateContactNumber.value,
+      email : this.getEmployeeCreationUpdateEmail.value,
+      fullName : this.getEmployeeCreationUpdateFullName.value,
+      roleId : this.getEmployeeCreationUpdateRole.value,
+      title : this.getEmployeeCreationUpdateTitle.value,
+      fcode : this.updatingEmployee?.fcode,
+      mcode : this.updatingEmployee?.mcode,
+      syscode : this.updatingEmployee?.syscode,
+      isActive : true,
+      role : this.updatingEmployee?.role
+    }
+
+    this.subs.sink = this.otherEmployeeService.updateOrDeleteEmployee(otherEmployee).subscribe(data =>{
+      if(data && data.content){
+        let updatedEmployee : otherEmployeeVM;
+        updatedEmployee = data.content;
+        this.allOtherEmployees.forEach((element,index) => {
+          if(updatedEmployee.fcode && element.fcode == updatedEmployee.fcode){
+            this.allOtherEmployees.splice(index,1,updatedEmployee);
+            this.tableOtherEmployees = this.allOtherEmployees;
+          }else if(updatedEmployee.mcode && element.mcode == updatedEmployee.mcode){
+            this.allOtherEmployees.splice(index,1,updatedEmployee);
+            this.tableOtherEmployees = this.allOtherEmployees;
+          }else if(updatedEmployee.syscode && element.syscode == updatedEmployee.syscode){
+            this.allOtherEmployees.splice(index,1,updatedEmployee);
+            this.tableOtherEmployees = this.allOtherEmployees;
+          }
+        });
+        this.isEmployeeFormUpdateVisible = false;
+        this.isloading = false;
+      }
+    })
+  }
+
+  
+  deleteHall(otherEmpData : otherEmployeeVM){
+    let otherEmp : otherEmployeeVM = otherEmpData;
+
+    let delotherEmp : otherEmployeeVM;
+
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete',
+      accept: () => {
+        this.isloading = true;
+        delotherEmp = {
+          ...otherEmp,
+          isActive : false
+        }
+
+        this.subs.sink = this.otherEmployeeService.updateOrDeleteEmployee(delotherEmp).subscribe(data =>{
+          if(data && data.content){
+            let deletedEmployee : otherEmployeeVM;
+            deletedEmployee = data.content;
+            this.allOtherEmployees.forEach((element,index) => {
+              if(deletedEmployee.fcode && element.fcode == deletedEmployee.fcode){
+                this.allOtherEmployees.splice(index,1);
+                this.tableOtherEmployees = this.allOtherEmployees;
+              }else if(deletedEmployee.mcode && element.mcode == deletedEmployee.mcode){
+                this.allOtherEmployees.splice(index,1);
+                this.tableOtherEmployees = this.allOtherEmployees;
+              }else if(deletedEmployee.syscode && element.syscode == deletedEmployee.syscode){
+                this.allOtherEmployees.splice(index,1);
+                this.tableOtherEmployees = this.allOtherEmployees;
+              }
+            });
+            this.isEmployeeFormUpdateVisible = false;
+            this.isloading = false;
+          }
+        })
+      }
+    })
   }
 
   submitClick(){
@@ -171,6 +311,7 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
       fullName : this.getEmployeeCreationFullName.value,
       roleId : this.getEmployeeCreationRole.value,
       title : this.getEmployeeCreationTitle.value,
+      isActive : true
     }
     
     this.subs.sink = this.otherEmployeeService.addOtherEmployee(otherEmployee).subscribe(data =>{

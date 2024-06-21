@@ -5,6 +5,7 @@ import { EnrolmentsResponse } from '../models/enrolmentsResponseVM';
 import { EnrolmentsCoursesResponse } from '../models/enrolmentCoursesResponseVM';
 import { EnrolmentCourseVM } from '../models/enrolmentCourse';
 import { EnrolmentsCourseResponse } from '../models/enrolmentsCoursesResponse';
+import { courseWiseStudentCountsResponseVM } from '../models/courseWiseStudentCountsResponseVM';
 
 @Injectable({
   providedIn: 'root'
@@ -25,5 +26,9 @@ export class EnrolmentCourseService {
 
   deleteCourses(enrolmentCourse :EnrolmentCourseVM[]) : Observable<EnrolmentsCoursesResponse> {
     return this.httpClient.put<EnrolmentsCoursesResponse>(`${this.BaseURL}/deleteenrolmentcourses`,enrolmentCourse);
+  }
+
+  getStudentCountByCourse(): Observable<courseWiseStudentCountsResponseVM> {
+    return this.httpClient.get<courseWiseStudentCountsResponseVM>(`${this.BaseURL}/getstudentcountbycourse`);
   }
 }
