@@ -6,6 +6,8 @@ import { ClassFeeCourseVM } from '../models/classFeeCourseVM';
 import { classFeeCourseResponseVM } from '../models/classFeeCourseResponseVM';
 import { courseWiseClassFeeResponseVM } from '../models/courseWiseClassFeeResponseVM';
 import { monthWiseIncomesResponseVM } from '../models/monthWiseIncomeResponseVM';
+import { monthCourseVM } from '../models/monthCourseVM';
+import { studentAllResponseVM } from '../models/studentAllResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +25,12 @@ export class ClassFeeCourseService {
     return this.httpClient.post<courseWiseClassFeeResponseVM>(`${this.BaseURL}/findfirstbystudentandcourse`,studentWiseCourses);
   }
 
-  getMonthWiseIncomes() :Observable<monthWiseIncomesResponseVM>{
-    return this.httpClient.get<monthWiseIncomesResponseVM>(`${this.BaseURL}/getstudentclassfeegroupbycourse`);
+  getMonthWiseIncomes(year : number) :Observable<monthWiseIncomesResponseVM>{
+    return this.httpClient.get<monthWiseIncomesResponseVM>(`${this.BaseURL}/getstudentclassfeegroupbycourse/${year}`);
+  }
+
+  getPaiedStudentByMonthAndCourse(monthCourse : monthCourseVM) : Observable<studentAllResponseVM>{
+    return this.httpClient.post<studentAllResponseVM>(`${this.BaseURL}/getclassfeecoursebymonthandcourse`,monthCourse);
   }
 
 }

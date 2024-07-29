@@ -21,6 +21,10 @@ export class TeacherService {
     return this.httpClient.get<TeachersResponse>(`${this.BaseURL}/getteachers`);
   }
 
+  getTeacher(usercode : string) : Observable<TeacherResponse>{
+    return this.httpClient.get<TeacherResponse>(`${this.BaseURL}/getteacher/${usercode}`);
+  }
+
   addTeacher(teacher : teacherVM) : Observable<TeacherResponse>{
     return this.httpClient.post<TeacherResponse>(`${this.BaseURL}/createteacher`,teacher);
   }

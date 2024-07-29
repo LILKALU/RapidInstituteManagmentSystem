@@ -230,54 +230,6 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
       }
     });
     
-    // let selectedStudent : studentVM;
-    // let selectedCourse : CourseVM
-    // let lastElementId : number = -1;
-    // let studentWiseClassFees : ClassFeeVM[] =[];
-    // this.studentClassFeesCourse = [];
-    // this.firstMonthId = -1;
-    // this.lastMonthId = -1;
-    // this.isLoading = true;
-    // this.allStudents.forEach(element => {
-    //   if(element.scode === this.getStudent.value){
-    //     selectedStudent = element;
-    //     this.selectedStudent = selectedStudent
-    //   }
-    // });
-
-    // this.allCourses.forEach(element => {
-    //   if(element.code === this.getCourse.value){
-    //     selectedCourse = element
-    //     this.selectedCourse = selectedCourse;
-    //   }
-    // });
-    
-
-    
-    // studentWiseClassFees = this.allClassFees.filter(el => el.student?.id === selectedStudent.id);
-    // console.log("studentWiseClassFees",studentWiseClassFees);
-    
-    // studentWiseClassFees.forEach(el1 => {
-    //   if(el1 && el1.classFeeCourse){
-    //     el1.classFeeCourse.forEach(el2 => {
-    //       if(el2.course?.id === selectedCourse.id){
-    //         this.studentClassFeesCourse.push(el2);
-    //       }
-    //     });
-    //   }
-    // });
-
-    // console.log("studentCourseClassFees",this.studentClassFeesCourse);
-    // lastElementId = this.studentClassFeesCourse.length - 1;
-    // let lstid : number = lastElementId ? lastElementId : 0;
-    // this.firstMonthId = this.studentClassFeesCourse[0].month?.id ? this.studentClassFeesCourse[0].month?.id : -1;
-    // this.lastMonthId = this.studentClassFeesCourse[lastElementId].month?.id ? this.studentClassFeesCourse[lastElementId].month?.id : -1;
-    
-    
-    // console.log("firstMonthId",this.firstMonthId);
-    // console.log("lastMonthId" , this.lastMonthId);
-    // this.getAttendCountOnMonth()
-    
   }
 
   getfirstPaymentMonthClassFee(studentWiseCourses : studentWiseCoursesVM[]){

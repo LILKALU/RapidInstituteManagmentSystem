@@ -6,6 +6,7 @@ import { countResponseVM } from '../models/countResponseVM';
 import { Observable } from 'rxjs';
 import { CourseVM } from '../models/coursesVM';
 import { attendanceSearchVM } from '../models/attendanceSearchVM';
+import { attendanceCountByMonthAndCourseResponseVM } from '../models/attendanceCountByMonthAndCourseResponseVM';
 
 
 @Injectable({
@@ -35,5 +36,9 @@ export class AttendanceService {
 
   getCountByCourseAndYearAndMonthAndDateAndStudent(attendanceSearch : attendanceSearchVM): Observable<countResponseVM>{
     return this.httpClient.post<countResponseVM>(`${this.BaseURL}/getcountbycourseandyearandmonthandstudent`,attendanceSearch);
+  }
+
+  getAttendanceCountByMonthAndCourse(year : number): Observable<attendanceCountByMonthAndCourseResponseVM>{
+    return this.httpClient.get<attendanceCountByMonthAndCourseResponseVM>(`${this.BaseURL}/getattendancecountbymonthandcourse/${year}`,);
   }
 }

@@ -111,7 +111,7 @@
             <div class="grid mt-5" *ngIf="isUpdateHallFeildVisible && getUpdateEndTime.value"> 
                 <!-- isHallSelecting -->
                 <div class="col-12">
-                    <p-dropdown [options]="selectableHalls" optionLabel="hallName" appendTo="body" placeholder="Hall" [style]="{'width':'100%'}" class="inputsStyle" formControlName="hall" (onBlur)="setUpdateClassFee()"></p-dropdown>
+                    <p-dropdown [options]="selectableHalls" optionLabel="hallName"  appendTo="body" placeholder="Hall" [style]="{'width':'100%'}" class="inputsStyle" formControlName="hall" (onBlur)="setUpdateClassFee()"></p-dropdown>
                 </div>
             </div>
             <div class="grid mt-5" *ngIf="isUpdateClassFeeFeildVisible && getUpdateHall.value"> 

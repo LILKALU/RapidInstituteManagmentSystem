@@ -1,0 +1,98 @@
+<div *ngIf="isLoading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isLoading">
+   
+    <div class="grid pt-4 pl-3">
+        <div class="col-4" *ngIf="isActionAllowed(3)">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">Search A Leave Request</label><br><br>
+                <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+        <div class="col-4">
+            <div [formGroup]="selectAction" *ngIf="isActionAllowed(1)">
+                <label for="createAction">Create A Leave Requets</label><br><br>
+                <p-radioButton value=2 inputId="createAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+                
+            </div>
+        </div>
+        <div class="col-4">
+            <button label="Create A Leave Requets" pButton *ngIf="action === 2" (click)="openRequestFormFo(true)"></button>
+            <div class="grid pt-4" *ngIf="action == 1">
+                <div class="col-8 p-float-label" [formGroup]="searchForm">
+                    <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
+                    <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Leave Requets</label>
+                </div>
+                <div class="col-4">
+                    <button label="Search" pButton (click)="searchLeaveRequest()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid pt-4 pl-3 pr-3"  *ngFor="let req of leaveRequestsaShow">
+        <div class="col-12">
+            <p-card>
+                <div class="grid">
+                    <div class="col-2 font-bold">Request Id : {{req.id}}</div>
+                    <div class="col-8"></div>
+                    <div class="col-1">
+                        <span [ngClass]="{ 
+                            'text-green-400': req.approvingStatus?.id === 1,
+                            'text-yellow-400': req.approvingStatus?.id === 2,
+                            'text-red-400': req.approvingStatus?.id === 3
+                        }">
+                            {{req.approvingStatus?.name}} <i class="fa-solid fa-circle"></i>
+                        </span>
+                    </div>
+                    <div class="col-1 text-red-400" *ngIf="userCode.startsWith('T')">
+                        <i class="fa-solid fa-circle-xmark fa-xl"></i>
+                    </div>
+                </div>
+                <div class="grid mt-3">
+                    <div class="col-11 font-bold">
+                        {{req.teacher?.title}}. {{req.teacher?.fullName}} has asked A leave on {{getDate(req.requestedDate)}} for {{req.leaveReason}}
+                    </div>
+                    <div class="col-1">
+
+                    </div>
+                </div>
+            </p-card>
+        </div>
+    </div>
+
+    <p-dialog header="Leave Request Form" [(visible)]="isRequestFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeLeaveRequestPopUp()">
+        <div class="grid">
+            <div class="col-10"></div>
+            <div class="col-2">
+                <span class="Requied ">* </span> <b> Requied</b> 
+            </div>
+        </div><br>
+
+        <form [formGroup]="requestForm">
+            <div class="grid">
+                <div class="col-4">
+                    <p-calendar formControlName="date" placeholder="Select Date" [style]="{'width':'100%'}" [showIcon]="true" [showClear]="true" [minDate]="today" inputId="buttondisplay" [showOnFocus]="false" appendTo="body"/>
+                </div>
+            </div>
+            <div class="grid mt-4">
+                <div class="col-12 p-float-label">
+                    <textarea rows="2" cols="80" id="reason" pInputTextarea formControlName="reason"></textarea>
+                    <label For="reason"><span class="Requied ">* </span>Reason</label>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="col-1"></div>
+                <div class="col-9"></div>
+                <div class="col-2">
+                    <button label="Submit" pButton class="p-button-success" [disabled]="!requestForm.valid" (click)="submitClick()"></button>
+                </div>
+            </div>
+        </form>
+
+
+    </p-dialog>
+</div>

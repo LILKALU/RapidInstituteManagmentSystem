@@ -1,1 +1,28 @@
-<p>manage-notification works!</p>
+<div *ngIf="isLoading" class="loading">
+  <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
+<div *ngIf="!isLoading">
+
+  <div class="grid pt-4 pl-3 pr-3 mt-3"  *ngFor="let noty of allNotifications">
+    <div class="col-12">
+        <p-card>
+            <div class="grid">
+                <div class="col-2 font-bold">Approved User Code : {{noty.createdUserCode}}</div>
+                <div class="col-8"></div>
+                <div class="col-2 text-600">
+                  Approved on : {{noty.createdDateTime}}
+                </div>
+            </div>
+            <div class="grid mt-3">
+                <div class="col-11 font-bold">
+                    {{noty.message}}
+                </div>
+                <div class="col-1">
+
+                </div>
+            </div>
+        </p-card>
+    </div>
+  </div>
+</div>

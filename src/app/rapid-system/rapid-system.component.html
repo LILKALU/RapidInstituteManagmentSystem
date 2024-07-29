@@ -18,7 +18,7 @@
                             </div>
                             <div class="mt-3">
                                 <i class="fa-solid fa-key option"></i>
-                                <button class="option">Change Password</button>
+                                <button class="option" (click)="openPasswordChange()">Change Password</button>
                                 <button class="option"></button>
                                 <button class="option"></button>
                             </div>
@@ -42,6 +42,7 @@
             </div>
         </div>
         <div class="col-10 content_area">
+            <p-toast></p-toast>
             <router-outlet ></router-outlet>
             <!-- <app-dashboard *ngIf="selectedModuleEnum === 1"></app-dashboard>
             <app-manage-student *ngIf="selectedModuleEnum === 2"></app-manage-student>
@@ -60,4 +61,55 @@
             <app-manage-privilage *ngIf="selectedModuleEnum === 15"></app-manage-privilage> -->
         </div>
     </div>
+
+    <p-dialog header="Password Change" [(visible)]="isPasswordChangeOpen" [style]="{width: '50vw'}" [modal]="true" (onHide)="closePassWordChangePopup()">
+        <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex"></p-steps>
+
+        <div *ngIf="activeStepIndex == 0">
+            <div class="grid ml-3 mr-3 mt-7">
+                <div class="col-12 p-float-label" [formGroup]="loginForm">
+                    <input type="password" pInputText class="inputsStyle" id="password" formControlName="password"> 
+                    <label For="password">Enter Your Password</label>
+                </div>
+            </div>
+    
+            <div class="grid ml-3 mr-3 mt-7">
+                <div class="col-8 align-content-end">
+                    
+                </div>
+                <div class="col-4">
+                    <button label="Reset" class="p-button-secondary mr-4" pButton (click)="reset()"></button>
+                    <button label="Varify Password" class="p-button-success" [disabled]="!loginForm.valid" pButton (click)="checkPassword()"></button>
+                </div>
+            </div>
+        </div>
+        
+        <div *ngIf="activeStepIndex == 1">
+            <div class="grid ml-3 mr-3 mt-7">
+                <div class="col-12 p-float-label" [formGroup]="passwordChangeForm">
+                    <input type="password" pInputText class="inputsStyle" id="newPassword" formControlName="newPassword"> 
+                    <label For="password">Enter New Password</label>
+                </div>
+            </div>
+            <div class="grid ml-3 mr-3 mt-4">
+                <div class="col-12 p-float-label" [formGroup]="passwordChangeForm">
+                    <input type="password" pInputText class="inputsStyle" id="confirmPassword" formControlName="confirmPassword"> 
+                    <label For="password">Confirm New Password</label>
+                </div>
+            </div>
+    
+            <div class="grid ml-3 mr-3 mt-4">
+                <div class="col-8 align-content-end">     
+                </div>
+                <div class="col-4">
+                    <button label="Reset" class="p-button-secondary mr-4" pButton (click)="reset()"></button>
+                    <button label="Varify Password" class="p-button-success" [disabled]="!passwordChangeForm.valid" pButton (click)="changePassword()"></button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="isUpdating" >
+            <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+        </div>
+    </p-dialog>
 </div>

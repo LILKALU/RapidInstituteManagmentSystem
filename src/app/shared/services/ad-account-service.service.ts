@@ -18,7 +18,15 @@ export class AdAccountServiceService {
     return this.httpClient.post<ADAccountResponseVM>(`${this.BaseURL}/createuseraccount`,adAccountVM);
   }
 
+  updateUserAccount(adAccountVM : ADAccountVM) : Observable<ADAccountResponseVM>{
+    return this.httpClient.put<ADAccountResponseVM>(`${this.BaseURL}/updateadacoount`,adAccountVM);
+  }
+
   login(adAccountVM : ADAccountVM) : Observable<loginDetailsResponseVM>{
     return this.httpClient.post<loginDetailsResponseVM>(`${this.BaseURL}/checklogin`,adAccountVM);
+  }
+
+  getALogin(adAccount :ADAccountVM) : Observable<ADAccountResponseVM>{
+    return this.httpClient.post<ADAccountResponseVM>(`${this.BaseURL}/getalogin`,adAccount);
   }
 }

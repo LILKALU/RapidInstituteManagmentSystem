@@ -19,6 +19,7 @@ import { LoginPageComponent } from './login-page/login-page.component';
 import { AuthGuard } from './shared/guard/guards/auth.guard';
 import { ManageSalaryPaymentsComponent } from './manage-salary-payments/manage-salary-payments.component';
 import { ManageNotificationComponent } from './manage-notification/manage-notification.component';
+import { ManageLeaveComponent } from './manage-leave/manage-leave.component';
 
 const routes: Routes = [
   {path : "login", component: LoginPageComponent},
@@ -39,6 +40,7 @@ const routes: Routes = [
   {path : "Manage Privileges", component: ManagePrivilageComponent ,canActivate : [AuthGuard]},
   {path : "Manage Salary Payment", component: ManageSalaryPaymentsComponent ,canActivate : [AuthGuard]},
   {path : "Manage Notification", component: ManageNotificationComponent ,canActivate : [AuthGuard]},
+  {path : "Manage Leave", component: ManageLeaveComponent ,canActivate : [AuthGuard]},
   {path: '', redirectTo: 'Dashboard', pathMatch: 'full'}
 ];
 

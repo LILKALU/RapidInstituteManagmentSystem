@@ -43,29 +43,136 @@
         </div>
 
         <div class="grid mt-4 ml-3 mr-3">
-            <div class="col-6">
-                <div class="card">
-                    <p-chart type="bar" [data]="classFeeChartData" [options]="basicOptions" />
-                </div>
+            <div class="col-7"></div>
+            <div class="col-3">
+                <form [formGroup]="yearFilterForm">
+                    <p-calendar view="year" formControlName="year" [style]="{'width':'100%'}" yearRange="2000:2024" [maxDate]="today" dateFormat="yy" placeholder="Select Year"></p-calendar>
+                </form>
             </div>
-            <div class="col-6">
-                <div class="card">
-                    <p-chart type="bar" [data]="teacherPaymentChartData" [options]="basicOptions" />
-                </div>
+            <div class="col-2">
+                <button label="Filter" pButton (click)="filterForYear()"></button>
+                <button pButton class="p-button-secondary ml-3" (click)="reset()">Reset</button>
             </div>
+            <!-- <div class="col-2">
+                <button pButton class="p-button-secondary" (click)="reset()">Reset</button>
+            </div> -->
         </div>
         <div class="grid mt-4 ml-3 mr-3">
             <div class="col-6">
-                <div class="card">
+                <div class="card incomeChart">
+                    <div *ngIf="monthWiseClassFees.length >0">
+                        <div class="grid mt-4">
+                            <div class="col-11"></div>
+                            <div class="col-1">
+                                <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.incomeChart')"></i>
+                            </div>
+                        </div>
+                        
+                        <p-chart type="bar" [data]="classFeeChartData" [options]="basicOptions" />
+                    </div>
+                    <div *ngIf="monthWiseClassFees.length == 0">
+                        <div class="text-center text-2xl font-semibold mt-3 mb-3">Monthly Class Fee Income</div>
+                        No entries Found
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card paymentChart">
+                    <div *ngIf="monthWiseTeacherPayments.length >0">
+                        <div class="grid mt-4">
+                            <div class="col-11"></div>
+                            <div class="col-1">
+                                <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.paymentChart')"></i>
+                            </div>
+                        </div>
+                        <p-chart type="bar" [data]="teacherPaymentChartData" [options]="basicOptions" />
+                    </div>
+                    <div *ngIf="monthWiseTeacherPayments.length == 0">
+                        <div class="text-center text-2xl font-semibold mt-3 mb-3">Monthly Class Fee Income</div>
+                        No entries Found
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid nested-grid">
+            <div class="col-6">
+                <div class="grid">
+                    <div class="col-12">
+                        <div class="card profitChart">
+                            <div class="grid mt-4">
+                                <div class="col-11"></div>
+                                <div class="col-1">
+                                    <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.profitChart')"></i>
+                                </div>
+                            </div>
+                            <p-chart type="bar" [data]="profitChartData" [options]="basicOptions" />
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card attendanceChart">
+                            <div *ngIf="monthWiseClassFees.length >0">
+                                <div class="grid mt-4">
+                                    <div class="col-11"></div>
+                                    <div class="col-1">
+                                        <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.attendanceChart')"></i>
+                                    </div>
+                                </div>
+                                <div class="text-center text-2xl font-semibold mt-3 mb-3">Class Wise Student Count</div>
+                                <p-chart type="bar" [data]="attendanceCountByMonthAndCourseChartData" [options]="basicOptionsForstack" />
+                                
+                                
+                            </div>
+                            <div *ngIf="monthWiseClassFees.length == 0">
+                                <div class="text-center text-2xl font-semibold mt-3 mb-3">Monthly Class Fee Income</div>
+                                No entries Found
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6">
+                <div class="col-12">
+                    <div class="card cwsChart">
+                        <div class="grid mt-4">
+                            <div class="col-11"></div>
+                            <div class="col-1">
+                                <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.cwsChart')"></i>
+                            </div>
+                        </div>
+                        <div class="text-center text-2xl font-semibold mt-3 mb-3">Class Wise Student Count</div>
+                        <p-chart type="pie" [data]="studentCountByCourseChartData" [options]="basicOptionsForPie" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-6">
+                <div class="card profitChart">
+                    <div class="grid mt-4">
+                        <div class="col-11"></div>
+                        <div class="col-1">
+                            <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.profitChart')"></i>
+                        </div>
+                    </div>
                     <p-chart type="bar" [data]="profitChartData" [options]="basicOptions" />
                 </div>
             </div>
             <div class="col-6">
-                <div class="card">
+                <div class="card cwsChart">
+                    <div class="grid mt-4">
+                        <div class="col-11"></div>
+                        <div class="col-1">
+                            <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.cwsChart')"></i>
+                        </div>
+                    </div>
                     <div class="text-center text-2xl font-semibold mt-3 mb-3">Class Wise Student Count</div>
                     <p-chart type="pie" [data]="studentCountByCourseChartData" [options]="basicOptionsForPie" />
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </div>

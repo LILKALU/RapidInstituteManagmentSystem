@@ -18,6 +18,8 @@ import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
 import { Router } from '@angular/router';
+import { ClassFeeCourseService } from '../shared/services/class-fee-course.service';
+import { monthCourseVM } from '../shared/models/monthCourseVM';
 
 @Component({
   selector: 'app-manage-attendance',
@@ -76,6 +78,7 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
   constructor(
     private formBuilder: FormBuilder,
     private courseService : CourseService,
+    private classFeeCourseService : ClassFeeCourseService,
     private enrolmentCourseService : EnrolmentCourseService,
     private monthService : MonthService,
     private attendanceService : AttendanceService,
@@ -187,27 +190,31 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
     console.log(this.getSelectedCourseForMark.value);
     this.studentsInCourse = []
     this.allEnrolments = []
-    this.allEnrolmentCourses.forEach(element => {
-      if(element && element.course && element.course.code === this.getSelectedCourseForMark.value){
-        if(element.enrolment && element.enrolment.student){
-          this.allEnrolments.push(element.enrolment)
-          this.studentsInCourse.push(element.enrolment.student)
-        }
+    let monthCourse : monthCourseVM | undefined;
+    let course : CourseVM | undefined;
+
+    course = this.dropdownCourses.find(el => el.code ===this.getSelectedCourseForMark.value)
+
+    if(course && this.thisMonth){
+      monthCourse = {
+        course : course,
+        month : this.thisMonth
       }
-    });
+    }
 
-    this.studentsInCourse.forEach(element => {
-      let name : string = element.scode + "Attendance";
-      formControls[name] = [false];
-    });
-    this.attendanceForm = this.formBuilder.group(formControls)
-    console.log("attendanceForm",this.getSelectedCourseForMark.value);
-    console.log("this.studentsInCourse" , this.studentsInCourse);
-    console.log("this.studentsInCourse" , this.studentsInCourse);
-    console.log("this.attendanceForm" , this.attendanceForm);
-    
-
-    this.setMarkedAttendance();
+    if(monthCourse){
+      this.subs.sink = this.classFeeCourseService.getPaiedStudentByMonthAndCourse(monthCourse).subscribe(data =>{
+        if(data && data.content){
+          this.studentsInCourse = data.content;
+          this.studentsInCourse.forEach(element => {
+            let name : string = element.scode + "Attendance";
+            formControls[name] = [false];
+          });
+          this.attendanceForm = this.formBuilder.group(formControls)
+          this.setMarkedAttendance();
+        }
+      })
+    }
   }
 
   setMarkedAttendance(){

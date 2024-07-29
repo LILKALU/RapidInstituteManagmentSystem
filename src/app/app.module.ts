@@ -49,6 +49,7 @@ import { ManageSalaryPaymentsComponent } from './manage-salary-payments/manage-s
 import { ChartModule } from 'primeng/chart';
 import { TeacherPaymentRecpitTemplateComponent } from './teacher-payment-recpit-template/teacher-payment-recpit-template.component';
 import { ManageNotificationComponent } from './manage-notification/manage-notification.component';
+import { ManageLeaveComponent } from './manage-leave/manage-leave.component';
 // import { LoginPageComponent } from './login-page/login-page.component';
 
 
@@ -77,6 +78,7 @@ import { ManageNotificationComponent } from './manage-notification/manage-notifi
     ManageSalaryPaymentsComponent,
     TeacherPaymentRecpitTemplateComponent,
     ManageNotificationComponent,
+    ManageLeaveComponent,
     // LoginPageComponent,
   ],
   imports: [
@@ -104,7 +106,7 @@ import { ManageNotificationComponent } from './manage-notification/manage-notifi
     MessagesModule,
     MultiSelectModule,
     PasswordModule,
-    ChartModule
+    ChartModule,
   ],
   providers: [ConfirmationService,MessageService],
   bootstrap: [AppComponent]

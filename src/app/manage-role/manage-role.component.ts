@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { SubSink } from 'subsink';
 import { RoleService } from '../shared/services/role.service';
 import { roleVM } from '../shared/models/roleVM';
@@ -54,6 +54,7 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
     private roleService : RoleService,
     private confirmationService: ConfirmationService,
     private localStorageService : LocalStorageService,
+    private messageService: MessageService,
     private router : Router
   ){}
 
@@ -167,6 +168,7 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
         this.tableRoles = this.allRoles;
         this.isRoleFormVisible = false;
         this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Record Inserted'});
       }
     })
   }
@@ -225,6 +227,7 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
               this.allRoles.splice(index,1);
               this.tableRoles = this.allRoles;
               this.isLoading = false;
+              this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Role Removed'});
             }
           }
         })

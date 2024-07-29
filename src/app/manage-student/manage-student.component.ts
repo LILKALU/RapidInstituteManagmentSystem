@@ -23,7 +23,7 @@ import { AdAccountServiceService } from '../shared/services/ad-account-service.s
 import { GradeService } from '../shared/services/grade.service';
 import { MonthService } from '../shared/services/month.service';
 import { MonthVM } from '../shared/models/monthVM';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { reciptTemplateDataVM } from '../shared/models/reciptTemplateDataVM';
 import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
 import { EnrolmentCourseService } from '../shared/services/enrolment-course.service';
@@ -190,6 +190,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private roleService : RoleService,
     private localStorageService : LocalStorageService,
+    private messageService: MessageService,
     private router : Router
   ) {
   }
@@ -509,6 +510,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
               if(element.id == student.id){
                 this.studentAllData.splice(index,1);
                 this.studentTableData = this.studentAllData;
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Student Removed'});
               }
             });
             

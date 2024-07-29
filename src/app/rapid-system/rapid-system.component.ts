@@ -6,6 +6,12 @@ import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
 import { Router } from '@angular/router';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AdAccountServiceService } from '../shared/services/ad-account-service.service';
+import { ADAccountVM } from '../shared/models/adAccountVM';
+import { MessageService } from 'primeng/api';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-rapid-system',
@@ -16,17 +22,36 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
   selectedModuleEnum : number = 1;
   private subs = new SubSink();
   appIcons : appIconVM[]=[]
+  loginForm !: FormGroup;
+  passwordChangeForm !: FormGroup;
   isLoading : boolean = false;
+  isUpdating : boolean = false;
+  isPasswordChangeOpen: boolean = false;
   logedDetails : loginDetailsVM | undefined;
+  adAccount : ADAccountVM | undefined;
   privilages : privilagesVM[] = [];
   name : string | undefined;
+  usercode : string ='';
+  isPasswordCorrect : boolean = false
+  activeStepIndex : number = 0;
+  steps = [
+    { label: 'Verify Password'},
+    { label: 'Change Password'}
+  ];
 
   @Output() isLogout = new EventEmitter<boolean>();
 
+  get getLoginPassword(): AbstractControl { return this.loginForm.get('password') as AbstractControl; }
+  get getNewPassword(): AbstractControl { return this.passwordChangeForm.get('newPassword') as AbstractControl; }
+  get getConfirmPassword(): AbstractControl { return this.passwordChangeForm.get('confirmPassword') as AbstractControl; }
+
   constructor(
+    private formBuilder: FormBuilder,
     private appIconService : AppIconService, 
     private localStorageService : LocalStorageService,
-    private router : Router
+    private adAccountService : AdAccountServiceService,
+    private router : Router,
+    private messageService: MessageService,
   ){}
 
   changeModule(moduleEnum : number=0 , appIconeName : string = ''){
@@ -40,7 +65,19 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getLoginData()
+    this.buildForms()
     this.isLogout.emit(false);
+  }
+
+  buildForms(){
+    this.loginForm = this.formBuilder.group({
+      password : ['',Validators.required]
+    })
+
+    this.passwordChangeForm = this.formBuilder.group({
+      newPassword : ['',Validators.required],
+      confirmPassword : ['',Validators.required]
+    })
   }
 
   getLoginData(){
@@ -49,6 +86,7 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
     console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
     this.name = this.logedDetails?.fullName.split(" ")[0];
+    this.usercode = this.logedDetails?.usercode ? this.logedDetails?.usercode : '';
     this.getAppIcons()
   }
 
@@ -61,6 +99,76 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
         this.isLoading = false;
       }
     })
+  }
+
+  changePassword(){
+    this.isUpdating = true;
+    let newPassword : string = this.getNewPassword.value;
+    let confirmPassword : string = this.getConfirmPassword.value;
+    let ad : ADAccountVM | undefined;
+
+    if(newPassword === confirmPassword){
+      ad = {
+        ...this.adAccount,
+        passWord : confirmPassword
+      }
+
+      this.subs.sink = this.adAccountService.updateUserAccount(ad).subscribe(data => {
+        if(data && data.content){
+          this.isUpdating = false;
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Password Updated' });
+        }
+      });
+
+    }else{
+      this.isUpdating = false;
+      this.messageService.add({ severity: 'warn', summary: 'Faild', detail: 'Password mismatch' });
+    }
+
+  }
+
+  closePassWordChangePopup(){
+    this.isPasswordChangeOpen = false;
+    this.activeStepIndex = 0;
+  }
+
+  checkPassword(){
+    this.isLoading = true;
+    let loginDetails : ADAccountVM;
+
+    loginDetails = {
+      userCode : this.usercode,
+      passWord : this.getLoginPassword.value
+    }
+
+    console.log(loginDetails);
+    
+
+    this.subs.sink = this.adAccountService.getALogin(loginDetails).subscribe(data =>{
+      if(data && data.content){
+        console.log(data.content);
+        this.adAccount = data.content;
+        this.isPasswordCorrect = true;
+
+        if(this.isPasswordCorrect){
+          this.activeStepIndex = this.activeStepIndex+1;
+        }
+        
+        this.isLoading = false;
+      }else{
+        this.isLoading = false;
+        this.messageService.add({ severity: 'warn', summary: 'Faild', detail: 'Wrong Password' });
+      }
+    })
+  }
+
+  reset(){
+    this.loginForm.reset();
+    this.passwordChangeForm.reset()
+  }
+
+  openPasswordChange(){
+    this.isPasswordChangeOpen = true;
   }
 
   isAllowed(appIconId : number = 0):boolean{

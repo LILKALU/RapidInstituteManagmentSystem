@@ -5,13 +5,19 @@ import { teacherVM } from '../shared/models/teachersVM';
 import { TeacherService } from '../shared/services/teacher.service';
 import { AdAccountServiceService } from '../shared/services/ad-account-service.service';
 import { ADAccountVM } from '../shared/models/adAccountVM';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { RoleService } from '../shared/services/role.service';
 import { roleVM } from '../shared/models/roleVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
 import { Router } from '@angular/router';
+import { LeaveRequestService } from '../shared/services/leave-request.service';
+import { ApprovingStatusService } from '../shared/services/approving-status.service';
+import { approvingStatusVM } from '../shared/models/approvingStatusVM';
+import { leaveRequestVM } from '../shared/models/leaveRequestVM';
+import { notificationVM } from '../shared/models/notificationVM';
+import { NotificationService } from '../shared/services/notification.service';
 
 @Component({
   selector: 'app-manage-teachers',
@@ -21,6 +27,7 @@ import { Router } from '@angular/router';
 export class ManageTeachersComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
+  today = new Date();
   appIconId : number = 6
   isloading : boolean = false;
   selectAction !: FormGroup;
@@ -38,6 +45,9 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
   teacherUpdateForm !:FormGroup;
   logedDetails : loginDetailsVM | undefined;
   privilages : privilagesVM[] = [];
+  approvingStatuses : approvingStatusVM[]=[];
+  leaveRequestsaAll : leaveRequestVM[]=[]
+  pendingLeaveRequestCount: number = 0;
 
   // get action value
   get getAction(): AbstractControl { return this.selectAction.get('action') as AbstractControl; }
@@ -68,6 +78,10 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private roleService : RoleService,
     private localStorageService : LocalStorageService,
+    private leaveRequestService : LeaveRequestService,
+    private approvingStatusService : ApprovingStatusService,
+    private notificationService : NotificationService,
+    private messageService: MessageService,
     private router : Router
   ){}
 
@@ -138,7 +152,6 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
             this.teachersTabelData = this.teachersAllData;
             this.teachersTabelData.reverse();
             this.getRole();
-            this.isloading = false;
           }
         })
       }else{
@@ -157,6 +170,28 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     this.subs.sink = this.roleService.getRoles().subscribe(data =>{
       if(data && data.content){
         this.role = data.content.find(el => el.id && el.id == 4);
+        this.getApprovingStatuses();
+      }
+    })
+  }
+
+  getApprovingStatuses(){
+    this.subs.sink = this.approvingStatusService.getApprovingStatuses().subscribe(data =>{
+      if(data && data.content){
+        this.approvingStatuses = data.content
+        this.getLeaveRequests()
+      }
+    })
+  }
+
+  getLeaveRequests(){
+    this.subs.sink = this.leaveRequestService.getRequestByApprovingStatus(this.approvingStatuses[1]).subscribe(data =>{
+      if(data && data.content){
+        this.leaveRequestsaAll = data.content;
+        this.pendingLeaveRequestCount = this.leaveRequestsaAll.length;
+        this.isloading = false;
+      }else{
+        this.isloading = false;
       }
     })
   }
@@ -317,5 +352,61 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     
   }
 
+  getDate(requestDate : string = ''){
+    return requestDate.split('T')[0];
+  }
+
+  setStatusOnLeaves(req : leaveRequestVM, status : approvingStatusVM){
+    this.isloading = true
+    if(req && status && this.logedDetails?.usercode){
+      let request : leaveRequestVM
+
+      request ={
+        ...req,
+        approvingStatus : status,
+        officerUserCode : this.logedDetails.usercode,
+      }
+
+      this.subs.sink = this.leaveRequestService.updateOrDeleteRequest(request).subscribe(data =>{
+        if(data && data.content){
+          let index : number = -1;
+          let leave : leaveRequestVM | undefined;
+
+          leave = this.leaveRequestsaAll.find(el => el.id == req.id);
+          if(leave){
+            index = this.leaveRequestsaAll.indexOf(leave);
+            this.leaveRequestsaAll.splice(index,1);
+            this.isloading = false;
+          }
+
+          if(status.id == 1 ){
+            this.setNotification(data.content)
+          }else{
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Leave Rejected'});
+          }
+        }
+      })
+    }
+  }
+
+  setNotification(leave : leaveRequestVM){
+    let notification : notificationVM;
+    let message : string;
+
+    message = `${leave.teacher?.title}.${leave.teacher?.fullName} is on leave on ${leave.requestedDate?.split('T')[0]}. So all the classes on that day will be canceled.`
+
+    notification = {
+      createdDateTime : this.today.toLocaleDateString(),
+      createdUserCode : this.logedDetails?.usercode,
+      message : message,
+      isActive : true
+    }
+
+    this.subs.sink = this.notificationService.addNotification(notification).subscribe(data =>{
+      if(data && data.content){
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave Accepted' });
+      }
+    })
+  }
   
 }

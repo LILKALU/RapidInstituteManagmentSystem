@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SubSink } from 'subsink';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
@@ -21,6 +21,10 @@ import { TeacherPaymentCourseService } from '../shared/services/teacher-payment-
 import { EnrolmentCourseService } from '../shared/services/enrolment-course.service';
 import { courseWiseStudentCountVM } from '../shared/models/courseWiseStudentCountVM';
 import { CourseVM } from '../shared/models/coursesVM';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { AttendanceService } from '../shared/services/attendance.service';
+import { attendanceCountByMonthAndCourseVM } from '../shared/models/attendanceCountByMonthAndCourseVM';
 
 @Component({
   selector: 'app-dashboard',
@@ -30,6 +34,9 @@ import { CourseVM } from '../shared/models/coursesVM';
 export class DashboardComponent implements OnInit, OnDestroy  {
 
   isLoading : boolean = false;
+  today = new Date();
+  thisFullYear : number = this.today.getFullYear();
+  fullyear : string = this.thisFullYear.toString();
   selectAction !: FormGroup
   searchForm !: FormGroup;
   appIconId : number = 1
@@ -41,19 +48,24 @@ export class DashboardComponent implements OnInit, OnDestroy  {
   studentCount : number = 0;
   courseCount : number = 0
   teacherCount : number = 0;
+  yearFilterForm !: FormGroup;
   classFeeChartData : chartVM|undefined
   teacherPaymentChartData : chartVM|undefined
   profitChartData : chartVM|undefined
   studentCountByCourseChartData : chartVM|undefined
+  attendanceCountByMonthAndCourseChartData : chartVM|undefined
   payments : number[]=[]
   classFees : number[]=[]
   months : MonthVM[]=[]
   monthWiseClassFees : monthWiseIncomeVM[]=[]
   monthWiseTeacherPayments : monthWiseIncomeVM[]=[]
   studentCountByCourse : courseWiseStudentCountVM[]=[]
+  attendanceCountByMonthAndCourse : attendanceCountByMonthAndCourseVM[]=[]
   basicOptions: any;
   basicOptionsForPie: any;
+  basicOptionsForstack: any;
 
+  get getSelectedYearForFilter(): AbstractControl { return this.yearFilterForm.get('year') as AbstractControl; }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,6 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     private localStorageService : LocalStorageService,
     private classFeeCourseService : ClassFeeCourseService,
     private teacherPaymentCourseService : TeacherPaymentCourseService,
+    private attendanceService : AttendanceService,
     private router : Router,
     private studentServices : StudentService,
     private teachersService : TeacherService,
@@ -77,8 +90,14 @@ export class DashboardComponent implements OnInit, OnDestroy  {
 
   ngOnInit(): void {
     this.getLoginData();
-    // this.buildForm();
+    this.buildForm();
     this.subscriptions();
+  }
+
+  buildForm(){
+    this.yearFilterForm = this.formBuilder.group({
+      year : [this.fullyear,Validators.required],
+    })
   }
 
   getLoginData(){
@@ -152,7 +171,9 @@ export class DashboardComponent implements OnInit, OnDestroy  {
   }
 
   getMonthWiseClassFees(){
-    this.subs.sink = this.classFeeCourseService.getMonthWiseIncomes().subscribe(data =>{
+    let date = new Date(this.getSelectedYearForFilter.value)
+    let year : number = date.getFullYear();
+    this.subs.sink = this.classFeeCourseService.getMonthWiseIncomes(year).subscribe(data =>{
       if(data && data.content){
         this.monthWiseClassFees = data.content;
 
@@ -170,12 +191,18 @@ export class DashboardComponent implements OnInit, OnDestroy  {
         this.setClassFeeChartData();
         this.getTeacherPaymentsByMonth()
         
+      }else{
+        this.monthWiseClassFees = []
+        this.setClassFeeChartData();
+        this.getTeacherPaymentsByMonth()
       }
     })
   }
 
   getTeacherPaymentsByMonth(){
-    this.subs.sink = this.teacherPaymentCourseService.getTeacherPaymentByMonth().subscribe(data =>{
+    let date = new Date(this.getSelectedYearForFilter.value)
+    let year : number = date.getFullYear();
+    this.subs.sink = this.teacherPaymentCourseService.getTeacherPaymentByMonth(year).subscribe(data =>{
       if(data && data.content){
         this.monthWiseTeacherPayments = data.content;
         
@@ -192,6 +219,11 @@ export class DashboardComponent implements OnInit, OnDestroy  {
           this.monthWiseTeacherPayments.splice(index,1,monthWiseTeacherPayment);
         });
 
+        this.setTeacherPaymentChartData();
+        this.setProfitChartData();
+        this.getCourseWiseStudentCount()
+      }else{
+        this.monthWiseTeacherPayments = [];
         this.setTeacherPaymentChartData();
         this.setProfitChartData();
         this.getCourseWiseStudentCount()
@@ -232,10 +264,269 @@ export class DashboardComponent implements OnInit, OnDestroy  {
             this.studentCountByCourse.splice(index,1,scc)
           }
         });
-        this.setStudentCountByCourseChartData()
+        this.setStudentCountByCourseChartData();
+        this.getAttendanceCountByMonthAndCourse()
         this.isLoading = false;
       }
     })
+  }
+
+  getAttendanceCountByMonthAndCourse(){
+    let date = new Date(this.getSelectedYearForFilter.value)
+    let year : number = date.getFullYear();
+    this.subs.sink = this.attendanceService.getAttendanceCountByMonthAndCourse(year).subscribe(data =>{
+      if(data && data.content){
+        this.attendanceCountByMonthAndCourse = data.content;
+
+        let red : number = Math.floor(Math.random() * 256);
+        let green : number = Math.floor(Math.random() * 256);
+        let blue : number = Math.floor(Math.random() * 256);
+
+        this.attendanceCountByMonthAndCourse.forEach((element,index) => {
+          let scc : attendanceCountByMonthAndCourseVM;
+          let course : CourseVM | undefined;
+          let color : string;
+          color = 'rgba('+ red + ',' + green + ',' + blue+')'
+
+          red = Math.floor(Math.random() * 256);
+          green = Math.floor(Math.random() * 256);
+          blue = Math.floor(Math.random() * 256);
+
+          course = this.courses.find(el => el.id == element.courseId);
+          if(course){
+            scc = {
+              ...element,
+              color : color
+            }
+
+            this.attendanceCountByMonthAndCourse.splice(index,1,scc)
+          }
+        });
+        this.setAttendanceCountByMonthAndCourseChartData();
+
+      }
+    })
+  }
+
+  setAttendanceCountByMonthAndCourseChartData(){
+    let dataset : dataSetsVM
+    let datasets : dataSetsVM[]=[]
+
+    let datajan : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datafeb : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datamar : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let dataapr : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datamay : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datajun : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datajul : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let dataaug : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datasep : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let dataoct : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datanov : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+    let datadec : number[]=[0,0,0,0,0,0,0,0,0,0,0,0];
+
+
+    let backgroundColor : string[]=[]
+    let labels : string[]=[]
+
+    this.courses.forEach((element,index) => {
+      if(element && element.code){
+        labels.push(element.code);
+      }
+
+      this.months.forEach(month => {
+        if(month.id && element.id){
+          let data :  number[]=[]
+          let x : attendanceCountByMonthAndCourseVM | undefined;
+          x = this.attendanceCountByMonthAndCourse.find(el => el.courseId && el.monthId && el.courseId == element.id && el.monthId == month.id);
+
+          if(month.id == 1 && x?.studentCount){
+            datajan[index] = x?.studentCount
+          }else if(month.id == 2 && x?.studentCount){
+            datafeb[index] = x?.studentCount
+          }else if(month.id == 3 && x?.studentCount){
+            datamar[index] = x?.studentCount
+          }else if(month.id == 4 && x?.studentCount){
+            dataapr[index] = x?.studentCount
+          }else if(month.id == 5 && x?.studentCount){
+            datamay[index] = x?.studentCount
+          }else if(month.id == 6 && x?.studentCount){
+            datajun[index] = x?.studentCount
+          }else if(month.id == 7 && x?.studentCount){
+            datajul[index] = x?.studentCount
+          }else if(month.id == 8 && x?.studentCount){
+            dataaug[index] = x?.studentCount
+          }else if(month.id == 9 && x?.studentCount){
+            datasep[index] = x?.studentCount
+          }else if(month.id == 10 && x?.studentCount){
+            dataoct[index] = x?.studentCount
+          }else if(month.id == 11 && x?.studentCount){
+            datanov[index] = x?.studentCount
+          }else if(month.id == 12 && x?.studentCount){
+            datadec[index] = x?.studentCount
+          }
+        }
+      });
+    });
+    
+    this.months.forEach(element => {
+      console.log(element.color);
+      
+      if(element.color){
+        switch(element.id){
+          case 1 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datajan
+            }
+            datasets.push(dataset)
+            break;
+          case 2 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datafeb
+            }
+            datasets.push(dataset)
+            break;
+          case 3 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datamar
+            }
+            datasets.push(dataset)
+            break;
+          case 4 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : dataapr
+            }
+            datasets.push(dataset)
+            break;
+          case 5 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datamay
+            }
+            datasets.push(dataset)
+            break;
+          case 6 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datajun
+            }
+            datasets.push(dataset)
+            break;
+          case 7 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datajul
+            }
+            datasets.push(dataset)
+            break;
+          case 8 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : dataaug
+            }
+            datasets.push(dataset)
+            break;
+          case 9 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datasep
+            }
+            datasets.push(dataset)
+            break;
+          case 10 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : dataoct
+            }
+            datasets.push(dataset)
+            break;
+          case 11 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datanov
+            }
+            datasets.push(dataset)
+            break;
+          case 12 : 
+            dataset = {
+              type : 'bar',
+              label : element.name,
+              backgroundColor : [element.color],
+              data : datadec
+            }
+            datasets.push(dataset)
+            break;
+        }
+      }
+      
+    });
+
+    this.attendanceCountByMonthAndCourseChartData = {
+      labels : labels,
+      datasets : datasets
+    }
+
+    this.basicOptionsForstack = {
+      maintainAspectRatio: false,
+      aspectRatio: 0.8,
+      plugins: {
+          legend: {
+              labels: {
+                  color: 'black',
+                  font: {
+                    size: 15 
+                  }
+              }
+          }
+      },
+      scales: {
+          y: {
+              stacked: true,
+              beginAtZero: true,
+              ticks: {
+                  color: 'black'
+              },
+              grid: {
+                  drawBorder: false
+              }
+          },
+          x: {
+              stacked: true,
+              ticks: {
+                  color: 'black'
+              },
+              grid: {
+                  drawBorder: false
+              }
+          }
+      }
+    };
   }
 
   setStudentCountByCourseChartData(){
@@ -342,15 +633,24 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     let dataset : dataSetsVM
     let data : number[]=[];
 
-    this.months.forEach((month,index) => {
-      this.monthWiseTeacherPayments.forEach(element => {
-        if(element.ammount && month.id == element.monthId){
-          data[index]=element.ammount
-        }else if(!(data[index]>0 || data[index]==0)){
-          data[index]=0
-        }
+    if(this.monthWiseTeacherPayments.length > 0){
+      this.months.forEach((month,index) => {
+        this.monthWiseTeacherPayments.forEach(element => {
+          if(element.ammount && month.id == element.monthId){
+            data[index]=element.ammount
+          }else if(!(data[index]>0 || data[index]==0)){
+            data[index]=0
+          }
+        });
       });
-    });
+    }else{
+      this.months.forEach(element => {
+        data.push(0);
+      });
+    }
+
+
+    
 
     // this.months.forEach(month => {
     //   this.monthWiseTeacherPayments.forEach(element => {
@@ -386,15 +686,21 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     let data : number[]=[];
     let brake : boolean;
 
-    this.months.forEach((month,index) => {
-      this.monthWiseClassFees.forEach(element => {
-        if(element.ammount && month.id == element.monthId){
-          data[index]=element.ammount
-        }else if(!(data[index]>0 || data[index]==0)){
-          data[index]=0
-        }
+    if(this.monthWiseClassFees.length>0){
+      this.months.forEach((month,index) => {
+        this.monthWiseClassFees.forEach(element => {
+          if(element.ammount && month.id == element.monthId){
+            data[index]=element.ammount
+          }else if(!(data[index]>0 || data[index]==0)){
+            data[index]=0
+          }
+        });
       });
-    });
+    }else{
+      this.months.forEach(element => {
+        data.push(0);
+      });
+    }
 
     this.classFees = data;
     console.log(data);
@@ -446,5 +752,47 @@ export class DashboardComponent implements OnInit, OnDestroy  {
           }
       }
     };
+  }
+
+  reset(){
+    this.getSelectedYearForFilter.patchValue(this.today)
+    this.filterForYear()
+  }
+
+  filterForYear(){
+    
+    this.getMonthWiseClassFees();
+  }
+
+  generatePDF(selectClass : string = ''):any{
+    const reciptContainer = document.querySelector(selectClass) as HTMLElement;
+    html2canvas(reciptContainer, {scale:2}).then(canvas => {
+      if(selectClass == '.cwsChart'){
+        console.log("cwsChart");
+        
+        const pdf = new jsPDF({
+          unit: 'mm',
+          format: [220,220]
+        });
+  
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG' , 0,0,220,220);
+        pdf.save('receipt.pdf');
+      }else{
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+  
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG' , 0,0,pageWidth,pageHeight);
+        pdf.save('receipt.pdf');
+      }
+    })
   }
 }

@@ -12,7 +12,7 @@ export class TeacherPaymentCourseService {
 
   constructor(private httpClient: HttpClient) { }
 
-  getTeacherPaymentByMonth() : Observable<monthWiseIncomesResponseVM>{
-    return this.httpClient.get<monthWiseIncomesResponseVM>(`${this.BaseURL}/getteacherpaymentbymonth`); 
+  getTeacherPaymentByMonth(year : number) : Observable<monthWiseIncomesResponseVM>{
+    return this.httpClient.get<monthWiseIncomesResponseVM>(`${this.BaseURL}/getteacherpaymentbymonth/${year}`); 
   }
 }

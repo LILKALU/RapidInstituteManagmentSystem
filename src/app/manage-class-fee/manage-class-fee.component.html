@@ -3,7 +3,7 @@
 </div>
 
 <div *ngIf="!isLoading">
-    <div class="grid mt-6" *ngIf="isActionAllowed(3)">
+    <div class="grid mt-6" *ngIf="isActionAllowed(1)">
         <div class="col-6 pl-6 pr-6">
             <form  [formGroup]="selectedDataForm">
                 <p-dropdown  [options]="allStudents" [style]="{'width':'100%'}" formControlName="student" [filter]="true" filterBy="scode"  [showClear]="true" placeholder="Select Student" optionLabel="scode" optionValue="scode" (onChange)="getCourses()">
