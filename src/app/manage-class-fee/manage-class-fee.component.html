@@ -122,14 +122,70 @@
                 <div class="col-4 centerText underline"><h4>{{findTotalAmount()}}</h4></div>
             </div>
 
-            <div class="grid mt-6">
+            <div class="grid mt-6" *ngIf="!(userCode.startsWith('S'))">
+                <div class="col-4"></div>
+                <div class="col-4">
+                    <div class="grid" [formGroup]="payingMethodForm">
+                        <div class="col-6">
+                            <label for="payByCard">Pay By Card</label><br><br>
+                            <p-radioButton value=1 inputId="payByCard" formControlName="method"></p-radioButton>
+                        </div>
+                        <div class="col-6">
+                            <label for="payByCash">Pay By Cash</label><br><br>
+                            <p-radioButton value=2 inputId="payByCash" formControlName="method"></p-radioButton>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4"></div>
+            </div>
+
+            <div class="grid mt-6" *ngIf="getPayingMethod.value == 1 || userCode.startsWith('S')" [formGroup]="cardDetailsForm">
+                <div class="col-12">
+                    <div class="grid">
+                        <div class="col-12">
+                            <h3>Card Payement</h3>
+                        </div>
+                    </div>
+                    <div class="grid mt-3">
+                        <div class="col-3">
+                            <input type="text" appNumeric formControlName="firstFourDigit" pInputText class="inputsStyle" placeholder="XXXX">
+                        </div>
+                        <div class="col-3">
+                            <input type="text" appNumeric formControlName="secondFourDigit" pInputText class="inputsStyle" id="title"   placeholder="XXXX">
+                        </div>
+                        <div class="col-3">
+                            <input type="text" appNumeric formControlName="thirdhFourDigit" pInputText class="inputsStyle" id="title"   placeholder="XXXX">
+                        </div>
+                        <div class="col-3">
+                            <input type="text" appNumeric formControlName="fourthFourDigit" pInputText class="inputsStyle" id="title"   placeholder="XXXX">
+                        </div>
+                    </div>
+                    <div class="grid mt-3">
+                        <div class="col-4">
+                            <p-calendar view="month" formControlName="expirDate" dateFormat="mm/yy" [readonlyInput]="true" placeholder="mm/yy"/>
+                        </div>
+                        <div class="col-5"></div>
+                        <div class="col-3">
+                            <input type="text" formControlName="CVC" pInputText class="inputsStyle" id="title"   placeholder="CV Code">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid mt-6"  *ngIf="getPayingMethod.value == 1 || userCode.startsWith('S')">
+                <div class="col-9"></div>
+                <div class="col-3">
+                    <button pButton class="p-button-primary" (click)="proceddPayment()"  [disabled]="!(cardDetailsForm.valid)">Save and Next</button>
+                </div>
+            </div>
+
+            <div class="grid mt-6"  *ngIf="getPayingMethod.value == 2">
                 <div class="col-3"></div>
                 <div class="col-3" [formGroup]="classFeeForm">
                     <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
                     <label for="payed">&nbsp; &nbsp; IS Payment Payed?</label>
                 </div>
                 <div class="col-3">
-                    <button pButton class="p-button-primary" (click)="proceddPayment()" [disabled]="!(getHasPaymentDone.value)">Save and Next</button>
+                    <button pButton class="p-button-primary" (click)="proceddPayment()"  [disabled]="!(getHasPaymentDone.value)">Save and Next</button>
                 </div>
                 <div class="col-3"></div>
             </div>

@@ -50,6 +50,8 @@ import { ChartModule } from 'primeng/chart';
 import { TeacherPaymentRecpitTemplateComponent } from './teacher-payment-recpit-template/teacher-payment-recpit-template.component';
 import { ManageNotificationComponent } from './manage-notification/manage-notification.component';
 import { ManageLeaveComponent } from './manage-leave/manage-leave.component';
+import { NumericDirective } from './directives/numeric.directive';
+import { TwoDecimalNumericDirective } from './directives/two-decimal-numeric.directive';
 // import { LoginPageComponent } from './login-page/login-page.component';
 
 
@@ -79,6 +81,8 @@ import { ManageLeaveComponent } from './manage-leave/manage-leave.component';
     TeacherPaymentRecpitTemplateComponent,
     ManageNotificationComponent,
     ManageLeaveComponent,
+    NumericDirective,
+    TwoDecimalNumericDirective,
     // LoginPageComponent,
   ],
   imports: [

@@ -18,6 +18,7 @@ import { approvingStatusVM } from '../shared/models/approvingStatusVM';
 import { leaveRequestVM } from '../shared/models/leaveRequestVM';
 import { notificationVM } from '../shared/models/notificationVM';
 import { NotificationService } from '../shared/services/notification.service';
+import { EmailService } from '../shared/services/email.service';
 
 @Component({
   selector: 'app-manage-teachers',
@@ -82,7 +83,8 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     private approvingStatusService : ApprovingStatusService,
     private notificationService : NotificationService,
     private messageService: MessageService,
-    private router : Router
+    private router : Router,
+    private emailService : EmailService
   ){}
 
   ngOnInit(): void {
@@ -98,7 +100,6 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -261,9 +262,7 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
 
     this.subs.sink = this.teachersService.addTeacher(teacher).subscribe(data => {
       if(data){
-        console.log("data",data);
         this.newTeacher = data?.content;
-        console.log("a",this.newTeacher.tcode);
         this.teachersAllData.push(this.newTeacher);
         this.teachersTabelData = this.teachersAllData;
         this.teachersTabelData.reverse();
@@ -283,9 +282,6 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     this.getUpdateTeacherEmail.patchValue(teacher.email);
     this.getUpdateTeacherFullName.patchValue(teacher.fullName);
     this.getUpdateTeacherHighestQuli.patchValue(teacher.highestQulification);
-    console.log("teacher",teacher);
-    
-    console.log("title",teacher.birthday);
     
     this.getUpdateTeacherTitle.patchValue(teacher.title);
     this.isTeacherUpdateFormVisible = true;
@@ -295,8 +291,6 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     let req : ADAccountVM;
     let usercode : string = teacher.tcode ? teacher.tcode : '';
     let defaultpassword : string = "teacher@1234"
-    console.log(usercode);
-    console.log("b",teacher);
     
     req = {
       userCode : usercode,
@@ -306,7 +300,6 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     this.subs.sink = this.adAccountService.createUserAccount(req).subscribe(data =>{
       if(data){
         this.teacherLoginData = data.content
-        console.log(this.teacherLoginData);
         
       }
     })
@@ -392,6 +385,7 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
   setNotification(leave : leaveRequestVM){
     let notification : notificationVM;
     let message : string;
+    let teacherId: number = leave.teacher?.id ? leave.teacher?.id : 0;
 
     message = `${leave.teacher?.title}.${leave.teacher?.fullName} is on leave on ${leave.requestedDate?.split('T')[0]}. So all the classes on that day will be canceled.`
 
@@ -405,7 +399,14 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
     this.subs.sink = this.notificationService.addNotification(notification).subscribe(data =>{
       if(data && data.content){
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave Accepted' });
+        this.sendEmail(message,teacherId)
       }
+    })
+  }
+
+  sendEmail(message : string, teacherId: number){
+    this.subs.sink = this.emailService.sendEmail(message, teacherId).subscribe(data =>{
+      
     })
   }
   

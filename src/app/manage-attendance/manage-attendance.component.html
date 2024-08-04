@@ -72,7 +72,7 @@
                     </p-dropdown>
                 </div>
                 <div class="col-3 pl-4 pr-6">
-                    <p-calendar view="year" formControlName="year" [style]="{'width':'100%'}" yearRange="2000:2024" [showClear]="true" [maxDate]="today" dateFormat="yy" placeholder="Select Year" (ngModelChange)="test()"></p-calendar>
+                    <p-calendar view="year" formControlName="year" [style]="{'width':'100%'}" yearRange="2000:2024" [showClear]="true" [maxDate]="today" dateFormat="yy" placeholder="Select Year" ></p-calendar>
                 </div>
                 <div class="col-3 pl-4 pr-6">
                     <p-dropdown  [options]="allMonths" [style]="{'width':'100%'}" formControlName="month" [filter]="true" filterBy="name"  [showClear]="true" placeholder="Select Month" optionLabel="name" optionValue="id">

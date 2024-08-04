@@ -117,7 +117,8 @@
             <div class="grid mt-5" *ngIf="isUpdateClassFeeFeildVisible && getUpdateHall.value"> 
                 <!-- isHallSelecting -->
                 <div class="col-12">
-                    <p-inputNumber mode="decimal" class="inputsStyle" inputId="locale-user" [style]="{'width':'100%'}" [minFractionDigits]="2" formControlName="courseFee" ></p-inputNumber>
+                    <input type="text" appTwoDecimalNumeric pInputText formControlName="courseFee" class="inputsStyle"  [style]="{'width':'100%'}" placeholder="Enter Course Fee">
+                    <!-- <p-inputNumber mode="decimal" class="inputsStyle" inputId="locale-user" [style]="{'width':'100%'}" [minFractionDigits]="2" formControlName="courseFee" ></p-inputNumber> -->
                 </div>
             </div>
             <div class="grid mt-5">
@@ -178,7 +179,7 @@
             <div class="grid mt-5" *ngIf="isClassFeeFeildVisible && getHall.value"> 
                 <!-- isHallSelecting -->
                 <div class="col-12">
-                    <p-inputNumber mode="decimal" class="inputsStyle" inputId="locale-user" [style]="{'width':'100%'}" [minFractionDigits]="2" formControlName="courseFee" (ngModelChange)="test()" ></p-inputNumber>
+                    <input type="text" appTwoDecimalNumeric formControlName="courseFee" pInputText class="inputsStyle"  [style]="{'width':'100%'}" placeholder="Enter Course Fee">
                 </div>
             </div>
             <div class="grid mt-5">

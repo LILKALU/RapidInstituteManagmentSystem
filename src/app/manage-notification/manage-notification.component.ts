@@ -34,7 +34,6 @@ export class ManageNotificationComponent implements OnInit{
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 

@@ -27,6 +27,9 @@ import { paymentsVM } from '../shared/models/paymentsVM';
 })
 export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
   isLoading : boolean = false;
+  today = new Date();
+  thisMonth : number = this.today.getMonth() + 1;
+  thisYear : number = this.today.getFullYear();
   selectAction !: FormGroup
   searchForm !: FormGroup;
   appIconId : number = 16
@@ -95,7 +98,6 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -144,13 +146,26 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
 
   getPayments(){
     this.isLoading = true;
-    this.subs.sink = this.teacherPaymentService.getTeacherPayments().subscribe(data =>{
-      if(data && data.content){
-        this.teacherPayments = data.content;
-        this.restructureTeacherPayment()
-        this.getTeachers();
-      }
-    })
+
+    if(this.logedDetails && this.logedDetails.id && this.logedDetails.usercode && this.logedDetails.usercode.startsWith('T')){
+      this.subs.sink = this.teacherPaymentService.getTeacherPaymentsByTeacherId(this.logedDetails.id).subscribe(data =>{
+        if(data && data.content){
+          this.teacherPayments = data.content;
+          this.restructureTeacherPayment()
+          this.getTeachers();
+        }
+      })
+    }else{
+      this.subs.sink = this.teacherPaymentService.getTeacherPayments().subscribe(data =>{
+        if(data && data.content){
+          this.teacherPayments = data.content;
+          this.restructureTeacherPayment()
+          this.getTeachers();
+        }
+      })
+    }
+
+    
   }
 
   restructureTeacherPayment(){
@@ -177,7 +192,6 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
       }
     });
     this.tablePayments = this.allPayments;
-    console.log("payments" , this.allPayments);
     
   }
 
@@ -219,14 +233,18 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
 
   openPaymentForm(){
     this.isPaymentFormVisible = true;
-  }
-
-  openAdvanceForm(){
-    
+    if(this.action ==3){
+      this.getPaymentFormTeacherId.patchValue(this.logedDetails?.id);
+      this.getPaymentFormMonthId.patchValue(this.thisMonth);
+      this.getPaymentFormMonthId.disable();
+      this.getPaymentFormTeacherId.disable();
+      this.getPaymentDetails();
+    }
   }
 
   closePaymentPopup(){
-
+    this.paymentForm.reset();
+    this.activeStepIndex = 0
   }
 
   getPaymentDetails(){
@@ -250,7 +268,6 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
               }
             });
           });
-          console.log(this.courseWisePayments);
           this.findTotal();
           this.isLoading = false;
           
@@ -312,7 +329,6 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
       this.subs.sink = this.teacherPaymentService.payTeacherPayment(teacherPayment).subscribe(data => {
         if(data && data.content){
           this.payementData = data.content;
-          console.log(this.payementData);
 
           if(this.payementData.teacherPaymentCourse){
             this.teacherPaymentReciptData = {

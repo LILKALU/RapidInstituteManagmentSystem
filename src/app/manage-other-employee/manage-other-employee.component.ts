@@ -101,7 +101,6 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 

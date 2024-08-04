@@ -25,6 +25,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { AttendanceService } from '../shared/services/attendance.service';
 import { attendanceCountByMonthAndCourseVM } from '../shared/models/attendanceCountByMonthAndCourseVM';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-dashboard',
@@ -35,6 +36,8 @@ export class DashboardComponent implements OnInit, OnDestroy  {
 
   isLoading : boolean = false;
   today = new Date();
+  foramtedToday : any;
+  userCode : string = ''
   thisFullYear : number = this.today.getFullYear();
   fullyear : string = this.thisFullYear.toString();
   selectAction !: FormGroup
@@ -64,6 +67,13 @@ export class DashboardComponent implements OnInit, OnDestroy  {
   basicOptions: any;
   basicOptionsForPie: any;
   basicOptionsForstack: any;
+  allCoursesOnToday : CourseVM[]=[];
+  todayAllCourses : CourseVM[]=[];
+  canceledCoursesOnToday : CourseVM[]=[];
+  studentCountForTeacher : number = 0;
+  courseCountForTeacher : number = 0;
+  teacherTodayCourse : CourseVM []=[]
+  studentTodayCourse : CourseVM []=[]
 
   get getSelectedYearForFilter(): AbstractControl { return this.yearFilterForm.get('year') as AbstractControl; }
 
@@ -92,6 +102,7 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     this.getLoginData();
     this.buildForm();
     this.subscriptions();
+    this.foramtedToday = moment(this.today).format("YYYY-MM-DD")
   }
 
   buildForm(){
@@ -103,8 +114,8 @@ export class DashboardComponent implements OnInit, OnDestroy  {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
+    this.userCode = this.logedDetails?.usercode ? this.logedDetails?.usercode : '';
   }
 
   isActionAllowed(action : number):boolean{
@@ -236,7 +247,6 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     this.subs.sink = this.enrolmentCourseService.getStudentCountByCourse().subscribe(data =>{
       if(data && data.content){
         this.studentCountByCourse = data.content
-        console.log("this.studentCountByCourse",this.studentCountByCourse);
         
 
         let red : number = Math.floor(Math.random() * 256);
@@ -303,7 +313,7 @@ export class DashboardComponent implements OnInit, OnDestroy  {
           }
         });
         this.setAttendanceCountByMonthAndCourseChartData();
-
+        this.getAllCoursesOnToday();
       }
     })
   }
@@ -370,7 +380,6 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     });
     
     this.months.forEach(element => {
-      console.log(element.color);
       
       if(element.color){
         switch(element.id){
@@ -549,21 +558,12 @@ export class DashboardComponent implements OnInit, OnDestroy  {
       });
     });
 
-    console.log(data);
-    console.log(backgroundColor);
-    console.log(labels);
-    
-    
-    
-
     dataset = {
       label : 'Student Enrolments',
       data : data,
       backgroundColor : backgroundColor,
       
     }
-
-    console.log("dataset",dataset);
     
 
     this.studentCountByCourseChartData = {
@@ -609,8 +609,6 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     let data : number[]=[];
 
     data = this.classFees.map((num,index) => num - this.payments[index])
-
-    console.log("prof",data);
 
     dataset = {
       label : 'Profit',
@@ -662,7 +660,6 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     //   });
     // });
     this.payments = data;
-    console.log("data",data);
 
     dataset = {
       label : 'Monthly Teacher Payments',
@@ -703,7 +700,6 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     }
 
     this.classFees = data;
-    console.log(data);
     
 
     dataset = {
@@ -768,7 +764,7 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     const reciptContainer = document.querySelector(selectClass) as HTMLElement;
     html2canvas(reciptContainer, {scale:2}).then(canvas => {
       if(selectClass == '.cwsChart'){
-        console.log("cwsChart");
+
         
         const pdf = new jsPDF({
           unit: 'mm',
@@ -795,4 +791,106 @@ export class DashboardComponent implements OnInit, OnDestroy  {
       }
     })
   }
+
+  getDayOfWeek(dateString : string) {
+    // Create a moment object from the input date string
+    const date = moment(dateString, "YYYY-MM-DD");
+
+    // Get the day of the week as a string
+    const dayOfWeek = date.format('dddd');
+
+    return dayOfWeek;
+  }
+
+  getAllCoursesOnToday(){
+    // this.allCoursesOnToday = []
+    let date :  string;
+    date = this.getDayOfWeek(this.foramtedToday)
+
+    this.subs.sink = this.courseService.getCoursesByDate(date).subscribe(data =>{
+      if(data && data.content){
+        this.todayAllCourses = data.content
+        this.getCanceledCourseOnToday();
+      }else{
+        this.getCanceledCourseOnToday();
+      }
+    })
+    
+  }
+
+  getCanceledCourseOnToday(){
+    let day :  string;
+    let date :  string;
+    date = moment(this.today).format("YYYY-MM-DD")
+    day = this.getDayOfWeek(this.foramtedToday);
+    
+    this.subs.sink = this.courseService.getCanceledCoursesByDate(date,day).subscribe(data =>{
+      if(data && data.content){
+        this.canceledCoursesOnToday = data.content
+        this.canceledCoursesOnToday.forEach(element => {
+          this.todayAllCourses = this.todayAllCourses.filter(el => el.id !== element.id)
+        });
+        this.getstudentscount()
+        
+      }else{
+        this.getstudentscount()
+      }
+    })
+  }
+
+  getstudentscount(){
+   if(this.logedDetails){
+    this.subs.sink = this.studentServices.getStudentByTeacherId(this.logedDetails.id).subscribe(data =>{
+      if(data && data.content){
+        this.studentCountForTeacher = data.content.length
+        this.getCourseForTeacherCount()
+      }else{
+        this.getCourseForTeacherCount()
+      }
+    })
+   }
+  }
+
+  getCourseForTeacherCount(){
+    if(this.logedDetails){
+      this.subs.sink = this.courseService.getCoursesByTeacherId(this.logedDetails.id).subscribe(data =>{
+        if(data && data.content){
+          this.courseCountForTeacher = data.content.length;
+          this.getTodayTeacherCourse()
+        }else{
+          this.getTodayTeacherCourse()
+        }
+      })
+    }
+    
+  }
+
+  getTodayTeacherCourse(){
+    let day :  string;
+    day = this.getDayOfWeek(this.foramtedToday);
+    if(this.logedDetails){
+      this.subs.sink = this.courseService.getTodayTeacherCourse(day,this.logedDetails.id).subscribe(data =>{
+        if(data && data.content){
+          this.teacherTodayCourse = data.content
+          this.getTodayStudentCourse()
+        }else{
+          this.getTodayStudentCourse()
+        }
+      })
+    }
+    
+  }
+  getTodayStudentCourse(){
+    let day :  string;
+    day = this.getDayOfWeek(this.foramtedToday);
+    if(this.logedDetails){
+      this.subs.sink = this.courseService.getTodayStudentCourse(day,this.logedDetails.id).subscribe(data =>{
+        if(data && data.content){
+          this.studentTodayCourse = data.content
+        }
+      })
+    }
+
+  }
+
 }

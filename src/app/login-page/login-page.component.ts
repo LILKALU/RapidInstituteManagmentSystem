@@ -5,6 +5,7 @@ import { AdAccountServiceService } from '../shared/services/ad-account-service.s
 import { ADAccountVM } from '../shared/models/adAccountVM';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-login-page',
@@ -26,7 +27,8 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private adAccountService : AdAccountServiceService,
-    private localStorageService : LocalStorageService
+    private localStorageService : LocalStorageService,
+    private messageService: MessageService,
   ){}
 
 
@@ -54,16 +56,15 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       userCode : this.getLoginUserCode.value,
       passWord : this.getLoginPassword.value
     }
-
-    console.log(loginDetails);
     
 
     this.subs.sink = this.adAccountService.login(loginDetails).subscribe(data =>{
-      if(data && data.content){
-        console.log(data.content);
+      if(data && data.content && data.code == "00"){
         this.logedDetails = data.content;
         this.localStorageService.setItem('login',JSON.stringify(this.logedDetails));
         this.isLogginSuccess.emit(this.logedDetails.isLoginSuccess);
+      }else{
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'The entered credentials are incorrect.'});
       }
     })
   }

@@ -129,7 +129,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -210,7 +209,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
       this.subs.sink = this.courseService.getCourses().subscribe(data =>{
         if(data){
           this.coursesAllData = data.content;
-          console.log("initCourset",this.coursesAllData);
           this.coursesTableData = this.coursesAllData
           this.coursesTableData.reverse()
           this.isLoading = false;
@@ -278,7 +276,7 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     course = {
       id : this.updateingCourse?.id,
       teacher : this.getUpdateTeacherName.value,
-      classFeeAmount : this.getUpdateCourseFee.value,
+      classFeeAmount : parseFloat(this.getUpdateCourseFee.value),
       date : this.getUpdateDay.value.name,
       endTime : endTimeValue,
       grade : this.getUpdateGrade.value,
@@ -292,7 +290,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     this.subs.sink = this.courseService.updateCourse(course).subscribe(data => {
       if(data){
         this.updatedCourse = data.content;
-        console.log("success");
         let index = this.coursesAllData.findIndex(course => course.id === this.updateingCourse?.id);
         this.coursesAllData[index] = this.updatedCourse;
         this.coursesTableData = this.coursesAllData;
@@ -310,14 +307,11 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     let endTimeValue = endtime.time ? endtime.time : '';
     let startTimeValue = starttime.time ? starttime.time : '';
 
-    console.log(this.getTeacherName.value);
-    // console.log(endTimeString);
-
     let course : CourseVM;
 
     course = {
       teacher : this.getTeacherName.value,
-      classFeeAmount : this.getCourseFee.value,
+      classFeeAmount : parseFloat(this.getCourseFee.value),
       date : this.getDay.value.name,
       endTime : endTimeValue,
       grade : this.getGrade.value,
@@ -326,7 +320,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
       subject : this.getSubject.value,
       isActive : true
     }
-    console.log(course);
     
     this.subs.sink = this.courseService.createCourse(course).subscribe(data =>{
       if(data){
@@ -349,11 +342,7 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     let startTimeIndex = this.allTimeSlots.findIndex(st => st.time === courseData.startTime)
     let endTimeIndex = this.allTimeSlots.findIndex(et => et.time === courseData.endTime)
     let classFee : number = courseData.classFeeAmount
-    let x = parseInt(classFee.toFixed(2));
-     
-
-    console.log(classFee);
-    console.log(this.selectableHalls[hallIndex]);
+    let x = parseFloat(classFee.toFixed(2));
 
     this.getUpdateCourseFee.patchValue(x)
 
@@ -393,7 +382,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
               }
             });
             this.coursesTableData = this.coursesAllData
-            console.log(this.deletedCourse);
             this.isLoading = false;
           }
         })
@@ -411,11 +399,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     this.isUpdateHallFeildVisible     = false
     this.isUpdateClassFeeFeildVisible = false
     this.courseUpdatePopUp.reset()
-  }
-
-  test(){
-    console.log(typeof this.getCourseFee.value);
-    
   }
 
   setUpdateSubject(){
@@ -554,7 +537,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
 
       let indexesToRemove = removedIndex.map(index => this.startTimeSlots[index]);
       this.startTimeSlots = this.startTimeSlots.filter(timeSlot => !indexesToRemove.includes(timeSlot));
-      console.log(this.allTimeSlots);
     }else{
       this.startTimeSlots = this.allTimeSlots
     }
@@ -573,8 +555,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     this.isEndTimeFeildVisible  = false
     this.isHallFeildVisible     = false
     this.isClassFeeFeildVisible = false
-
-    console.log("ds",this.getDay.value);
     
     let removedIndex : number[] = [];
 
@@ -604,12 +584,9 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
 
       let indexesToRemove = removedIndex.map(index => this.startTimeSlots[index]);
       this.startTimeSlots = this.startTimeSlots.filter(timeSlot => !indexesToRemove.includes(timeSlot));
-      console.log(this.allTimeSlots);
     }else{
       this.startTimeSlots = this.allTimeSlots
     }
-
-    console.log(this.allTimeSlots);
     
 
   }
@@ -694,8 +671,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
 
     let indexesToRemove = removedIndex.map(index => this.endTimeSlots[index]);
     this.endTimeSlots = this.endTimeSlots.filter(timeSlot => !indexesToRemove.includes(timeSlot));
-
-    console.log("removed end time 1st",this.endTimeSlots);
     
 
     removedIndex = []
@@ -711,8 +686,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
       }
     });
     
-    console.log("closestTime" , closestAfterTime);
-    
 
     this.endTimeSlots.forEach((element,index) => {
       let eleTime = moment(element.time , 'HH:mm')
@@ -723,8 +696,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
 
     let indexeToRemove = removedIndex.map(index => this.endTimeSlots[index]);
     this.endTimeSlots = this.endTimeSlots.filter(timeSlot => !indexeToRemove.includes(timeSlot));
-
-    console.log("endTimeSlots",this.endTimeSlots);
     
   }
 
@@ -795,9 +766,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     this.coursesOnSelectedDay.forEach(element => {
         momCourseStartTime = moment(element.startTime, 'HH:mm');
         momCourseEndTime = moment(element.endTime, 'HH:mm');
-        console.log(momSelectedStartTime.isBefore(momCourseEndTime));
-        console.log( momSelectedEndTime.isAfter(momCourseStartTime));
-        
         
         if(momSelectedStartTime.isBefore(momCourseEndTime) && momSelectedEndTime.isAfter(momCourseStartTime)){
           this.selectableHalls.forEach((hall,index) => {
@@ -807,15 +775,10 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
           });
         }
     });
-
-    console.log(hallIndexs);
     
     let indexeToRemove = hallIndexs.map(index => this.selectableHalls[index]);
-    console.log(indexeToRemove);
     
     this.selectableHalls = this.selectableHalls.filter(hall => !indexeToRemove.includes(hall));
-
-    console.log(this.selectableHalls);
   }
 
   setUpdateClassFee(){
@@ -864,8 +827,6 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
         }
       }
     });
-
-    console.log(hallIds);
   }
 
   closeCourseCreationPopup(){

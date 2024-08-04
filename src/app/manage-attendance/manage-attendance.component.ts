@@ -101,7 +101,6 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -186,8 +185,6 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
   getStudentsInCourse(){
     let formControls: { [key: string]: any } = {};
     this.isLoading = true;
-
-    console.log(this.getSelectedCourseForMark.value);
     this.studentsInCourse = []
     this.allEnrolments = []
     let monthCourse : monthCourseVM | undefined;
@@ -218,13 +215,11 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
   }
 
   setMarkedAttendance(){
-    console.log("date" ,new Date("2024-01-25"));
     let attenadanceSearch : attendanceSearchVM;
     this.attedanceOnCourse = [];
     
     let today :string = this.thisFullYear + '-' + this.thisMonthId + '-' + this.thisDate
     this.selectedCourse = this.dropdownCourses.find(el => el && el.code && el.code === this.getSelectedCourseForMark.value)
-    console.log("this.selectedCourse",this.selectedCourse);
      
     if(this.selectedCourse && this.thisMonth){
       attenadanceSearch = {
@@ -245,7 +240,6 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
                 this.attendanceForm.get(name)?.patchValue(isAttend)
               }
             });
-            // console.log("parent",ele);
           });
           this.isUpdateForm = true;
           this.isLoading = false;
@@ -291,29 +285,27 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
     });
     this.subs.sink = this.attendanceService.updateAttendance(this.attenadances).subscribe(data =>{
       if(data){
-        console.log("success" , data);
+
         this.isLoading=false;
         this.isUpdateForm = false;
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Attendance Marked' });
       }
     })
-    console.log(this.attenadances);
+
     
   }
 
   submit(){
-    console.log("this.attendanceForm" , this.attendanceForm);
+
     this.attenadances = [];
     let course : CourseVM | undefined;
     this.isLoading=true;
-    // console.log(this.getSelectedCourseForMark.value);
 
     course = this.dropdownCourses.find(el => el.code && el.code === this.getSelectedCourseForMark.value)
     
     this.studentsInCourse.forEach(element => {
       let name : string = element.scode + "Attendance";
       let attendance : attendanceVM;
-      console.log(this.attendanceForm.get(name)?.value);
       
       if(course){
         attendance = {
@@ -331,17 +323,11 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
     
     this.subs.sink = this.attendanceService.markAttendance(this.attenadances).subscribe(data =>{
       if(data){
-        console.log("success" , data);
         this.isLoading=false;
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Attendance Marked' });
       }
     })
 
-    // console.log(this.attenadances);
-  }
-
-  test(){
-    console.log(this.getSelectedYearForSearch.value);
   }
 
   searchHall(){
@@ -401,13 +387,6 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
 
   filterAttendanceData(){
     let filterData : attendanceVM[] = this.searchedAttenadancesAllData;
-    console.log(this.getFormFilterIsAttend.value);
-    console.log(this.attendanceToString(this.getFormFilterIsAttend.value));
-
-    console.log(typeof this.getFormFilterIsAttend.value);
-    console.log(typeof this.attendanceToString(this.getFormFilterIsAttend.value));
-    
-    
 
     if(filterData && filterData.length && this.getFormFilterName && this.getFormFilterName.value && this.getFormFilterName.value.id){
       filterData = filterData.filter(el => el.student && el.student.id == this.getFormFilterName.value.id);

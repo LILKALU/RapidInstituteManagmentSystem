@@ -74,7 +74,6 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -173,7 +172,6 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
   }
 
   submitUpdateClick(){
-    console.log(this.getCreateFirstTermModulesCount.value);
     this.isloading = true
     let sub : SubjectVM;
 
@@ -222,7 +220,6 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
             this.subjectsAllData = data.content;
             this.subjectTableData = this.subjectsAllData
             this.subjectTableData.reverse();
-            console.log(this.subjectsAllData);
           }
           this.isloading = false;
         })

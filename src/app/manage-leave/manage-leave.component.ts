@@ -11,6 +11,7 @@ import { LeaveRequestService } from '../shared/services/leave-request.service';
 import { leaveRequestVM } from '../shared/models/leaveRequestVM';
 import { ApprovingStatusService } from '../shared/services/approving-status.service';
 import { approvingStatusVM } from '../shared/models/approvingStatusVM';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-manage-leave',
@@ -51,6 +52,7 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
     private localStorageService : LocalStorageService,
     private teachersService : TeacherService,
     private leaveRequestService : LeaveRequestService,
+    private confirmationService: ConfirmationService,
     private approvingStatusService : ApprovingStatusService,
     private router : Router
   ){}
@@ -68,7 +70,6 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
     this.userCode = this.logedDetails?.usercode ? this.logedDetails?.usercode : '';
   }
@@ -107,7 +108,6 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
             if(data && data.content){
               this.teacher = data.content
               this.getApprovingStatuses()
-              console.log("teacher",data.content);
             }
           })
         }else{
@@ -145,6 +145,7 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
       if(data && data.content){
         this.leaveRequestsaAll = data.content;
         this.leaveRequestsaShow = this.leaveRequestsaAll
+        
         this.isLoading = false;
       }else{
         this.isLoading = false;
@@ -167,7 +168,6 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
 
   submitClick(){
     let req : leaveRequestVM | undefined;
-    console.log(typeof this.getRequestDate.value);
     
 
     if(this.teacher){
@@ -183,8 +183,8 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
     if(req){
       this.subs.sink = this.leaveRequestService.makeRequest(req).subscribe(data =>{
         if(data && data.content){
-          console.log(data.content);
-          this.leaveRequestsaAll.push(data.content)
+          this.leaveRequestsaAll.unshift(data.content);
+          
           this.closeLeaveRequestPopUp()
         }
       })
@@ -193,5 +193,33 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
 
   getDate(requestDate : string = ''){
     return requestDate.split('T')[0];
+  }
+
+  deleteLeave(leave : leaveRequestVM){
+    let leaveReq : leaveRequestVM
+
+    
+
+    this.confirmationService.confirm({
+      message: 'Are you sure that you want to delete',
+      accept: () => {
+        this.isLoading = true;
+        leaveReq = {
+          ...leave,
+          isActive : false,
+          approvingStatus : this.approvingStatuses[2]
+        }
+
+        this.subs.sink = this.leaveRequestService.updateOrDeleteRequest(leaveReq).subscribe(data =>{
+          if(data){
+            let index = this.leaveRequestsaAll.indexOf(leave);
+    
+            this.leaveRequestsaAll.splice(index,1);
+            this.leaveRequestsaShow = this.leaveRequestsaAll
+            this.isLoading = false;
+          }
+        })
+      }
+    })
   }
 }

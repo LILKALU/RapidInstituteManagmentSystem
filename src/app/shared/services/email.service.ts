@@ -22,4 +22,8 @@ export class EmailService {
   sendTeacherRecipt(emailData :teacherEmailVM) : Observable<teacherEmailResponseVM> {
     return this.httpClient.post<teacherEmailResponseVM>(`${this.BaseURL}/sendteacherreciptemail`,emailData);
   }
+
+  sendEmail(message : string, teacherId : number) : Observable<teacherEmailResponseVM> {
+    return this.httpClient.get<teacherEmailResponseVM>(`${this.BaseURL}/sendleavemessage/${message}/${teacherId}`);
+  }
 }

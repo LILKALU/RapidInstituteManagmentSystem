@@ -22,6 +22,18 @@ export class CourseService {
     return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcoursesbyteacherid/${teacherId}`)
   }
 
+  getCoursesByDate(date : string) : Observable<CourseResponse> {
+    return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcoursesbydate/${date}`)
+  }
+
+  getTodayTeacherCourse(date : string , teacherId : number) : Observable<CourseResponse> {
+    return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcoursesbydateandteacher/${date}/${teacherId}`)
+  }
+
+  getTodayStudentCourse(date : string , studentId : number) : Observable<CourseResponse> {
+    return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcoursesbydateandstudentid/${date}/${studentId}`)
+  }
+
   createCourse(course :CourseVM) : Observable<CourseResponses> {
     return this.httpClient.post<CourseResponses>(`${this.BaseURL}/addcourse`,course);
   }
@@ -32,5 +44,9 @@ export class CourseService {
 
   updateCourse(course :CourseVM) : Observable<CourseResponses> {
     return this.httpClient.put<CourseResponses>(`${this.BaseURL}/updatecourse`,course);
+  }
+
+  getCanceledCoursesByDate(date : string, day:string) : Observable<CourseResponse> {
+    return this.httpClient.get<CourseResponse>(`${this.BaseURL}/getcanceledcoursesbydate/${date}/${day}`)
   }
 }

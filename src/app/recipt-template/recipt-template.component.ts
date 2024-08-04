@@ -57,7 +57,6 @@ export class ReciptTemplateComponent implements OnInit, OnChanges, OnDestroy{
 
       this.subs.sink = this.emailService.sendRecipt(emailData).subscribe(data =>{
         if(data){
-          console.log(data);
         }
       })
     })

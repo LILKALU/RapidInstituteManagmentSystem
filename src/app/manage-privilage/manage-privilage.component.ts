@@ -85,7 +85,6 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
       if(data && data.content){
         this.allprivilages = data.content;
         this.tableprivilages = this.allprivilages
-        console.log("this.allprivilages",this.allprivilages);
         this.isLoading = false;
       }
     })
@@ -106,9 +105,6 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
     let role : roleVM = this.getPrivilageCreationRole.value;
     let appicon : appIconVM = this.getPrivilageCreationAppIcon.value;
     let action : actionVM[] = this.getPrivilageCreationActions.value;
-    console.log(this.getPrivilageCreationRole.value);
-    console.log(this.getPrivilageCreationAppIcon.value);
-    console.log(this.getPrivilageCreationActions.value);
     
     if(role && appicon && action && action.length && action.length > 0){
       action.forEach(element => {
@@ -136,9 +132,6 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
     let role : roleVM = this.getPrivilageUpdateRole.value;
     let appicon : appIconVM = this.getPrivilageUpdateAppIcon.value;
     let action : actionVM[] = this.getPrivilageUpdateActions.value;
-    console.log(this.getPrivilageCreationRole.value);
-    console.log(this.getPrivilageCreationAppIcon.value);
-    console.log(this.getPrivilageCreationActions.value);
     
     if(role && appicon && action && action.length && action.length > 0){
       action.forEach(element => {
@@ -210,7 +203,6 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
 
   filterAttendanceData(){
     let filterData : privilagesVM[] = this.allprivilages;
-    console.log(this.getFormFilterAction.value);
     
 
     if(filterData && filterData.length && this.getFormFilterRole && this.getFormFilterRole.value && this.getFormFilterRole.value.id){
@@ -315,7 +307,6 @@ export class ManagePrivilageComponent implements OnInit, OnDestroy {
             this.allprivilages.push(element);
           });
           this.tableprivilages = this.allprivilages;
-          console.log(data.content);
           this.closePrivilagesCreatePopup();
           this.isLoading =false;
         }

@@ -83,7 +83,6 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
     this.name = this.logedDetails?.fullName.split(" ")[0];
     this.usercode = this.logedDetails?.usercode ? this.logedDetails?.usercode : '';
@@ -95,7 +94,6 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
     this.subs.sink = this.appIconService.getAppIcons().subscribe(data =>{
       if(data && data.content){
         this.appIcons = data.content;
-        console.log(this.appIcons);
         this.isLoading = false;
       }
     })
@@ -140,13 +138,10 @@ export class RapidSystemComponent implements OnInit, OnDestroy {
       userCode : this.usercode,
       passWord : this.getLoginPassword.value
     }
-
-    console.log(loginDetails);
     
 
     this.subs.sink = this.adAccountService.getALogin(loginDetails).subscribe(data =>{
       if(data && data.content){
-        console.log(data.content);
         this.adAccount = data.content;
         this.isPasswordCorrect = true;
 

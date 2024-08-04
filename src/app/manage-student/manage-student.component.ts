@@ -208,7 +208,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -315,7 +314,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
           if(data){
             this.isloaded = true;
             this.courses = data.content;
-            console.log("courses" , this.courses);
             this.getAllStudent();
           }
         });
@@ -346,12 +344,9 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     }else{
       this.subs.sink = this.studentServices.getStudent().subscribe(data =>{
         if(data){
-          console.log("student data", data);
           this.isloaded = true;
           this.studentAllData = data.content;
           this.studentTableData = data.content;
-          console.log("student table data", this.studentAllData);
-          console.log("student all data", this.studentTableData);
           this.studentTableData.reverse();
           this.getGrade();
         }
@@ -366,11 +361,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         this.getMonths();
       } 
     })
-    // this.courses.forEach(element => {
-    //   this.grades.push(element.grade)
-    // });
-    // this.getTheSubject?.disable();
-    console.log("grade", this.grades);
     
   }
 
@@ -378,7 +368,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.subs.sink = this.monthService.getMonths().subscribe(data =>{
       if(data){
         this.months = data.content;
-        console.log("months" , this.months);
         this.getEnrolmentCourses()
       }
     })
@@ -419,7 +408,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
     this.subjects = uniqueSubjects;
     this.getTheSubject?.enable();
-    console.log(this.subjects);
   }
 
   getstudentcode(id : number) : string{
@@ -448,7 +436,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
     this.instructors = uniqueInstructors;
     this.getTheInstructor?.enable();
-    console.log(this.instructors);
   }
 
   getDates(){
@@ -459,9 +446,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       }
     });
     this.getTheDate?.enable();
-    console.log(this.courses);
-    
-    console.log(this.courseDates);
     
   }
 
@@ -480,7 +464,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   nextClick(){
-    console.log(this.getUpdateStudentDistrict.value);
     
     this.activeStepIndex = this.activeStepIndex + 1;
   }
@@ -490,8 +473,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     let student : studentVM;
     let delStudent : studentVM
     student = studentdata ? studentdata : {};
-    
-    console.log(student);
     this.confirmationService.confirm({
       message: 'Are you sure that you want to delete',
       accept: () => {
@@ -500,7 +481,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
           isActive : false
         }
         this.getEnrolmentByStudent(studentdata);
-        console.log(delStudent);
     
         this.subs.sink = this.studentServices.removeStudent(delStudent).subscribe(data =>{
           if(data){
@@ -541,7 +521,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
     this.subs.sink = this.enrolmentCoursesService.deleteCourses(selectedEnrolment).subscribe(data =>{
       if(data && data.content){
-        console.log("deleted",data.content);
       }
     })
   }
@@ -572,7 +551,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
     this.subs.sink = this.enrolmentService.addEnrolments(this.removeEnrolments).subscribe(data =>{
       if(data){
-        console.log("Enrolments Removed" , data);
         
       }
     })
@@ -597,7 +575,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   removeCourse(course : any){
-    console.log(course);
     this.enrolledCourses.forEach((element,index) => {
       if(element.id === course.id){
         this.enrolledCourses.splice(index,1);
@@ -668,21 +645,13 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       email : this.getStudentEmail.value,
       role : this.role
     }
-
-    console.log(student);
     
     this.subs.sink = this.studentServices.createStudent(student).subscribe(data => {
       if(data && data.content && data.content.id && data.content.id > 0){
         this.student = data.content;
-        console.log("all data before push", this.studentAllData);
         this.studentAllData.push(this.student);
-        console.log("all data after push", this.studentAllData);
-        console.log("table data befor equal", this.studentTableData);
         this.studentTableData = this.studentAllData;
-        console.log("table data after equal", this.studentTableData);
         this.studentTableData.reverse();
-
-        console.log("table data after reverse",  this.studentTableData);
         this.activeStepIndex = this.activeStepIndex + 1;
         
       }
@@ -806,9 +775,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     let usercode : string = this.student?.scode ? this.student?.scode : '';
     let userAccount : ADAccountVM;
 
-    console.log("usercode" , usercode);
-    console.log("password" , password);
-
     userAccount = {
       userCode : usercode,
       passWord : password
@@ -817,7 +783,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.subs.sink = this.adAccountServiceService.createUserAccount(userAccount).subscribe(data =>{
       if(data){
         this.adAccountDetails = data.content ? data.content : {};
-        console.log(this.adAccountDetails);
       }
     })
     
@@ -840,8 +805,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       enrolmentCorseDTO : enrolmentCourse,
       student : this.student
     }
-
-    console.log(enrolment);
     
     this.subs.sink = this.enrolmentService.addEnrolment(enrolment).subscribe(data => {
       if(data){
@@ -878,12 +841,10 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     });
 
     this.enrollmentForm.reset();
-    console.log(this.enrolledCourses);
   }
 
   searchParent(){
     let searchedNIC = this.getNicNo.value;
-    console.log(searchedNIC);
     this.isSearchParent = true;
     this.parentDetailForm.reset();
 
@@ -903,9 +864,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         this.isASearchedParent = false;
       }
     })
-    console.log(searchedNIC);
     this.getParentNIC.patchValue(searchedNIC)
-    console.log(this.getParentNIC.value);
     
   }
 
@@ -960,12 +919,9 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       email : this.getUpdateStudentEmail.value,
       role : this.role
     }
-
-    console.log(student);
     
     this.subs.sink = this.studentServices.updateStudent(student).subscribe(data => {
       if(data && data.content && data.content.id && data.content.id > 0){
-        console.log(data);
         
         this.updatedStudent = data.content
         this.studentAllData.forEach((element , index) => {
@@ -982,7 +938,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   goToUpdateForm(studentdata : studentVM){
-    console.log(studentdata);
     
     this.getUpdateStudentBirthday.patchValue(studentdata?.birthDay);
     this.getUpdateStudentCallingName.patchValue(studentdata?.callingName);
@@ -1004,8 +959,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.getUpdateParentRelationship.patchValue(studentdata?.parent?.relationship);
     this.getUpdateParentTitle.patchValue(studentdata?.parent?.title);
     this.getUpdateParentEmail.patchValue(studentdata.parent?.email)
-
-    console.log();
     
     
     this.isUpdateFormRedy = true;

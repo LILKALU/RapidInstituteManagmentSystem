@@ -67,7 +67,6 @@ export class ManageActionComponent  implements OnInit, OnDestroy{
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -183,7 +182,6 @@ export class ManageActionComponent  implements OnInit, OnDestroy{
     this.subs.sink = this.actionService.addAction(action).subscribe(data =>{
       if(data && data.content){
         this.newlyAddedAction = data.content;
-        console.log(this.newlyAddedAction);
         this.allAction.push(this.newlyAddedAction);
         this.tableAction = this.allAction
         this.closeAppIconCreatePopup();

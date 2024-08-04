@@ -69,7 +69,6 @@ export class AppIconsComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -232,7 +231,6 @@ export class AppIconsComponent implements OnInit, OnDestroy {
 
     this.subs.sink = this.appIconService.addAppIcon(appIcon).subscribe(data =>{
       if(data && data.content){
-        console.log(data.content);
         this.newlyAddedAppIcon = data.content
         this.allAppIcons.push(this.newlyAddedAppIcon);
         this.tableAppIcons = this.allAppIcons;

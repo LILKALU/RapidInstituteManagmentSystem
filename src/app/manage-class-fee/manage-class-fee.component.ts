@@ -36,13 +36,16 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   appIconId : number = 9
+  userCode : string = ''
   today = new Date();
   thisMonth : number = this.today.getMonth() + 1;
   thisYear : number = this.today.getFullYear();
   isLoading : boolean = false;
   selectedDataForm !: FormGroup
   payingMonthForm !: FormGroup
+  payingMethodForm !: FormGroup
   classFeeForm !: FormGroup;
+  cardDetailsForm !: FormGroup;
   allStudents : studentVM[] = [];
   allEnrolmentCourses : EnrolmentCourseVM[] = [];
   dropdownCourses : CourseVM[] = [];
@@ -82,8 +85,17 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   get getCourse(): AbstractControl { return this.selectedDataForm.get('course') as AbstractControl; }
 
   get getPayingMonths(): AbstractControl { return this.payingMonthForm.get('month') as AbstractControl; }
+  
+  get getPayingMethod(): AbstractControl { return this.payingMethodForm.get('method') as AbstractControl; }
 
   get getHasPaymentDone(): AbstractControl { return this.classFeeForm.get('hasPaymentDone') as AbstractControl; }
+
+  get getFirstFourDigit(): AbstractControl { return this.cardDetailsForm.get('firstFourDigit') as AbstractControl; }
+  get getSecondFourDigit(): AbstractControl { return this.cardDetailsForm.get('secondFourDigit') as AbstractControl; }
+  get getThirdFourDigit(): AbstractControl { return this.cardDetailsForm.get('thirdhFourDigit') as AbstractControl; }
+  get getFourthFourDigit(): AbstractControl { return this.cardDetailsForm.get('fourthFourDigit') as AbstractControl; }
+  get getExpirDate(): AbstractControl { return this.cardDetailsForm.get('expirDate') as AbstractControl; }
+  get getCVC(): AbstractControl { return this.cardDetailsForm.get('CVC') as AbstractControl; }
  
 
   constructor(
@@ -111,7 +123,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
+    this.userCode = this.logedDetails?.usercode ? this.logedDetails?.usercode : ''
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -136,6 +148,19 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     this.classFeeForm = this.formBuilder.group({
       hasPaymentDone:['',Validators.required]
     })
+
+    this.payingMethodForm = this.formBuilder.group({
+      method : ['' , Validators.required]
+    });
+
+    this.cardDetailsForm = this.formBuilder.group({
+      firstFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      secondFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      thirdhFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      fourthFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      expirDate : [null, Validators.required],
+      CVC : [null, [Validators.required, Validators.pattern(/^[0-9]{3}$/)]]
+    })
   }
 
   subscriptions(){
@@ -159,6 +184,10 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     this.subs.sink = this.studentServices.getStudent().subscribe(data =>{
       if(data){
         this.allStudents = data.content
+        if(this.userCode.startsWith("S")){
+          this.getStudent.patchValue((this.allStudents.find(el => el.scode == this.userCode))?.scode)
+          this.getStudent.disable()
+        }
         this.getEnrolmentCourses()
       }
     })
@@ -198,6 +227,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     this.subs.sink = this.monthService.getMonths().subscribe(data =>{
       if(data){
         this.months = data.content;
+        this.getCourses()
         this.isLoading = false;
       }
     })
@@ -312,63 +342,8 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
       }
       searchAttends.push(searchAttend);
     });
-
-    // if(searchAttends.length>0){
-    //   searchAttends.forEach(element => {
-    //     this.subs.sink = this.attendanceService.getCountByCourseAndYearAndMonthAndDateAndStudent(element).subscribe(data =>{
-    //     if(data && data.content){
-    //       this.attendCountOnMonth.push(data.content);
-    //       if(this.attendCountOnMonth.length == 12){
-    //         this.getPayableMonths();
-    //         this.isLoading = false;
-    //       }
-    //     }else{
-    //       this.attendCountOnMonth.push(0);
-    //       if(this.attendCountOnMonth.length == 12){
-    //         this.getPayableMonths();
-    //         this.isLoading = false;
-    //       }
-    //     }
-    //   })
-    //   });
-    // }
   }
 
-  // changeBackgroundColor(monthId : number = -1, courseId : number = -1) : string{
-  //   if(this.firstClassFees && this.firstClassFees.length && this.lastClassFees && this.lastClassFees.length && this.selectedCourses && this.selectedCourses.length == this.firstClassFees.length && this.selectedCourses.length == this.lastClassFees.length){
-  //     let firstClassFee = this.firstClassFees.find(el => el && el.course?.id == courseId);
-  //   let lastClassFee = this.lastClassFees.find(el => el.course?.id == courseId);
-
-  //   let firstClassFeeMonthId = firstClassFee?.month?.id ? firstClassFee?.month?.id : -1;
-  //   let lastClassFeeMonthId = lastClassFee?.month?.id ? lastClassFee?.month?.id : -1;
-
-  //   if(firstClassFeeMonthId == monthId){
-  //     return 'green_background'
-  //   }else if(firstClassFeeMonthId > monthId){
-  //     return 'black_background'
-  //   }else if(lastClassFeeMonthId == monthId){
-  //     return 'green_background'
-  //   }else if(firstClassFeeMonthId < monthId && lastClassFeeMonthId > monthId){
-  //     return 'green_background'
-  //   }else if(lastClassFeeMonthId != monthId && lastClassFeeMonthId < monthId && this.thisMonth == monthId){
-  //     return 'red_background'
-  //   }else {
-  //     return 'empty_background'
-  //   }
-  //   }else {
-  //     return ''
-  //   }
-    
-  // }
-
-  // testfun(){
-  //   this.getCourse.valueChanges.subscribe(data => {
-  //     if(data){
-  //       console.log("උනෝඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕඕ");
-        
-  //     }
-  //   })
-  // }
 
   setStyleClassForEachCourse(studentWiseCourses : studentWiseCoursesVM[]){
     let c : CourseVM;
@@ -439,15 +414,6 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
           this.updatedCourses[index] = c;
         }
       });
-      // this.getCourse.patchValue(this.selectedCourses);
-      // this.studentWiseCourses.forEach(element => {
-        console.log("this.arrears",this.arrears);
-        console.log("this.payingCourseWiseMonths",this.payingCourseWiseMonths);
-        
-        
-        
-      // });
-      // this.studentAllData.splice(index,1,data.content);
     });
     
   }
@@ -458,7 +424,6 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     if(course && course.styleClassName && course.styleClassName.length >0 && month && month.id){
       classname = course.styleClassName[month.id -1];
     }
-    console.log(classname);
     
     if(classname && (classname == "green_background" || classname == "black_background")){
       return false;
@@ -527,7 +492,6 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   }
 
   selectPyingMonths(month : MonthVM , course :CourseVM){
-    console.log(course);
     
     let coursewisemonths : courseWiseMonths;
     let months : MonthVM[]=[];
@@ -575,8 +539,6 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
       }
       this.payingCourseWiseMonths.push(coursewisemonths);
     }
-    
-    console.log(this.payingCourseWiseMonths);
     
   }
 
@@ -667,7 +629,6 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     if(classFee){
       this.subs.sink = this.classFeeService.addStudentClassFees(classFee).subscribe(data =>{
         if(data && data.content){
-          console.log("data.content",data.content);
           this.proceedClassFeePayment = data.content;
 
           this.reciptTemplateData = {

@@ -19,6 +19,10 @@ export class TeacherPaymentService {
     return this.httpClient.post<teacherPaymentResponseVM>(`${this.BaseURL}/addteacherpayment`,teacherPayment);
   }
 
+  getTeacherPaymentsByTeacherId(teacherId : number) : Observable<teacherPaymentsResponseVM>{
+    return this.httpClient.get<teacherPaymentsResponseVM>(`${this.BaseURL}/getteacherpaymentbyteacherid/${teacherId}`);
+  }
+
   getTeacherPayments() : Observable<teacherPaymentsResponseVM>{
     return this.httpClient.get<teacherPaymentsResponseVM>(`${this.BaseURL}/getteacherpayment`);
   }

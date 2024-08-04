@@ -78,7 +78,6 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -143,7 +142,6 @@ export class ManageHallComponent implements OnInit, OnDestroy {
             this.hallAllData = data.content;
             this.hallTableData = this.hallAllData;
             this.hallTableData.reverse();
-            console.log(this.hallTableData);
             
           }
         })
@@ -223,7 +221,6 @@ export class ManageHallComponent implements OnInit, OnDestroy {
               }
             });
             this.hallTableData = this.hallAllData
-            console.log(this.deletedHall);
             this.isLoading = false;
           }
         })
@@ -232,7 +229,6 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   }
 
   openUpdateForm(halldata : HallVM){
-    console.log(halldata);
     this.selectedHall = halldata;
     let isac : boolean = halldata.isAC ? halldata?.isAC : false;
     this.getHallUpdateCapacity.patchValue(halldata.capacity);
@@ -263,7 +259,6 @@ export class ManageHallComponent implements OnInit, OnDestroy {
         this.hallTableData = this.hallAllData;
         this.hallTableData.reverse();
       }
-      console.log(this.newHall);
       this.closeHallCreationPopup();
     });
   }

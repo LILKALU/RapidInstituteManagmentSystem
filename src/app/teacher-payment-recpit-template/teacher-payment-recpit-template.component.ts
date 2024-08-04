@@ -62,7 +62,6 @@ export class TeacherPaymentRecpitTemplateComponent  implements OnInit, OnChanges
 
       this.subs.sink = this.emailService.sendTeacherRecipt(emailData).subscribe(data =>{
         if(data){
-          console.log(data);
         }
       })
     })

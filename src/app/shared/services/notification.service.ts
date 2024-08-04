@@ -21,4 +21,6 @@ export class NotificationService {
   getNotification():Observable<notificationResponsesVM>{
     return this.httpClient.get<notificationResponsesVM>(`${this.BaseURL}/getnotification`);
   }
+
+  
 }

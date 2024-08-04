@@ -40,7 +40,7 @@
         <form *ngIf="activeStepIndex == 0"  [formGroup]="studentDetailForm">
             <div class="grid">
                 <div class="col-12 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="FullName" formControlName="fullName">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="FullName" formControlName="fullName">
                     <label For="FullName"><span class="Requied ">* </span>Full Name</label>
                 </div>
             </div>
@@ -65,30 +65,30 @@
     
             <div class="grid pt-5">
                 <div class="col-6 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="callingName" formControlName="callingName">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="callingName" formControlName="callingName">
                     <label For="callingName"><span class="Requied ">* </span>Calling Name</label>
                 </div>
                 <div class="col-6 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="school" formControlName="school">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="school" formControlName="school">
                     <label For="school"><span class="Requied ">* </span>School</label>
                 </div>
             </div>
     
             <div class="grid pt-5">
                 <div class="col-3 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="houseNo"  formControlName="houseNo">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="houseNo"  formControlName="houseNo">
                     <label For="houseNo"><span class="Requied ">* </span>House No</label>
                 </div>
                 <div class="col-3 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="lane" formControlName="lane">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="lane" formControlName="lane">
                     <label For="lane">Lane</label>
                 </div>
                 <div class="col-3 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="city" formControlName="city">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="city" formControlName="city">
                     <label For="city"><span class="Requied ">* </span>City</label>
                 </div>
                 <div class="col-3 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="district" formControlName="district">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="district" formControlName="district">
                     <label For="district"><span class="Requied ">* </span>District</label>
                 </div>
             </div>
@@ -123,14 +123,14 @@
         <form *ngIf="activeStepIndex == 1 && isSearchParent" [formGroup]="parentDetailForm">
             <div class="grid">
                 <div class="col-12 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
                     <label for="parentName"><span class="Requied ">* </span>Parent Name</label>
                 </div>
             </div>
     
             <div class="grid pt-5">
                 <div class="col-4 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="title" formControlName="title">
                     <label for="title"><span class="Requied ">* </span>Title</label>
                 </div>
     
@@ -152,7 +152,7 @@
                 </div>
     
                 <div class="col-4 p-float-label">
-                    <input type="text" pInputText class="inputsStyle" id="occupation" formControlName="occupation">
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="occupation" formControlName="occupation">
                     <label for="occupation">Occupation</label>
                 </div>
     
@@ -411,7 +411,7 @@
     <form *ngIf="updateActiveStepIndex == 0"  [formGroup]="studentUpdateForm">
         <div class="grid">
             <div class="col-12 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="FullName" formControlName="fullName">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="FullName" formControlName="fullName">
                 <label For="FullName"><span class="Requied ">* </span>Full Name</label>
             </div>
         </div>
@@ -436,30 +436,30 @@
 
         <div class="grid pt-5">
             <div class="col-6 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="callingName" formControlName="callingName">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="callingName" formControlName="callingName">
                 <label For="callingName"><span class="Requied ">* </span>Calling Name</label>
             </div>
             <div class="col-6 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="school" formControlName="school">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="school" formControlName="school">
                 <label For="school"><span class="Requied ">* </span>School</label>
             </div>
         </div>
 
         <div class="grid pt-5">
             <div class="col-3 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="houseNo"  formControlName="houseNo">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="houseNo"  formControlName="houseNo">
                 <label For="houseNo"><span class="Requied ">* </span>House No</label>
             </div>
             <div class="col-3 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="lane" formControlName="lane">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="lane" formControlName="lane">
                 <label For="lane">Lane</label>
             </div>
             <div class="col-3 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="city" formControlName="city">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="city" formControlName="city">
                 <label For="city"><span class="Requied ">* </span>City</label>
             </div>
             <div class="col-3 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="district" formControlName="district">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="district" formControlName="district">
                 <label For="district"><span class="Requied ">* </span>District</label>
             </div>
         </div>
@@ -481,19 +481,19 @@
     <form *ngIf="updateActiveStepIndex == 1" [formGroup]="parentUpdateForm">
         <div class="grid">
             <div class="col-12 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="parentName" formControlName="fullName">
                 <label for="parentName"><span class="Requied ">* </span>Parent Name</label>
             </div>
         </div>
 
         <div class="grid pt-5">
             <div class="col-4 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="title" formControlName="title">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="title" formControlName="title">
                 <label for="title"><span class="Requied ">* </span>Title</label>
             </div>
 
             <div class="col-4 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="NIC" formControlName="NIC">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="NIC" formControlName="NIC">
                 <label for="NIC"><span class="Requied ">* </span>NIC No</label>
             </div>
 
@@ -510,7 +510,7 @@
             </div>
 
             <div class="col-4 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="occupation" formControlName="occupation">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="occupation" formControlName="occupation">
                 <label for="occupation"><span class="Requied ">* </span>Occupation</label>
             </div>
 

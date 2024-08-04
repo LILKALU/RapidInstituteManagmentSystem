@@ -70,7 +70,6 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -171,7 +170,6 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
               }
             });
             this.tableGrades = this.allGrades
-            console.log(this.deletedGrade);
             this.isLoading = false;
           }
         })

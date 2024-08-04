@@ -14,12 +14,6 @@ export class StudentService {
 
   constructor(private httpClient: HttpClient) { }
 
-  // createStudent(student : studentVM) : Observable<any>{
-  //   console.log(student);
-    
-  //   return this.httpClient.post(`${this.BaseURL}/addstudent`,student);
-  // }
-
   updateStudent(student : studentVM) : Observable<studentResponseVM>{
     return this.httpClient.put<studentResponseVM>(`${this.BaseURL}/updatestudent`,student);
   }

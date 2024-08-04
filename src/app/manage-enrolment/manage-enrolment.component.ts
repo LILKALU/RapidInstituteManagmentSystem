@@ -34,12 +34,15 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   private subs = new SubSink();
   appIconId : number = 7
   today = new Date();
+  searchForm !: FormGroup;
+  isSearched : boolean = false;
   isLoading : boolean = false;
   leftSideCourses : CourseVM[] = [];
   enrolmentForm !: FormGroup;
   rightSideCourses : CourseVM[] = [];
   enrolingCourse : CourseVM | undefined;
   allCourses : CourseVM[] = [];
+  viewCourses : CourseVM[] = [];
   enrolmentCourses : EnrolmentCourseVM[] = [];
   deletedEnrolment : EnrolmentCourseVM | undefined
   courseStudents : StudentCourseVM[] = [];
@@ -64,6 +67,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   get getScode(): AbstractControl { return this.enrolmentForm.get('scode') as AbstractControl; }
 
   get getHasPaymentDone(): AbstractControl { return this.classFeeForm.get('hasPaymentDone') as AbstractControl; }
+
+  get getSearchCourse(): AbstractControl { return this.searchForm.get('courses') as AbstractControl; }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -96,12 +101,15 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     this.classFeeForm = this.formBuilder.group({
       hasPaymentDone:['',Validators.required]
     })
+
+    this.searchForm = this.formBuilder.group({
+      courses : [null]
+    })
   }
 
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
-    console.log("this.logedDetails",this.logedDetails);
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -135,15 +143,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
       this.subs.sink = this.courseService.getCoursesByTeacherId(this.logedDetails.id).subscribe(data =>{
         if(data){
           this.allCourses = data.content
-          this.allCourses.forEach(element => {
-            let courseId : number;
-            courseId = element.id ? element.id : -1;
-            if(courseId % 2 === 0){
-              this.leftSideCourses.push(element);
-            }else{
-              this.rightSideCourses.push(element);
-            }
-          });
+          this.viewCourses = this.allCourses
+          this.categorizeCourse()
         }
         this.getEnrolments();
       })
@@ -151,15 +152,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
       this.subs.sink = this.courseService.getCourses().subscribe(data =>{
         if(data){
           this.allCourses = data.content
-          this.allCourses.forEach(element => {
-            let courseId : number;
-            courseId = element.id ? element.id : -1;
-            if(courseId % 2 === 0){
-              this.leftSideCourses.push(element);
-            }else{
-              this.rightSideCourses.push(element);
-            }
-          });
+          this.viewCourses = this.allCourses
+          this.categorizeCourse()
         }
         
         this.getEnrolments();
@@ -167,11 +161,24 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     }
   }
 
+  categorizeCourse(){
+    this.rightSideCourses=[];
+    this.leftSideCourses=[]
+    this.viewCourses.forEach(element => {
+      let courseId : number;
+      courseId = element.id ? element.id : -1;
+      if(courseId % 2 === 0){
+        this.leftSideCourses.push(element);
+      }else{
+        this.rightSideCourses.push(element);
+      }
+    });
+  }
+
   getEnrolments(){
     this.subs.sink = this.enrolmentCourseService.getEnrolmentCourse().subscribe(data =>{
       if(data){
         this.enrolmentCourses = data.content;
-        console.log(this.enrolmentCourses);
         this.groupEnrolments();
       }
     })
@@ -182,7 +189,6 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     this.subs.sink = this.monthService.getMonths().subscribe(data =>{
       if(data){
         this.months = data.content;
-        console.log("months" , this.months);
         this.isLoading = false;
       }
     })
@@ -198,8 +204,6 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
       }
       this.courseStudents.push(courseStudent)
     });
-
-    console.log("courseStudents",this.courseStudents);
   }
 
   filterByCourse(course : CourseVM) : StudentCourseVM[]{
@@ -225,14 +229,12 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   openEnrolDialog(course : CourseVM){
     this.enrolingCourse = course;
     this.isEnrolDialogVisible = true;
-    console.log(this.enrolingCourse);
   }
 
   searchStudent(){
     this.isStudentGetting = true;
     let courseStudent : CourseStudentVM;
     this.courseStudent = [];
-    console.log(this.enrolingCourse);
     
 
     this.subs.sink = this.studentServices.getStudentByScode(this.getScode.value).subscribe(data =>{
@@ -268,8 +270,6 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
       enrolmentCorseDTO : enrolmentCourse,
       student : this.searchedStudent
     }
-
-    console.log(enrolment);
 
     this.subs.sink = this.enrolmentService.addEnrolment(enrolment).subscribe(data => {
       if(data){
@@ -381,7 +381,6 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     
         this.subs.sink = this.subs.sink = this.enrolmentCourseService.deleteCourse(deletingEnrolment).subscribe(data =>{
           if(data){
-            console.log("deleted");
             
             this.deletedEnrolment = data.content
             this.enrolmentCourses.forEach((element,index) => {
@@ -398,7 +397,6 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
               }
               this.subs.sink = this.studentServices.removeStudent(removeStudent).subscribe(data => {
                 if(data){
-                  console.log("Deleted" , data.content);
                 }
               })
             }
@@ -410,5 +408,18 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     });
   }
 
+  searchEnrolment(){
+    this.isSearched = true
+    
+    this.viewCourses = this.getSearchCourse.value;
+    this.categorizeCourse()
+  }
+
+  reset(){
+    this.isSearched = false
+    this.searchForm.reset()
+    this.viewCourses = this.allCourses
+    this.categorizeCourse()
+  }
 
 }

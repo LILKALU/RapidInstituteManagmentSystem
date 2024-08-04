@@ -1,3 +1,7 @@
+<div *ngIf="isLoading" class="loading">
+    <img src="../../assets/giphy.gif" alt="" srcset="" class="lodingGif">
+</div>
+
 <div *ngIf="!isLoading">
     <div *ngIf="logedDetails && logedDetails.usercode && (logedDetails.usercode.startsWith('A') || logedDetails.usercode.startsWith('M'))">
         <div class="grid mt-4 ml-3 mr-3">
@@ -12,7 +16,6 @@
                         </div>
                     </div>
                 </p-card>
-                
             </div>
             <div class="col-4">
                 <p-card header="Course Count" class="course-card">
@@ -174,5 +177,155 @@
                 </div>
             </div>
         </div> -->
+    </div>
+
+    <div *ngIf="logedDetails && logedDetails.usercode && (logedDetails.usercode.startsWith('F'))">
+        <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-4">
+                <p-card header="Student Count" class="student-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-user-graduate iconsize"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{studentCount}}</span>
+                        </div>
+                    </div>
+                </p-card>
+                
+            </div>
+            <div class="col-4">
+                <p-card header="Course Count" class="course-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-users-rectangle iconsizestudent"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{courseCount}}</span>
+                        </div>
+                    </div>
+                </p-card>
+                
+            </div>
+            <div class="col-4">
+                <p-card header="Teacher Count" class="teacher-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-person-chalkboard iconsize"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{teacherCount}}</span>
+                        </div>
+                    </div>
+                </p-card>
+                
+            </div>
+        </div>
+
+        <div class="grid mt-4 ml-4 mr-3">
+            <h4>Today : {{foramtedToday}}  {{getDayOfWeek(foramtedToday)}}</h4>
+        </div>
+
+        <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-6 text-center"><h3>Classes On Today</h3></div>
+            <div class="col-6 text-center"><h3>Canceled Classes On Today</h3></div>
+        </div>
+
+        <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-6">
+                <div class="grid">
+                    <div class="col-6" *ngFor="let course of todayAllCourses">
+                        <p-card header="{{course.teacher.fullName}}'s {{course.grade.name}} {{course.subject.name}} class">
+                        </p-card>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="grid">
+                    <div class="col-6" *ngFor="let course of canceledCoursesOnToday">
+                        <p-card header="{{course.teacher.fullName}}'s {{course.grade.name}} {{course.subject.name}} class" class="canceled-card">
+                        </p-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="logedDetails && logedDetails.usercode && (logedDetails.usercode.startsWith('T'))">
+        <div class="grid mt-4 ml-3 mr-3">
+            <div class="col-6">
+                <p-card header="Student Count" class="student-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-user-graduate iconsizeForTeacher"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{studentCountForTeacher}}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+            <div class="col-6">
+                <p-card header="Course Count" class="course-card">
+                    <div class="grid">
+                        <div class="col-1">
+                            <i class="fa-solid fa-users-rectangle iconsizeForTeacher"></i>
+                        </div>
+                        <div class="col-11">
+                            <span class="cardfont">{{courseCountForTeacher}}</span>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+        </div>
+        
+        <div class="grid mt-4 ml-4 mr-3">
+            <h4>Today : {{foramtedToday}}  {{getDayOfWeek(foramtedToday)}}</h4>
+            
+        </div>
+
+        <div class="grid mt-4 ml-4 mr-3"><h5>Courses on today</h5></div>
+        <div class="grid mt-4 ml-4 mr-3" *ngIf="teacherTodayCourse.length>0">
+            <div class="col-3" *ngFor="let course of teacherTodayCourse">
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <h3 class="ml-4 pt-4">{{course.code}}</h3>
+                        <h5 class="ml-4 pt-4">{{course.grade.name}} {{course.subject.name}} Class at {{course.startTime}}</h5>
+                    </ng-template>
+                </p-card>
+            </div>
+        </div>
+
+        <div class="grid mt-4 ml-4 mr-3" *ngIf="!(teacherTodayCourse.length>0)">
+            <div class="col-3">
+                <h5 class="text-red-500">You have no classes on today</h5>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="logedDetails && logedDetails.usercode && (logedDetails.usercode.startsWith('S'))">
+        <div class="grid mt-4 ml-4 mr-3">
+            <h4>Today : {{foramtedToday}}  {{getDayOfWeek(foramtedToday)}}</h4>
+            
+        </div>
+
+        <div class="grid mt-4 ml-4 mr-3"><h5>Courses on today</h5></div>
+
+        <div class="grid mt-4 ml-4 mr-3" *ngIf="studentTodayCourse.length>0">
+            <div class="col-3" *ngFor="let course of studentTodayCourse">
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <h3 class="ml-4 pt-4">{{course.code}}</h3>
+                        <h5 class="ml-4 pt-4">{{course.grade.name}} {{course.subject.name}} Class at {{course.startTime}}</h5>
+                    </ng-template>
+                </p-card>
+            </div>
+        </div>
+
+        <div class="grid mt-4 ml-4 mr-3" *ngIf="!(studentTodayCourse.length>0)">
+            <div class="col-3">
+                <h4 class="text-red-500">You have no classes on today</h4>
+            </div>
+        </div>
     </div>
 </div>

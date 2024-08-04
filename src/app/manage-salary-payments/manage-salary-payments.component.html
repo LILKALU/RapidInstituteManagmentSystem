@@ -4,10 +4,17 @@
 
 <div *ngIf="!isLoading">
     <div class="grid pt-4 pl-3">
-        <div class="col-4" *ngIf="isActionAllowed(1)">
+        <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">
                 <label for="searchAction">Search a Payment</label><br><br>
                 <p-radioButton value=1 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
+            </div>
+        </div>
+
+        <div class="col-4" *ngIf="isActionAllowed(3) && (logedDetails && logedDetails.usercode && logedDetails.usercode.startsWith('T')) ">
+            <div [formGroup]="selectAction">
+                <label for="searchAction">View This Month Salary</label><br><br>
+                <p-radioButton value=3 inputId="searchAction" formControlName="action" (click)="loadTheContent()"></p-radioButton>
             </div>
         </div>
 
@@ -29,6 +36,7 @@
                 </div>
             </div>
             <button label="Make a Payment" pButton *ngIf="action === 2" (click)="openPaymentForm()"></button>
+            <button label="See This Month Payment" pButton *ngIf="action === 3" (click)="openPaymentForm()"></button>
             
         </div>
     </div>
@@ -51,7 +59,7 @@
                         <td class="centerText">({{payement.course?.code}}) - {{payement.course?.grade?.name}} {{payement.course?.date}} {{payement.course?.subject?.name}} Class at {{payement.course?.startTime}}</td>
                         <td class="centerText">{{payement.month.name}}</td>
                         <td class="centerText">{{payement.amount}}</td>
-                        <td class="centerText">{{payement.date}}</td>
+                        <td class="centerText">{{payement.date.split('T')[0]}}</td>
                         <!-- <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(roleData)" *ngIf="isActionAllowed(2)"></i>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteGrade(roleData)" *ngIf="isActionAllowed(4)"></i></td> -->
                     </tr>
                 </ng-template>
@@ -66,7 +74,7 @@
     </div>
 
     <p-dialog header="Payment Form" [(visible)]="isPaymentFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closePaymentPopup()">
-        <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex"></p-steps>
+        <p-steps [model]="steps" [readonly]="true" [(activeIndex)]="activeStepIndex" *ngIf="!(action == 3)"></p-steps>
         <div *ngIf="activeStepIndex == 0">
             <form [formGroup]="paymentForm">
                 <div class="grid mt-6">
@@ -77,7 +85,7 @@
                         <p-dropdown [options]="allMonths" optionLabel="name" optionValue="id" appendTo="body" placeholder="Month" [style]="{'width':'100%'}" class="inputsStyle" formControlName="monthid"></p-dropdown>
                     </div>
                     <div class="col-4">
-                        <button pButton class="p-button-primary" (click)="getPaymentDetails()" [disabled]="!paymentForm.valid">Search</button>
+                        <button pButton class="p-button-primary" (click)="getPaymentDetails()" [disabled]="!paymentForm.valid" *ngIf="!(action == 3)">Search</button>
                     </div>
                 </div>
             </form>
@@ -157,7 +165,7 @@
                     </div>
                 </div>
     
-                <div class="grid mt-6" *ngIf="!isPaymentPayed">
+                <div class="grid mt-6" *ngIf="!isPaymentPayed && !(action === 3)">
                     <div class="col-3"></div>
                     <div class="col-3" [formGroup]="teacherPayemntForm">
                         <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>

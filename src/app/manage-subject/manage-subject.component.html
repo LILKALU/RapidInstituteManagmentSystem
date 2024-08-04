@@ -22,7 +22,7 @@
             <button label="Create A Subject" pButton *ngIf="action === 2" (click)="openSubjectForm(true)"></button>
             <div class="grid pt-4" *ngIf="action == 1">
                 <div class="col-8 p-float-label" [formGroup]="searchForm">
-                    <input type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
+                    <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="searchValue" formControlName="searchValue"> 
                     <label For="searchValue"> &nbsp;&nbsp;&nbsp;<i class="fa-solid fa-magnifying-glass"></i>&nbsp; &nbsp;Search A Subject</label>
                 </div>
                 <div class="col-4">
@@ -79,7 +79,7 @@
     <form [formGroup]="subjectCreationForm">
         <div class="grid">
             <div class="col-12 p-float-label">
-                <input type="text" pInputText class="inputsStyle" id="subName" formControlName="subName">
+                <input appCapitalizeEachWord type="text" pInputText class="inputsStyle" id="subName" formControlName="subName">
                 <label For="subName"><span class="Requied ">* </span>Subject Name</label>
             </div>
         </div>
