@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { SubSink } from 'subsink';
 import { HallVM } from '../shared/models/hallVM';
 import { HallServiceService } from '../shared/services/hall-service.service';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
@@ -62,6 +62,7 @@ export class ManageHallComponent implements OnInit, OnDestroy {
     private hallService : HallServiceService,
     private confirmationService: ConfirmationService,
     private localStorageService : LocalStorageService,
+    private messageService: MessageService,
     private router : Router
   ){}
 
@@ -194,6 +195,7 @@ export class ManageHallComponent implements OnInit, OnDestroy {
         this.hallUpdateForm.reset();
         this.isHallUpdateFormVisible = false;
         this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Hall Updated' });
       }
     })
   }
@@ -222,6 +224,7 @@ export class ManageHallComponent implements OnInit, OnDestroy {
             });
             this.hallTableData = this.hallAllData
             this.isLoading = false;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Hall Removed' });
           }
         })
       }
@@ -241,6 +244,7 @@ export class ManageHallComponent implements OnInit, OnDestroy {
   }
 
   submitClick(){
+    this.isLoading = true;
     let hall : HallVM;
 
     hall = {
@@ -260,6 +264,8 @@ export class ManageHallComponent implements OnInit, OnDestroy {
         this.hallTableData.reverse();
       }
       this.closeHallCreationPopup();
+      this.isLoading = false;
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Hall Registered' });
     });
   }
 }

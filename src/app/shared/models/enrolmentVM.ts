@@ -5,6 +5,6 @@ import { studentVM } from "./studentVM";
 export interface EnrolmentVM {
     id ?: number;
     student ?: studentVM;
-    enrolmentCorseDTO ?: EnrolmentCourseVM[];
+    enrolmentCourses ?: EnrolmentCourseVM[];
     date ?: string;
 }

@@ -103,7 +103,6 @@ export class AppIconsComponent implements OnInit, OnDestroy {
       if(data && data.content){
         this.allAppIcons = data.content;
         this.tableAppIcons = this.allAppIcons;
-        console.log(this.allAppIcons);
         this.isLoading = false;
       }
     })

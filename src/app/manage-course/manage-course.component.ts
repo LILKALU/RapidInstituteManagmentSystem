@@ -15,7 +15,7 @@ import { CourseVM } from '../shared/models/coursesVM';
 import { timeSlotsResponse } from '../shared/models/timeSlotsResponseVM';
 import { TimeSlotService } from '../shared/services/time-slot.service';
 import { timeSlotVM } from '../shared/models/timeSlotVM';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { LocalStorageService } from '../shared/services/local-storage.service';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
@@ -113,7 +113,8 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     private timeSlotService : TimeSlotService,
     private confirmationService: ConfirmationService,
     private localStorageService : LocalStorageService,
-    private router : Router
+    private router : Router,
+    private messageService: MessageService,
   ){}
 
   ngOnDestroy(): void {
@@ -295,6 +296,7 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
         this.coursesTableData = this.coursesAllData;
         this.closeCourseUpdatePopup();
         this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Course Updated' });
       }
     })
   }
@@ -324,9 +326,9 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
     this.subs.sink = this.courseService.createCourse(course).subscribe(data =>{
       if(data){
         this.closeCourseCreationPopup();
-        this.coursesAllData.push(data.content);
+        this.coursesAllData.unshift(data.content);
         this.coursesTableData = this.coursesTableData;
-        this.coursesTableData.reverse()
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Course Created' });
       }
     });    
   }
@@ -383,6 +385,7 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
             });
             this.coursesTableData = this.coursesAllData
             this.isLoading = false;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Course Removed' });
           }
         })
       }
@@ -391,13 +394,13 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
 
   closeCourseUpdatePopup(){
     this.isUpdateFormVisible = false
-    this.isUpdateSubjectFeildVisible  = false       
-    this.isUpdateGradeFeildVisible    = false
-    this.isUpdateDayFeildVisible      = false
-    this.isUpdateStartTimeFeildVisible= false
-    this.isUpdateEndTimeFeildVisible  = false
-    this.isUpdateHallFeildVisible     = false
-    this.isUpdateClassFeeFeildVisible = false
+    // this.isUpdateSubjectFeildVisible  = false       
+    // this.isUpdateGradeFeildVisible    = false
+    // this.isUpdateDayFeildVisible      = false
+    // this.isUpdateStartTimeFeildVisible= false
+    // this.isUpdateEndTimeFeildVisible  = false
+    // this.isUpdateHallFeildVisible     = false
+    // this.isUpdateClassFeeFeildVisible = false
     this.courseUpdatePopUp.reset()
   }
 

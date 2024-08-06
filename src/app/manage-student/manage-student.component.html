@@ -1,4 +1,5 @@
 <div *ngIf="isloaded">
+    <p-toast></p-toast>
     <div class="grid pt-4 pl-3">
         <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectStudentStatus">
@@ -50,8 +51,8 @@
                     <input type="text" pInputText class="inputsStyle" id="contactNumber" formControlName="contactNumber">
                     <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
                 </div>
-                <div class="col-4 p-float-label">
-                    <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true"></p-calendar>
+                <div class="col-4 p-float-label"> 
+                    <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true" [maxDate]="maxDate" [defaultDate]="maxDate"></p-calendar>
                     <label For="birthaday"><span class="Requied ">* </span>Birthday</label>
                 </div>
                 <div class="col-4">
@@ -147,7 +148,7 @@
     
             <div class="grid pt-5">
                 <div class="col-4 p-float-label" *ngIf="relationships">
-                    <p-dropdown  [showClear]="true" appendTo="body"inputId="relationship" [options]="relationships" optionLabel="name"  placeholder="Relationship" [style]="{'width':'100%'}" formControlName="relationship"></p-dropdown>
+                    <p-dropdown  [showClear]="true" appendTo="body" inputId="relationship" [options]="relationships" optionLabel="name"  placeholder="Relationship" [style]="{'width':'100%'}" formControlName="relationship" ></p-dropdown>
                     <label for="relationship"><span class="Requied ">* </span>Relationship</label>
                 </div>
     
@@ -267,8 +268,66 @@
                         <h5>{{classfeeWithAddmision()}}</h5>
                     </div>
                 </div><br>
-                <div class="grid">
-                    <div class="col-6" [formGroup]="classFeeForm">
+
+                <div class="grid mt-6">
+                    <div class="col-4"></div>
+                    <div class="col-4">
+                        <div class="grid" [formGroup]="payingMethodForm">
+                            <div class="col-6">
+                                <label for="payByCard">Pay By Card</label><br><br>
+                                <p-radioButton value=1 inputId="payByCard" formControlName="method"></p-radioButton>
+                            </div>
+                            <div class="col-6">
+                                <label for="payByCash">Pay By Cash</label><br><br>
+                                <p-radioButton value=2 inputId="payByCash" formControlName="method"></p-radioButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4"></div>
+                </div>
+
+                <div class="grid mt-6" *ngIf="getPayingMethod.value == 1" [formGroup]="cardDetailsForm">
+                    <div class="col-12">
+                        <div class="grid">
+                            <div class="col-12">
+                                <h3>Card Payement</h3>
+                            </div>
+                        </div>
+                        <div class="grid mt-3">
+                            <div class="col-3">
+                                <input type="text" appNumeric formControlName="firstFourDigit" pInputText class="inputsStyle" placeholder="XXXX">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" appNumeric formControlName="secondFourDigit" pInputText class="inputsStyle" id="title"   placeholder="XXXX">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" appNumeric formControlName="thirdhFourDigit" pInputText class="inputsStyle" id="title"   placeholder="XXXX">
+                            </div>
+                            <div class="col-3">
+                                <input type="text" appNumeric formControlName="fourthFourDigit" pInputText class="inputsStyle" id="title"   placeholder="XXXX">
+                            </div>
+                        </div>
+                        <div class="grid mt-3">
+                            <div class="col-4">
+                                <p-calendar view="month" formControlName="expirDate" dateFormat="mm/yy" [readonlyInput]="true" placeholder="mm/yy"/>
+                            </div>
+                            <div class="col-5"></div>
+                            <div class="col-3">
+                                <input type="text" formControlName="CVC" pInputText class="inputsStyle" id="title"   placeholder="CV Code">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid mt-6"  *ngIf="getPayingMethod.value == 1">
+                    <div class="col-9"></div>
+                    <div class="col-3">
+                        <button pButton class="p-button-success" (click)="proceddPayment()"  [disabled]="!(cardDetailsForm.valid)">Save and Next</button>
+                    </div>
+                </div>
+
+                <div class="grid" *ngIf="getPayingMethod.value == 2">
+                    <div class="col-6" [formGroup]="classFeeForm" >
                         <p-checkbox formControlName="hasPaymentDone" [binary]="true" value="true" inputId="payed"></p-checkbox>
                         <label for="payed">&nbsp; &nbsp; IS Payment Payed?</label>
                     </div>
@@ -422,7 +481,7 @@
                 <label For="contactNumber"><span class="Requied ">* </span>Contact Number</label>
             </div>
             <div class="col-4 p-float-label">
-                <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true"></p-calendar>
+                <p-calendar formControlName="birthday" id="birthaday" appendTo="body" [showIcon]="true"  [maxDate]="maxDate"></p-calendar>
                 <label For="birthaday"><span class="Requied ">* </span>Birthday</label>
             </div>
             <div class="col-4">
@@ -464,7 +523,7 @@
             </div>
         </div>
         <div class="grid">
-            <div class="col-12 p-float-label">
+            <div class="col-12 mt-4 p-float-label">
                 <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
                 <label For="email"><span class="Requied ">* </span>Email</label>
             </div>
@@ -520,7 +579,7 @@
             </div>
         </div>
         <div class="grid">
-            <div class="col-12 p-float-label">
+            <div class="col-12 mt-4 p-float-label">
                 <input type="text" pInputText class="inputsStyle" id="email" formControlName="email">
                 <label for="email"><span class="Requied ">* </span>Email</label>
             </div>
@@ -532,7 +591,7 @@
             </div>
             <div class="col-6"></div>
             <div class="col-4">
-                <button label="Submit and Next" pButton class="p-button-success" [disabled]="!parentUpdateForm.valid" (click)="updateStudent()"></button>
+                <button label="Submit" pButton class="p-button-success" [disabled]="!parentUpdateForm.valid" (click)="updateStudent()"></button>
             </div>
         </div>
     </form>

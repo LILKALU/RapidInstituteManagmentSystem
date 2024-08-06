@@ -44,12 +44,16 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   today = new Date();
+  userCode : string = ''
+  maxDate !: Date;
   appIconId : number = 2
   selectStudentStatus !: FormGroup;
   studentDetailForm !: FormGroup;
   studentUpdateForm !: FormGroup;
   searchForm !: FormGroup;
   classFeeForm !: FormGroup;
+  payingMethodForm !: FormGroup
+  cardDetailsForm !: FormGroup;
   parentDetailForm !: FormGroup;
   parentUpdateForm !: FormGroup;
   enrollmentForm !: FormGroup;
@@ -90,6 +94,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   reciptTemplateData : reciptTemplateDataVM | undefined;
   proceedClassFeePayment : ClassFeeVM | undefined;
   logedDetails : loginDetailsVM | undefined;
+  selectedStudent : studentVM | undefined;
   privilages : privilagesVM[] = [];
   relationships : any[] = [{name:'Mother'},{name:'Father'},{name:'Sister'},{name:'Brother'},{name:'Grand Mother'},{name:'Grand Father'},{name:'Aunty'},{name:'Uncle'},{name:'Gardian'}]; 
   dates : any[] = [{date:"Monday"},{date:"Tuesday"},{date:"Wednesday"},{date:"Thursday"},{date:"Friday"},{date:"Saturday"},{date:"Sunday"}]
@@ -171,6 +176,15 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   get getTheTime(): AbstractControl { return this.enrollmentForm.get('time') as AbstractControl; }
   get getTheDate(): AbstractControl { return this.enrollmentForm.get('date') as AbstractControl; }
 
+  get getPayingMethod(): AbstractControl { return this.payingMethodForm.get('method') as AbstractControl; }
+
+  get getFirstFourDigit(): AbstractControl { return this.cardDetailsForm.get('firstFourDigit') as AbstractControl; }
+  get getSecondFourDigit(): AbstractControl { return this.cardDetailsForm.get('secondFourDigit') as AbstractControl; }
+  get getThirdFourDigit(): AbstractControl { return this.cardDetailsForm.get('thirdhFourDigit') as AbstractControl; }
+  get getFourthFourDigit(): AbstractControl { return this.cardDetailsForm.get('fourthFourDigit') as AbstractControl; }
+  get getExpirDate(): AbstractControl { return this.cardDetailsForm.get('expirDate') as AbstractControl; }
+  get getCVC(): AbstractControl { return this.cardDetailsForm.get('CVC') as AbstractControl; }
+
 
   get getSearchValue(): AbstractControl { return this.searchForm.get('searchValue') as AbstractControl; }
 
@@ -193,10 +207,14 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private router : Router
   ) {
+
+    this.maxDate = new Date();
+    this.maxDate.setFullYear(this.maxDate.getFullYear() - 5);
   }
   
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+    
   }
 
   ngOnInit(): void {
@@ -208,6 +226,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
+    this.userCode = this.logedDetails?.usercode ? this.logedDetails?.usercode : ''
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -287,6 +306,19 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.classFeeForm = this.formBuilder.group({
       hasPaymentDone:['',Validators.required]
     })
+
+    this.payingMethodForm = this.formBuilder.group({
+      method : ['' , Validators.required]
+    });
+
+    this.cardDetailsForm = this.formBuilder.group({
+      firstFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      secondFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      thirdhFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      fourthFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      expirDate : [null, Validators.required],
+      CVC : [null, [Validators.required, Validators.pattern(/^[0-9]{3}$/)]]
+    })
   }
 
   loadTheContent(){
@@ -295,6 +327,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       this.isStudentFormVisible = false;
     }
   }
+
 
   isActionAllowed(action : number):boolean{
     if(this.privilages.filter(el => el.appIcon.id == this.appIconId && el.action.id == action).length > 0){
@@ -490,7 +523,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
               if(element.id == student.id){
                 this.studentAllData.splice(index,1);
                 this.studentTableData = this.studentAllData;
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Student Removed'});
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Removed'});
               }
             });
             
@@ -532,8 +565,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     let removeEnrolmentCourses : EnrolmentCourseVM[]=[];
 
     this.removeEnrolments.forEach((element,index) => {
-      if(element.enrolmentCorseDTO){
-        removeEnrolmentCourses = element.enrolmentCorseDTO
+      if(element.enrolmentCourses){
+        removeEnrolmentCourses = element.enrolmentCourses
         removeEnrolmentCourses.forEach((ele,i) => {
           removeEnrolmentCourse = {
             ...ele,
@@ -544,7 +577,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       }
       removeEnrolment = {
         ...element,
-        enrolmentCorseDTO : removeEnrolmentCourses
+        enrolmentCourses : removeEnrolmentCourses
       }
       this.removeEnrolments.splice(index,1,removeEnrolment);
     });
@@ -653,6 +686,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
         this.studentTableData = this.studentAllData;
         this.studentTableData.reverse();
         this.activeStepIndex = this.activeStepIndex + 1;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Registered' });
         
       }
     });
@@ -764,6 +798,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
         this.createStudentLoginDetails();
         this.activeStepIndex = this.activeStepIndex + 1;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Payment Success' });
       }
       
     })
@@ -802,14 +837,15 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     });
 
     enrolment = {
-      enrolmentCorseDTO : enrolmentCourse,
+      enrolmentCourses : enrolmentCourse,
       student : this.student
     }
     
     this.subs.sink = this.enrolmentService.addEnrolment(enrolment).subscribe(data => {
-      if(data){
+      if(data && data.content){
         this.enrollments = data.content;
         this.activeStepIndex = this.activeStepIndex +1;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Enrolled' });
       }
     });
   }
@@ -847,24 +883,140 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     let searchedNIC = this.getNicNo.value;
     this.isSearchParent = true;
     this.parentDetailForm.reset();
+    let relationship : any
 
     this.subs.sink = this.parentService.getParentById(searchedNIC).subscribe(data => {
       if(data && data.content && data.code == "00"){
         this.searchedParent = data.content;
         this.getParentFullName.patchValue(data?.content?.fullName);
         this.getParentBirthaday.patchValue(data?.content?.birthday);
+        this.getParentBirthaday.disable();
         this.getParentContactNumber.patchValue(data?.content?.contactNumber);
         this.getParentNIC.patchValue(data?.content?.nic);
         this.getParentOccupation.patchValue(data?.content?.occupation);
-        this.getParentRelationship.patchValue(data?.content?.relationship);
+
+        relationship = this.relationships.find(el => el.name == data?.content?.relationship)
+        this.getParentRelationship.patchValue(relationship);
+
         this.getParentTitle.patchValue(data?.content?.title);
         this.getParentEmail.patchValue(data.content.email)
         this.isASearchedParent = true;
       }else{
+        let dobString : string
+        dobString = this.getBirthdayByNic(searchedNIC);
+        let dob = new Date(dobString)
+        this.getParentBirthaday.patchValue(dob);
+        this.getParentBirthaday.disable();
         this.isASearchedParent = false;
       }
     })
     this.getParentNIC.patchValue(searchedNIC)
+    
+  }
+
+  getBirthdayByNic(nicNo : string) :string{
+    let birthYear: any;
+    let birthMonth: any;
+    let birthDate: any;
+    let dob : any
+ 
+    if (nicNo.length === 10) {
+      birthYear = nicNo.substring(0, 2);
+      birthYear = '19' + birthYear;
+      birthDate = nicNo.substring(2, 5);
+      birthDate = parseInt(birthDate);
+
+      if (birthDate > 500) {
+        birthDate = birthDate - 500;
+      }
+
+        if (birthDate > 335) {
+          birthDate = birthDate - 335;
+          birthMonth = 12;
+        } else if (birthDate > 305) {
+          birthDate = birthDate - 305;
+          birthMonth = 11;
+        } else if (birthDate > 274) {
+          birthDate = birthDate - 274;
+          birthMonth = 10;
+        } else if (birthDate > 244) {
+          birthDate = birthDate - 244;
+          birthMonth = 9;
+        } else if (birthDate > 213) {
+          birthDate = birthDate - 213;
+          birthMonth = 8;
+        } else if (birthDate > 182) {
+          birthDate = birthDate - 182;
+          birthMonth = 7;
+        } else if (birthDate > 152) {
+          birthDate = birthDate - 152;
+          birthMonth = 6;
+        } else if (birthDate > 121) {
+          birthDate = birthDate - 121;
+          birthMonth = 5;
+        } else if (birthDate > 91) {
+          birthDate = birthDate - 91;
+          birthMonth = 4;
+        } else if (birthDate > 60) {
+          birthDate = birthDate - 60;
+          birthMonth = 3;
+        } else if (birthDate < 32) {
+          birthMonth = 1;
+        } else if (birthDate > 31) {
+          birthDate = birthDate - 31;
+          birthMonth = 2;
+        }
+
+    } else {
+      birthYear = nicNo.substring(0, 4);
+      birthDate = nicNo.substring(4, 7);
+      birthDate = parseInt(birthDate);
+      if (birthDate > 500) {
+        birthDate = birthDate - 500;
+      }
+
+        if (birthDate > 335) {
+          birthDate = birthDate - 335;
+          birthMonth = 12;
+        } else if (birthDate > 305) {
+          birthDate = birthDate - 305;
+          birthMonth = 11;
+        } else if (birthDate > 274) {
+          birthDate = birthDate - 274;
+          birthMonth = 10;
+        } else if (birthDate > 244) {
+          birthDate = birthDate - 244;
+          birthMonth = 9;
+        } else if (birthDate > 213) {
+          birthDate = birthDate - 213;
+          birthMonth = 8;
+        } else if (birthDate > 182) {
+          birthDate = birthDate - 182;
+          birthMonth = 7;
+        } else if (birthDate > 152) {
+          birthDate = birthDate - 152;
+          birthMonth = 6;
+        } else if (birthDate > 121) {
+          birthDate = birthDate - 121;
+          birthMonth = 5;
+        } else if (birthDate > 91) {
+          birthDate = birthDate - 91;
+          birthMonth = 4;
+        } else if (birthDate > 60) {
+          birthDate = birthDate - 60;
+          birthMonth = 3;
+        } else if (birthDate < 32) {
+          birthMonth = 1;
+        } else if (birthDate > 31) {
+          birthDate = birthDate - 31;
+          birthMonth = 2;
+        }
+    }
+    // let timeDiff = Math.abs(Date.now() - new Date(birthYear).getTime());
+    // let fullbirthYear = new Date(birthYear).getFullYear();
+    dob = `${birthYear}-${birthMonth}-${birthDate}`
+
+    return dob
     
   }
 
@@ -880,9 +1032,11 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
   updateStudent(){
     this.isUpdating = true;
+    let studentId : number = this.selectedStudent?.id ? this.selectedStudent.id : 0;
+    let studentCode : string = this.selectedStudent?.scode ? this.selectedStudent.scode : '';
     let parent : parentVM;
     parent = {
-      id : this.additionalInfoPopUpData?.parent?.id,
+      ...this.selectedStudent?.parent,
       fullName : this.getUpdateParentFullName.value,
       title : this.getUpdateParentTitle.value,
       nic : this.getUpdateParentNIC.value,
@@ -896,7 +1050,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     
 
     let address : addressVM = {
-      id : this.additionalInfoPopUpData?.address?.id,
+      ...this.selectedStudent?.address,
       houseNo : this.getUpdateStudenthouseNo.value,
       lane : this.getUpdateStudentLane.value,
       city : this.getUpdateStudentCity.value,
@@ -904,6 +1058,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     }
 
     let student : studentVM = {
+      id : studentId,
+      scode : studentCode,
       fullName : this.getUpdateStudentFullName.value,
       callingName : this.getUpdateStudentCallingName.value,
       birthDay : this.getUpdateStudentBirthday.value,
@@ -914,8 +1070,6 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       parent : parent,
       school : this.getUpdateStudentSchool.value,
       isAdmisionPaid : false,
-      id : this.additionalInfoPopUpData?.id,
-      scode : this.additionalInfoPopUpData?.scode,
       email : this.getUpdateStudentEmail.value,
       role : this.role
     }
@@ -931,6 +1085,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
             this.isUpdating = false;
             this.isUpdateFormRedy = false;
             this.isAditionalInfo = false;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Updated' });
           }
         });
       }
@@ -938,7 +1093,8 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
   }
 
   goToUpdateForm(studentdata : studentVM){
-    
+    let relationship : any
+    this.selectedStudent = studentdata;
     this.getUpdateStudentBirthday.patchValue(studentdata?.birthDay);
     this.getUpdateStudentCallingName.patchValue(studentdata?.callingName);
     this.getUpdateStudentCity.patchValue(studentdata?.address?.city);
@@ -956,7 +1112,9 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
     this.getUpdateParentFullName.patchValue(studentdata?.parent?.fullName);
     this.getUpdateParentNIC.patchValue(studentdata?.parent?.nic);
     this.getUpdateParentOccupation.patchValue(studentdata?.parent?.occupation);
-    this.getUpdateParentRelationship.patchValue(studentdata?.parent?.relationship);
+
+    relationship = this.relationships.find(el => el.name == studentdata?.parent?.relationship)
+    this.getUpdateParentRelationship.patchValue(relationship);
     this.getUpdateParentTitle.patchValue(studentdata?.parent?.title);
     this.getUpdateParentEmail.patchValue(studentdata.parent?.email)
     

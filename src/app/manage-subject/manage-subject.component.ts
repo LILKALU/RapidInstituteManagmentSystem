@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { SubjectService } from '../shared/services/subject.service';
 import { SubSink } from 'subsink';
 import { SubjectVM } from '../shared/models/subjectVM';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
 import { LocalStorageService } from '../shared/services/local-storage.service';
@@ -58,6 +58,7 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
     private subjectservice : SubjectService,
     private confirmationService: ConfirmationService,
     private localStorageService : LocalStorageService,
+    private messageService: MessageService,
     private router : Router
   ){}
 
@@ -137,6 +138,7 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
         this.subjectTableData.reverse()
         this.isloading = false;
         this.closeDialog();
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Subject Created' });
       }
     });
   }
@@ -162,6 +164,7 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
                 this.subjectsAllData.splice(index , 1);
                 this.subjectTableData = this.subjectsAllData
                 this.isloading = false;
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Subject Removed' });
               }
             });
           }
@@ -194,6 +197,7 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
           }
         });
       }
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Subject Updated' });
       this.isloading = false;
       this.closeUpdateDialog();
     });

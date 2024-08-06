@@ -52,6 +52,7 @@ import { ManageNotificationComponent } from './manage-notification/manage-notifi
 import { ManageLeaveComponent } from './manage-leave/manage-leave.component';
 import { NumericDirective } from './directives/numeric.directive';
 import { TwoDecimalNumericDirective } from './directives/two-decimal-numeric.directive';
+import { UppercaseLettersDirective } from './directives/uppercase-letters.directive';
 // import { LoginPageComponent } from './login-page/login-page.component';
 
 
@@ -83,6 +84,7 @@ import { TwoDecimalNumericDirective } from './directives/two-decimal-numeric.dir
     ManageLeaveComponent,
     NumericDirective,
     TwoDecimalNumericDirective,
+    UppercaseLettersDirective,
     // LoginPageComponent,
   ],
   imports: [

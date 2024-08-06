@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { SubSink } from 'subsink';
 import { GradeService } from '../shared/services/grade.service';
 import { GradeVM } from '../shared/models/gradeVM';
@@ -54,6 +54,7 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private gradeService : GradeService,
     private localStorageService : LocalStorageService,
+    private messageService: MessageService,
     private router : Router
   ){}
   
@@ -171,6 +172,7 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
             });
             this.tableGrades = this.allGrades
             this.isLoading = false;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Grade Removed' });
           }
         })
       }
@@ -214,6 +216,7 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
         this.gradeCreationForm.reset();
         this.isGradeUpdateFormVisible = false;
         this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Grade Updated' });
       }
     })
   }
@@ -230,10 +233,11 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
     this.subs.sink = this.gradeService.createGrade(grade).subscribe(data =>{
       if(data){
         this.newlyCreatedGrade = data.content;
-        this.allGrades.push(this.newlyCreatedGrade);
+        this.allGrades.unshift(this.newlyCreatedGrade);
         this.tableGrades = this.allGrades;
         this.isGradeFormVisible = false;
         this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Grade Created' });
       }
     })
   }

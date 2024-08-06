@@ -538,71 +538,47 @@ export class DashboardComponent implements OnInit, OnDestroy  {
     };
   }
 
-  setStudentCountByCourseChartData(){
-    let dataset : dataSetsVM
-    let data : number[]=[];
-    let backgroundColor : string[]=[]
-    let labels : string[]=[]
-
+  setStudentCountByCourseChartData() {
+    let dataset: any;
+    let data: number[] = [];
+    let backgroundColor: string[] = [];
+    let labels: string[] = [];
+  
     this.courses.forEach((course) => {
-      this.studentCountByCourse.forEach((element,index) => {
-        if(element.studentCount && element.course && element.course.code && element.color && course.id == element.courseId){
-          data[index]=element.studentCount;
-          backgroundColor[index] = element.color
-          labels[index] = element.course.code
+      this.studentCountByCourse.forEach((element) => {
+        if (element.studentCount && element.course && element.course.code && element.color && course.id == element.courseId) {
+          data.push(element.studentCount);
+          backgroundColor.push(element.color);
+          labels.push(element.course.code);
         }
-        // else if(!(data[index]>0 || data[index]==0) && element.color){
-        //   data[index]=0
-        //   backgroundColor[index] = element.color
-        // }
       });
     });
-
+  
     dataset = {
-      label : 'Student Enrolments',
-      data : data,
-      backgroundColor : backgroundColor,
-      
-    }
-    
-
+      label: 'Student Enrolments',
+      data: data,
+      backgroundColor: backgroundColor,
+    };
+  
     this.studentCountByCourseChartData = {
-      labels : labels,
-      datasets : [dataset]
-    }
-
+      labels: labels,
+      datasets: [dataset]
+    };
+  
     this.basicOptionsForPie = {
       plugins: {
-          legend: {
-              labels: {
-                  color: 'black',
-                  font: {
-                    size: 15 
-                  }
-              }
+        legend: {
+          labels: {
+            color: 'black',
+            font: {
+              size: 15 
+            }
           }
-      },
-      scales: {
-          y: {
-              beginAtZero: true,
-              ticks: {
-                  color: 'black'
-              },
-              grid: {
-                  drawBorder: false
-              }
-          },
-          x: {
-              ticks: {
-                  color: 'black'
-              },
-              grid: {
-                  drawBorder: false
-              }
-          }
+        }
       }
     };
   }
+  
 
   setProfitChartData(){
     let dataset : dataSetsVM

@@ -6,7 +6,7 @@ import { CourseVM } from '../shared/models/coursesVM';
 import { EnrolmentCourseService } from '../shared/services/enrolment-course.service';
 import { EnrolmentCourseVM } from '../shared/models/enrolmentCourse';
 import { StudentCourseVM } from '../shared/models/studentCourseVM';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { StudentService } from '../shared/services/student.service';
 import { studentVM } from '../shared/models/studentVM';
 import { CourseStudentVM } from '../shared/models/courseStudentVM';
@@ -33,6 +33,7 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
 
   private subs = new SubSink();
   appIconId : number = 7
+  userCode : string = '';
   today = new Date();
   searchForm !: FormGroup;
   isSearched : boolean = false;
@@ -56,6 +57,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
   activeStepIndex : number = 0;
   reciptTemplateData : reciptTemplateDataVM | undefined;
   courseStudent : CourseStudentVM[] = []
+  payingMethodForm !: FormGroup
+  cardDetailsForm !: FormGroup;
   logedDetails : loginDetailsVM | undefined;
   privilages : privilagesVM[] = [];
   steps = [
@@ -66,9 +69,18 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
 
   get getScode(): AbstractControl { return this.enrolmentForm.get('scode') as AbstractControl; }
 
+  get getPayingMethod(): AbstractControl { return this.payingMethodForm.get('method') as AbstractControl; }
+
   get getHasPaymentDone(): AbstractControl { return this.classFeeForm.get('hasPaymentDone') as AbstractControl; }
 
   get getSearchCourse(): AbstractControl { return this.searchForm.get('courses') as AbstractControl; }
+
+  get getFirstFourDigit(): AbstractControl { return this.cardDetailsForm.get('firstFourDigit') as AbstractControl; }
+  get getSecondFourDigit(): AbstractControl { return this.cardDetailsForm.get('secondFourDigit') as AbstractControl; }
+  get getThirdFourDigit(): AbstractControl { return this.cardDetailsForm.get('thirdhFourDigit') as AbstractControl; }
+  get getFourthFourDigit(): AbstractControl { return this.cardDetailsForm.get('fourthFourDigit') as AbstractControl; }
+  get getExpirDate(): AbstractControl { return this.cardDetailsForm.get('expirDate') as AbstractControl; }
+  get getCVC(): AbstractControl { return this.cardDetailsForm.get('CVC') as AbstractControl; }
 
   constructor(
     private formBuilder: FormBuilder,
@@ -80,6 +92,7 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     private classFeeService : ClassFeeService,
     private monthService : MonthService,
     private localStorageService : LocalStorageService,
+    private messageService: MessageService,
     private router : Router
   ){}
 
@@ -105,11 +118,25 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     this.searchForm = this.formBuilder.group({
       courses : [null]
     })
+
+    this.payingMethodForm = this.formBuilder.group({
+      method : ['' , Validators.required]
+    });
+
+    this.cardDetailsForm = this.formBuilder.group({
+      firstFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      secondFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      thirdhFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      fourthFourDigit : [null,[Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
+      expirDate : [null, Validators.required],
+      CVC : [null, [Validators.required, Validators.pattern(/^[0-9]{3}$/)]]
+    })
   }
 
   getLoginData(){
     let loginData : any = this.localStorageService.getItem('login');
     this.logedDetails = JSON.parse(loginData)
+    this.userCode = this.logedDetails?.usercode ? this.logedDetails?.usercode : ''
     this.privilages = this.logedDetails?.privilagesDTO ? this.logedDetails?.privilagesDTO : [];
   }
 
@@ -238,7 +265,7 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     
 
     this.subs.sink = this.studentServices.getStudentByScode(this.getScode.value).subscribe(data =>{
-      if(data){
+      if(data && data.content){
         this.searchedStudent = data.content;
         courseStudent = {
           course : this.enrolingCourse,
@@ -246,6 +273,9 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
         }
         this.courseStudent.push(courseStudent);
         this.enrolmentForm.reset();
+        this.isStudentGetting = false;
+      }else{
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Student Not Found'});
         this.isStudentGetting = false;
       }
     })
@@ -267,12 +297,12 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
     });
 
     enrolment = {
-      enrolmentCorseDTO : enrolmentCourse,
+      enrolmentCourses : enrolmentCourse,
       student : this.searchedStudent
     }
 
     this.subs.sink = this.enrolmentService.addEnrolment(enrolment).subscribe(data => {
-      if(data){
+      if(data && data.content){
         this.enrollments = data.content;
         this.activeStepIndex = this.activeStepIndex +1;
         this.enrolmentCourses.push(this.enrollments);
@@ -284,6 +314,11 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
         this.courseStudents.push(courseStudents);
         this.activeStepIndex = 1;
         this.isLoading = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Enrolled' });
+      }else{
+        this.isLoading = false;
+        this.isEnrolDialogVisible = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Student Already Enrolled' });
       }
     });
   }
@@ -345,7 +380,7 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
         
 
         this.activeStepIndex = this.activeStepIndex + 1;
-        
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Payment Success' });
       }
     })
   }
@@ -402,6 +437,8 @@ export class ManageEnrolmentComponent implements OnInit, OnDestroy {
             }
 
             this.isLoading = false;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Student Withdraw' });
+            
           }
         })
       }

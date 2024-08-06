@@ -12,6 +12,7 @@ import { leaveRequestVM } from '../shared/models/leaveRequestVM';
 import { ApprovingStatusService } from '../shared/services/approving-status.service';
 import { approvingStatusVM } from '../shared/models/approvingStatusVM';
 import { ConfirmationService } from 'primeng/api';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-manage-leave',
@@ -153,12 +154,20 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
     })
   }
 
-  openRequestFormFo(hallFormVisibility : boolean){
+   openRequestFormFom(hallFormVisibility : boolean){
     this.isRequestFormVisible = hallFormVisibility;
   }
 
   searchLeaveRequest(){
+    let date : string;
+    date = moment(this.getSearchValue.value).format("YYYY-MM-DD")
+    
+    this.leaveRequestsaShow = this.leaveRequestsaAll.filter(el => el && el.requestedDate && el.requestedDate.split('T')[0] == date);
+  }
 
+  reset(){
+    this.leaveRequestsaShow = this.leaveRequestsaAll;
+    this.searchForm.reset();
   }
 
   closeLeaveRequestPopUp(){
@@ -197,8 +206,6 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
 
   deleteLeave(leave : leaveRequestVM){
     let leaveReq : leaveRequestVM
-
-    
 
     this.confirmationService.confirm({
       message: 'Are you sure that you want to delete',

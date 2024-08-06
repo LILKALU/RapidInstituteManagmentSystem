@@ -1,4 +1,5 @@
 <div *ngIf="!isLoading">
+    <p-toast></p-toast>
     <div class="grid pt-4 pl-3">
         <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">

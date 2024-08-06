@@ -19,6 +19,7 @@ import { leaveRequestVM } from '../shared/models/leaveRequestVM';
 import { notificationVM } from '../shared/models/notificationVM';
 import { NotificationService } from '../shared/services/notification.service';
 import { EmailService } from '../shared/services/email.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-manage-teachers',
@@ -212,9 +213,11 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
   submitUpdateClick(){
     this.isloading = true;
     let teacher : teacherVM;
+    let bd = new Date(this.getUpdateTeacherBirthday.value)
+    let birthday : string = moment(bd).format("MM/DD/YYYY")
 
     teacher = {
-      birthday : this.getUpdateTeacherBirthday.value.toLocaleDateString(),
+      birthday : birthday,
       contactNumber : this.getUpdateTeacherContactNumber.value,
       email : this.getUpdateTeacherEmail.value,
       fullName : this.getUpdateTeacherFullName.value,
@@ -234,6 +237,7 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
           }
         });
         this.teachersTabelData = this.teachersAllData;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Teacher Details Updated' });
         this.isTeacherUpdateFormVisible = false;
         this.isloading = false;
       }
@@ -268,9 +272,8 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
         this.teachersTabelData.reverse();
         this.createUserAccount(this.newTeacher);
         this.closeDialog();
-        
         this.isloading = false;
-
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Teacher Registered' });
       }
     })
   }
@@ -335,6 +338,7 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
               if(element.id === teacherdata.id){
                 this.teachersAllData.splice(index , 1);
                 this.teachersTabelData = this.teachersAllData
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Teacher Removed' });
                 this.isloading = false;
               }
             });

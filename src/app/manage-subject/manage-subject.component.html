@@ -4,6 +4,7 @@
 </div>
 
 <div *ngIf="!isloading">
+    <p-toast></p-toast>
     <div class="grid pt-4 pl-3">
         <div class="col-4" *ngIf="isActionAllowed(3)">
             <div [formGroup]="selectAction">
@@ -68,7 +69,7 @@
 
 
 
-<p-dialog header="Hall Creation Form" [(visible)]="isSubjectFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeDialog()">
+<p-dialog header="Subject Creation Form" [(visible)]="isSubjectFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeDialog()">
     <div class="grid">
         <div class="col-10"></div>
         <div class="col-2">
@@ -108,7 +109,7 @@
     </form>
 </p-dialog>
 
-<p-dialog header="Hall Update Form" [(visible)]="isUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeUpdateDialog()">
+<p-dialog header="Subject Update Form" [(visible)]="isUpdateFormVisible" [style]="{width: '50vw'}" [modal]="true" (onHide)="closeUpdateDialog()">
     <div class="grid">
         <div class="col-10"></div>
         <div class="col-2">
