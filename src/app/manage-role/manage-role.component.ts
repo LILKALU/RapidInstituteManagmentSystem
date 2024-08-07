@@ -185,13 +185,14 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
           this.updatedRole = data.content
           let index : number;
           index = this.allRoles.indexOf(r);
-          if(index && this.updatedRole){
+          if(index >= 0 && this.updatedRole){
             this.allRoles.splice(index,1, this.updatedRole);
             this.tableRoles = this.allRoles;
             this.roleUpdateForm.reset();
             this.isRoleUpdateFormVisible = false;
-            this.isLoading = false;
           }
+          
+          this.isLoading = false;
         }
       })
     }

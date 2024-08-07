@@ -209,6 +209,9 @@ export class ManageAttendanceComponent implements OnInit, OnDestroy{
           });
           this.attendanceForm = this.formBuilder.group(formControls)
           this.setMarkedAttendance();
+        }else{
+          this.isLoading = false;
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'There Are No Students' });
         }
       })
     }
