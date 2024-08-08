@@ -26,6 +26,9 @@ import { Router } from '@angular/router';
 import { LocalStorageService } from '../shared/services/local-storage.service';
 import { loginDetailsVM } from '../shared/models/loginDetailsVM';
 import { privilagesVM } from '../shared/models/privilagesVM';
+import { studentWiseCoursessVM } from '../shared/models/studentWiseCoursesVM';
+import { courseWiseMonthsWithStudentVM } from '../shared/models/courseWiseMonthsWithStudentVM';
+import { courseWiseMonth } from '../shared/models/courseWiseMonthVM';
 
 @Component({
   selector: 'app-manage-class-fee',
@@ -55,6 +58,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   allCourses : CourseVM[]= [];
   months : MonthVM[] = [];
   payingCourseWiseMonths : courseWiseMonths[]=[];
+  notAttendCourseWiseMonth : courseWiseMonths[]=[];
   firstClassFees : courseWiseClassFeeVM[]=[];
   lastClassFees : courseWiseClassFeeVM[]=[];
   firstMonthId : number = -1;
@@ -64,6 +68,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   arrearsMonths : MonthVM[] = [];
   payableMonths : MonthVM[] = [];
   arrears : MonthVM[] = [];
+  courseWiseFirstPaiedMonth : courseWiseMonth[]=[]
   proceedClassFeePayment : ClassFeeVM | undefined;
   isMakePaymentPopupOpen : boolean = false;
   selectedCourses : CourseVM[] = []; 
@@ -71,6 +76,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   activeStepIndex : number = 0;
   selectedCourse!: CourseVM; 
   subTotal : number = 0;
+  unpaidCourseWiseMonths : courseWiseMonths[]=[]
   reciptTemplateData : reciptTemplateDataVM | undefined;
   logedDetails : loginDetailsVM | undefined;
   privilages : privilagesVM[] = [];
@@ -107,6 +113,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     private classFeeCourseService : ClassFeeCourseService,
     private monthService : MonthService,
     private localStorageService : LocalStorageService,
+    private attendanceService : AttendanceService,
     private router : Router
   ){}
 
@@ -234,14 +241,13 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   }
 
   getClassFees(){
-    this.selectedCourses = [];
-    // this.isLoading = true;
-    let selectedStudent : studentVM;
-    let studentWiseCourses : studentWiseCoursesVM[] = [];
-    let studentWiseCourse : studentWiseCoursesVM;
+    let studentWiseCourses : studentWiseCoursessVM
 
-    this.selectedCourses = this.getCourse.value;
-    
+    let selectedStudent : studentVM | undefined;
+    this.selectedCourses = [];
+    this.payingCourseWiseMonths = [];
+    this.updatedCourses = []
+
     this.allStudents.forEach(element => {
       if(element.scode === this.getStudent.value){
         selectedStudent = element;
@@ -249,17 +255,76 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.selectedCourses.forEach(element => {
-      studentWiseCourse = {
-        course : element,
-        student : selectedStudent
-      }
-      studentWiseCourses.push(studentWiseCourse);
-      if(this.selectedCourses.length == studentWiseCourses.length){
-        this.getfirstPaymentMonthClassFee(studentWiseCourses);
-      }
-    });
+    this.selectedCourses = this.getCourse.value;
     
+    studentWiseCourses = {
+      student : selectedStudent,
+      courses : this.getCourse.value
+    }
+
+    this.getUnpaidCourseWiseMonth(studentWiseCourses)
+    console.log("studentWiseCourses",studentWiseCourses);
+    
+    // this.selectedCourses = [];
+    // // this.isLoading = true;
+
+    // let studentWiseCourses : studentWiseCoursesVM[] = [];
+    // let studentWiseCourse : studentWiseCoursesVM;
+
+    // this.selectedCourses = this.getCourse.value;
+    
+
+
+    // this.selectedCourses.forEach(element => {
+    //   studentWiseCourse = {
+    //     course : element,
+    //     student : selectedStudent
+    //   }
+    //   studentWiseCourses.push(studentWiseCourse);
+    //   if(this.selectedCourses.length == studentWiseCourses.length){
+    //     this.getfirstPaymentMonthClassFee(studentWiseCourses);
+    //   }
+    // });
+    
+  }
+
+  getUnpaidCourseWiseMonth(studentWiseCourses : studentWiseCoursessVM){
+    let courseWiseMonthsWithStudent : courseWiseMonthsWithStudentVM
+    this.subs.sink = this.classFeeService.getUnpaidMonths(studentWiseCourses).subscribe(data =>{
+      if(data && data.content){
+        this.unpaidCourseWiseMonths = data.content
+        courseWiseMonthsWithStudent = {
+          payingCourseWiseMonths : this.unpaidCourseWiseMonths,
+          student : this.selectedStudent,
+          thisMonthId : this.thisMonth
+        }
+
+        console.log("courseWiseMonthsWithStudent",courseWiseMonthsWithStudent);
+        
+
+        this.removeUnAttendMonth(courseWiseMonthsWithStudent,studentWiseCourses);
+      }
+    })
+  }
+
+  removeUnAttendMonth(courseWiseMonthsWithStudent : courseWiseMonthsWithStudentVM, studentWiseCourses : studentWiseCoursessVM){
+    this.subs.sink = this.attendanceService.removeUnAttendMonth(courseWiseMonthsWithStudent).subscribe(data =>{
+      if(data && data.content && data.content.payingCourseWiseMonths){
+        this.notAttendCourseWiseMonth = data.content.payingCourseWiseMonths;
+        console.log("updatedCourses",this.notAttendCourseWiseMonth);
+        this.getfirstMonthClassFee(studentWiseCourses)
+        
+      }
+    })
+  }
+
+  getfirstMonthClassFee(studentWiseCourses : studentWiseCoursessVM){
+    this.subs.sink = this.classFeeService.getFirstPaidClassFee(studentWiseCourses).subscribe(data =>{
+      if(data && data.content){
+        this.courseWiseFirstPaiedMonth = data.content;
+        this.setStyleClassForEachCourse()
+      }
+    })
   }
 
   getfirstPaymentMonthClassFee(studentWiseCourses : studentWiseCoursesVM[]){
@@ -284,7 +349,7 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
         if(data && data.content){
           this.lastClassFees = data.content;
           if(this.lastClassFees.length == studentWiseCourses.length){
-            this.setStyleClassForEachCourse(studentWiseCourses);
+            // this.setStyleClassForEachCourse(studentWiseCourses);
           }
         }
       })
@@ -345,64 +410,54 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
   }
 
 
-  setStyleClassForEachCourse(studentWiseCourses : studentWiseCoursesVM[]){
-    let c : CourseVM;
-    let styleClasses : string[] = [];
-    this.payingCourseWiseMonths = [];
-    let arrears : MonthVM[] = [];
-    this.arrears = []
-    studentWiseCourses.forEach(element => {
-      styleClasses = [];
-      arrears = [];
-      let course : CourseVM = element.course;
-      let firstClassFee : ClassFeeCourseVM | undefined;
-      let lastClassFee : ClassFeeCourseVM | undefined;
-      let firstMonth : MonthVM | undefined;
-      let lastMonth : MonthVM | undefined;
+  setStyleClassForEachCourse(){
+    let course : CourseVM
+    let styleClasses : string[]=[]
+    let monthThis : MonthVM | undefined;
+    let c : CourseVM
+    monthThis = this.months.find(el => el.id == this.thisMonth);
 
-      firstClassFee = this.firstClassFees.find(el =>  el.course.id === course.id)?.classFeeCourse;
-      lastClassFee = this.lastClassFees.find(el => el.course.id === course.id)?.classFeeCourse;
-
-      firstMonth = firstClassFee?.month
-      lastMonth = lastClassFee?.month
+    this.selectedCourses.forEach(element => {
+      course = element
+      styleClasses = ['empty_background','empty_background','empty_background','empty_background','empty_background','empty_background','empty_background','empty_background','empty_background','empty_background','empty_background','empty_background']
 
       this.months.forEach(month => {
-        let monthId = month.id
         
-        if(firstMonth?.id == monthId){
-          styleClasses.push('green_background')
-        }else if(firstMonth?.id && monthId && firstMonth?.id > monthId){
-          styleClasses.push('black_background')
-        }else if(lastMonth?.id == monthId){
-          styleClasses.push('green_background')
-        }else if(firstMonth?.id && monthId && lastMonth?.id && firstMonth?.id < monthId && lastMonth?.id > monthId){
-          styleClasses.push('green_background')
-        }else if(monthId && lastMonth?.id && lastMonth?.id != monthId && lastMonth?.id < monthId && this.thisMonth >= monthId){
-          let m : MonthVM = {
-            ...month,
-            diabled : true
+        this.unpaidCourseWiseMonths.forEach(um => {
+          if(um.course && um.course.id && um.course.id == course.id){
+            if(month && month.id && um && um.months && !(um.months.some(m => m.id == month.id))){
+              styleClasses[month.id-1] = 'green_background';
+            }else if (month && month.id && um && um.months && um.months.some(m => m.id == month.id)){
+              styleClasses[month.id-1] = 'red_background';
+            }else if(month && monthThis && month.id && um && um.months && !(um.months.some(m => m.id == month.id))){
+              styleClasses[month.id-1] = 'green_background';
+            }
           }
-          this.arrears.push(m);
-          arrears.push(m);
-          styleClasses.push('red_background')
-        }else{
-          styleClasses.push('empty_background')
-        }
-        
-      });
+        });
 
-      let cw : courseWiseMonths;
-        let name : string;
-        let ammount : number;
-        name = '('+course.code+') - ' + course.teacher.fullName + '\'s ' + course.grade.name + ' ' + course.date + ' ' + course.subject.name + ' Class at ' + course.startTime;
-        ammount = course.classFeeAmount;
-        cw = {
-          course : course,
-          months : arrears,
-          courseName : name,
-          courseAmount : ammount
+        this.notAttendCourseWiseMonth.forEach(nac => {
+          if(nac.course && nac.course.id && nac.course.id == course.id){
+            if(month && month.id && nac.months && nac.months.some(m => m.id == month.id)){
+              let index = this.arrears.indexOf(month)
+              if(index != -1){
+              }
+              styleClasses[month.id-1] = "black_background"
+            }
+          }
+        });
+
+        this.courseWiseFirstPaiedMonth.forEach(cwf => {
+          if(cwf.course && cwf.course.id && cwf.course.id == course.id){
+            if(month && month.id && cwf.month && cwf.month.id && cwf.month.id > month.id ){
+              styleClasses[month.id-1] = "black_background"
+            }
+          }
+        });
+
+        if(month.id && month.id > this.thisMonth){
+          styleClasses[month.id-1] = 'empty_background'
         }
-        this.payingCourseWiseMonths.push(cw);
+      });
         
       c = {
         ...course,
@@ -414,8 +469,39 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
           this.updatedCourses[index] = c;
         }
       });
-    });
     
+
+    });
+
+    this.setArreasMonth()
+  }
+
+  setArreasMonth(){
+    this.updatedCourses.forEach(course => {
+      let arrears : MonthVM[]=[] 
+      if(course.styleClassName){
+
+        course.styleClassName.forEach((className,index) => {
+          
+          if(className == 'red_background'){
+            arrears.push(this.months[index])
+          }
+        });
+
+        let cw : courseWiseMonths;
+          let name : string;
+          let ammount : number;
+          name = '('+course.code+') - ' + course.teacher.fullName + '\'s ' + course.grade.name + ' ' + course.date + ' ' + course.subject.name + ' Class at ' + course.startTime;
+          ammount = course.classFeeAmount;
+        cw = {
+          course : course,
+          months : arrears,
+          courseName : name,
+          courseAmount : ammount
+        }
+        this.payingCourseWiseMonths.push(cw);
+      }
+    });
   }
 
   isMonthSelectableForPayment(course : CourseVM, month : MonthVM) : boolean{

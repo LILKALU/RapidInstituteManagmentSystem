@@ -7,6 +7,8 @@ import { Observable } from 'rxjs';
 import { CourseVM } from '../models/coursesVM';
 import { attendanceSearchVM } from '../models/attendanceSearchVM';
 import { attendanceCountByMonthAndCourseResponseVM } from '../models/attendanceCountByMonthAndCourseResponseVM';
+import { courseWiseMonthsWithStudentVM } from '../models/courseWiseMonthsWithStudentVM';
+import { courseWiseMonthsWithStudentResponseVM } from '../models/courseWiseMonthWithStudentResponseVM';
 
 
 @Injectable({
@@ -40,5 +42,9 @@ export class AttendanceService {
 
   getAttendanceCountByMonthAndCourse(year : number): Observable<attendanceCountByMonthAndCourseResponseVM>{
     return this.httpClient.get<attendanceCountByMonthAndCourseResponseVM>(`${this.BaseURL}/getattendancecountbymonthandcourse/${year}`,);
+  }
+
+  removeUnAttendMonth(courseWiseMonthsWithStudent : courseWiseMonthsWithStudentVM) : Observable<courseWiseMonthsWithStudentResponseVM> {
+    return this.httpClient.post<courseWiseMonthsWithStudentResponseVM>(`${this.BaseURL}/removeunattendmonths`,courseWiseMonthsWithStudent);
   }
 }

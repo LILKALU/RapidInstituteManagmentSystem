@@ -5,6 +5,9 @@ import { ClassFeeVM } from '../models/classFeeVM';
 import { classFeeResponse } from '../models/classFeeResponse';
 import { classFeesResponse } from '../models/classfeesResponse';
 import { studentWiseCoursesVM } from '../models/studentWiseCourseVM';
+import { studentWiseCoursessVM } from '../models/studentWiseCoursesVM';
+import { courseWiseMonthsResponseVM } from '../models/courseWiseMonthsResponseVM';
+import { courseWiseMonthResponse } from '../models/courseWiseMonthResponseVM';
 
 @Injectable({
   providedIn: 'root'
@@ -29,5 +32,13 @@ export class ClassFeeService {
 
   findLastByStudentAndCourse(studentWiseCourses : studentWiseCoursesVM): Observable<classFeeResponse>{
     return this.httpClient.post<classFeeResponse>(`${this.BaseURL}/findlastbystudentandcourse`,studentWiseCourses);
+  }
+
+  getUnpaidMonths(studentWiseCoursess : studentWiseCoursessVM) : Observable<courseWiseMonthsResponseVM>{
+    return this.httpClient.post<courseWiseMonthsResponseVM>(`${this.BaseURL}/getunpaidmonths`,studentWiseCoursess)
+  }
+
+  getFirstPaidClassFee(studentWiseCoursess : studentWiseCoursessVM) : Observable<courseWiseMonthResponse>{
+    return this.httpClient.post<courseWiseMonthResponse>(`${this.BaseURL}/getfirstpaiedmonth`,studentWiseCoursess)
   }
 }
