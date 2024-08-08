@@ -596,9 +596,9 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
 
   searchStudent(){
     this.studentTableData = this.studentAllData.filter(el => el.scode == this.getSearchValue.value)
-    if(this.studentTableData.length === 0){
-      this.studentTableData = this.studentAllData
-      alert("No Matching Results")
+    if(!(this.studentTableData.length > 0)){
+      this.studentTableData = this.studentAllData;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Student Code'});
     }
   }
 

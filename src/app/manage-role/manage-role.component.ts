@@ -140,6 +140,10 @@ export class ManageRoleComponent implements OnInit, OnDestroy {
 
   searchRole(){
     this.tableRoles = this.allRoles.filter(el => el.name && this.getSearchValue.value && el.name.startsWith(this.getSearchValue.value));
+    if(!(this.tableRoles.length > 0)){
+      this.tableRoles = this.allRoles;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Role'});
+    }
   }
 
   reset(){

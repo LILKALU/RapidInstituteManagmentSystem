@@ -859,6 +859,11 @@ export class ManageCourseComponent implements OnInit, OnDestroy {
 
   searchCourse(){
     this.coursesTableData = this.coursesAllData.filter(el => el.code == this.getSearchValue.value)
+
+    if(!(this.coursesTableData.length > 0)){
+      this.coursesTableData = this.coursesAllData;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Course Code'});
+    }
   }
   reset(){
     this.coursesTableData = this.coursesAllData

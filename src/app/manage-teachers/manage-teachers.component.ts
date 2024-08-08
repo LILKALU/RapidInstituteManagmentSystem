@@ -208,6 +208,11 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
 
   searchTeacher(){
     this.teachersTabelData = this.teachersAllData.filter(el => el.tcode == this.getSearchValue.value)
+
+    if(!(this.teachersTabelData.length > 0)){
+      this.teachersTabelData = this.teachersAllData;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Teacher Code'});
+    }
   }
 
   submitUpdateClick(){

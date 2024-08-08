@@ -19,6 +19,7 @@ import { TeacherPaymentService } from '../shared/services/teacher-payment.servic
 import { courseWiseMonths } from '../shared/models/courseWiseMonthsVM';
 import { teacherPaymentReciptDataVM } from '../shared/models/teacherPaymentReciptDataVM';
 import { paymentsVM } from '../shared/models/paymentsVM';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-manage-salary-payments',
@@ -82,6 +83,7 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
     private teachersService : TeacherService,
     private monthService : MonthService,
     private courseService : CourseService,
+    private messageService: MessageService,
     private teacherPaymentService : TeacherPaymentService
   ){}
 
@@ -244,7 +246,10 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
 
   closePaymentPopup(){
     this.paymentForm.reset();
-    this.activeStepIndex = 0
+    this.teacherPayemntForm.reset();
+    this.activeStepIndex = 0;
+    this.courseWisePayments = [];
+    this.isPaymentFormVisible = false;
   }
 
   getPaymentDetails(){
@@ -342,6 +347,7 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
           }
           this.activeStepIndex = this.activeStepIndex + 1;
           this.isLoading = false;
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Payment Done' });
         }
       });
     }
@@ -349,6 +355,11 @@ export class ManageSalaryPaymentsComponent implements OnInit, OnDestroy {
 
   searchPayment(){
     this.tablePayments = this.allPayments.filter(el => el.reciptNumber && this.getSearchValue.value && el.reciptNumber == this.getSearchValue.value)
+
+    if(!(this.tablePayments.length > 0)){
+      this.tablePayments = this.allPayments;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Recipt Number'});
+    }
   }
 
   reset(){

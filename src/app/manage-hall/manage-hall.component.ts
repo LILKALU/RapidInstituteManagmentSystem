@@ -125,6 +125,11 @@ export class ManageHallComponent implements OnInit, OnDestroy {
 
   searchHall(){
     this.hallTableData = this.hallAllData.filter(el => el.hallName == this.getSearchValue.value);
+
+    if(!(this.hallTableData.length > 0)){
+      this.hallTableData = this.hallAllData;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Hall Name'});
+    }
   }
 
   reset(){

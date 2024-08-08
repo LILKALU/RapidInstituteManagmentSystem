@@ -245,8 +245,13 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
     this.isSubjectFormVisible = hallFormVisibility;
   }
 
-  searchHall(){
+  searchSubject(){
     this.subjectTableData = this.subjectsAllData.filter(el => el.code == this.getSearchValue.value);
+
+    if(!(this.subjectTableData.length > 0)){
+      this.subjectTableData = this.subjectsAllData;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Subject Code'});
+    }
   }
   
   reset(){

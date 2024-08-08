@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AdAccountServiceService } from '../shared/services/ad-account-service.service';
 import { SubSink } from 'subsink';
 import { RoleService } from '../shared/services/role.service';
@@ -67,6 +67,7 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
     private otherEmployeeService : OtherEmployeeService,
     private adAccountService : AdAccountServiceService,
     private confirmationService: ConfirmationService,
+    private messageService: MessageService,
     private localStorageService : LocalStorageService,
     private router : Router
   ){}
@@ -170,6 +171,11 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
 
   searchEmployee(){
     this.tableOtherEmployees = this.allOtherEmployees.filter(el => el.fcode == this.getSearchValue.value || el.syscode == this.getSearchValue.value || el.mcode == this.getSearchValue.value)
+
+    if(!(this.tableOtherEmployees.length > 0)){
+      this.tableOtherEmployees = this.allOtherEmployees;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Employee Code'});
+    }
   }
 
   reset(){

@@ -140,6 +140,11 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
 
   searchGrade(){
     this.tableGrades = this.allGrades.filter(el => el.code === this.getSearchValue.value)
+
+    if(!(this.tableGrades.length > 0)){
+      this.tableGrades = this.allGrades;
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Invalid Grade Code'});
+    }
   }
 
   openUpdateForm(grade : GradeVM){
