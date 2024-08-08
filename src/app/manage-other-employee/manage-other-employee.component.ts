@@ -180,6 +180,7 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
 
   reset(){
     this.tableOtherEmployees = this.allOtherEmployees;
+    this.getSearchValue.reset();
   }
 
   closeDialog(){
@@ -263,12 +264,13 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
         });
         this.isEmployeeFormUpdateVisible = false;
         this.isloading = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Employee Updated' });
       }
     })
   }
 
   
-  deleteHall(otherEmpData : otherEmployeeVM){
+  deleteOtherEmployee(otherEmpData : otherEmployeeVM){
     let otherEmp : otherEmployeeVM = otherEmpData;
 
     let delotherEmp : otherEmployeeVM;
@@ -300,6 +302,7 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
             });
             this.isEmployeeFormUpdateVisible = false;
             this.isloading = false;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Employee Removed' });
           }
         })
       }
@@ -326,6 +329,9 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
           roleId : this.getEmployeeCreationRole.value
         }
 
+        this.allOtherEmployees.unshift(this.newlyAddedOtherEmployee)
+        this.tableOtherEmployees = this.allOtherEmployees;
+
         this.createUserAccount(this.newlyAddedOtherEmployee);
       }
     })
@@ -347,6 +353,8 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
         if(data && data.content){
           this.otherEmployeeLoginData = data.content;
           this.isloading = false;
+          this.closeDialog()
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Employee Registered' });
         }
       })
     }else if(otherEmployee && otherEmployee.mcode && otherEmployee.roleId && otherEmployee.roleId == 3){
@@ -363,6 +371,8 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
         if(data && data.content){
           this.otherEmployeeLoginData = data.content;
           this.isloading = false;
+          this.closeDialog()
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Employee Registered' });
         }
       })
     }else if(otherEmployee && otherEmployee.syscode){
@@ -379,6 +389,8 @@ export class ManageOtherEmployeeComponent implements OnInit, OnDestroy{
         if(data && data.content){
           this.otherEmployeeLoginData = data.content;
           this.isloading = false;
+          this.closeDialog()
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Employee Registered' });
         }
       })
 

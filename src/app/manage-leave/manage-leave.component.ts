@@ -93,7 +93,7 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
     });
 
     this.requestForm = this.formBuilder.group({
-      date : ['',Validators.required],
+      date : [null,Validators.required],
       reason : ['',Validators.required]
     })
   }
@@ -177,12 +177,22 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
 
   submitClick(){
     let req : leaveRequestVM | undefined;
+    let reqDate = new Date(this.getRequestDate.value)
+    let zero = '0';
+    let date = reqDate.getDate();
+    let year = reqDate.getFullYear();
+    let month = reqDate.getMonth();
+    let requestDate : string;
+    requestDate = `${year}-${month>=10 ? month : zero+month}-${date>=10 ? date : zero+date}T00:00:01.000Z`
+    console.log("requestDater",requestDate);
+    
+    
     
 
     if(this.teacher){
       req = {
         teacher : this.teacher,
-        requestedDate : this.getRequestDate.value,
+        requestedDate : requestDate,
         approvingStatus : this.approvingStatuses.find(el => el.id == 2),
         leaveReason : this.getRequestReason.value,
         isActive : true

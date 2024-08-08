@@ -378,13 +378,14 @@ export class ManageTeachersComponent implements OnInit, OnDestroy {
           if(leave){
             index = this.leaveRequestsaAll.indexOf(leave);
             this.leaveRequestsaAll.splice(index,1);
+            this.pendingLeaveRequestCount = this.leaveRequestsaAll.length;
             this.isloading = false;
           }
 
           if(status.id == 1 ){
             this.setNotification(data.content)
           }else{
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Leave Rejected'});
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave Rejected'});
           }
         }
       })

@@ -53,7 +53,7 @@
         <div class="col-12">
             <p-table  [value]="tableOtherEmployees" class="centerText" [tableStyle]="{ 'min-width': '100%' }" [paginator]="true" [rows]="5" [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 20]">
                 <ng-template pTemplate="header">
-                    <th>Full Name</th>
+                    <th>Name</th>
                     <th>Code</th>
                     <th>Position</th>
                     <th>Phone Number</th>
@@ -68,7 +68,7 @@
                         <td class="centerText">{{getPosition(otherEmpData)}}</td>
                         <td class="centerText">{{otherEmpData.contactNumber}}</td>
                         <td class="centerText">{{otherEmpData.email}}</td>
-                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(otherEmpData)" *ngIf="isActionAllowed(2)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteHall(otherEmpData)" *ngIf="isActionAllowed(4)"></i></td>
+                        <td class="centerText"> <i class="fa-solid fa-pen-to-square" (click)="openUpdateForm(otherEmpData)" *ngIf="isActionAllowed(2)"></i>  &nbsp; <i class="fa-solid fa-trash delete-color" (click)="deleteOtherEmployee(otherEmpData)" *ngIf="isActionAllowed(4)"></i></td>
                     </tr>
                 </ng-template>
             </p-table>
