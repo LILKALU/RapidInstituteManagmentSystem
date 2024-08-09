@@ -275,7 +275,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       birthday:['',Validators.required],
       relationship:['',Validators.required],
       occupation: ['',Validators.required],
-      contactNumber : ['',Validators.required],
+      contactNumber : ['',[Validators.required, Validators.pattern(/^([0][7][01245678][0-9]{7})|([\\+][9][4][7][01245678][0-9]{7})|([0][1-9][1-9][0-9]{7})$/)]],
       email : ['',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]]
     })
 
@@ -286,7 +286,7 @@ export class ManageStudentComponent implements OnInit, OnDestroy {
       birthday:['',Validators.required],
       relationship:['',Validators.required],
       occupation: ['',Validators.required],
-      contactNumber : ['',Validators.required],
+      contactNumber : ['',[Validators.required, Validators.pattern(/^([0][7][01245678][0-9]{7})|([\\+][9][4][7][01245678][0-9]{7})|([0][1-9][1-9][0-9]{7})$/)]],
       email : ['',[Validators.required, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]]
     })
 

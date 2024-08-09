@@ -133,9 +133,7 @@ export class ManageSubjectComponent implements OnInit, OnDestroy {
     this.subs.sink = this.subjectservice.createSubject(sub).subscribe(data =>{
       if(data){
         this.newlyCreatedSubject = data.content;
-        this.subjectsAllData.push(this.newlyCreatedSubject);
-        this.subjectTableData = this.subjectsAllData;
-        this.subjectTableData.reverse()
+        this.subjectsAllData.unshift(this.newlyCreatedSubject);
         this.isloading = false;
         this.closeDialog();
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Subject Created' });

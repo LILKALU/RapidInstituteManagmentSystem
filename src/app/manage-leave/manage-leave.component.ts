@@ -11,7 +11,7 @@ import { LeaveRequestService } from '../shared/services/leave-request.service';
 import { leaveRequestVM } from '../shared/models/leaveRequestVM';
 import { ApprovingStatusService } from '../shared/services/approving-status.service';
 import { approvingStatusVM } from '../shared/models/approvingStatusVM';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import * as moment from 'moment';
 
 @Component({
@@ -54,6 +54,7 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
     private teachersService : TeacherService,
     private leaveRequestService : LeaveRequestService,
     private confirmationService: ConfirmationService,
+    private messageService: MessageService,
     private approvingStatusService : ApprovingStatusService,
     private router : Router
   ){}
@@ -181,13 +182,10 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
     let zero = '0';
     let date = reqDate.getDate();
     let year = reqDate.getFullYear();
-    let month = reqDate.getMonth();
+    let month = reqDate.getMonth()+1;
     let requestDate : string;
     requestDate = `${year}-${month>=10 ? month : zero+month}-${date>=10 ? date : zero+date}T00:00:01.000Z`
     console.log("requestDater",requestDate);
-    
-    
-    
 
     if(this.teacher){
       req = {
@@ -203,7 +201,7 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
       this.subs.sink = this.leaveRequestService.makeRequest(req).subscribe(data =>{
         if(data && data.content){
           this.leaveRequestsaAll.unshift(data.content);
-          
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave Requested'});
           this.closeLeaveRequestPopUp()
         }
       })
@@ -234,6 +232,7 @@ export class ManageLeaveComponent implements OnInit, OnDestroy {
             this.leaveRequestsaAll.splice(index,1);
             this.leaveRequestsaShow = this.leaveRequestsaAll
             this.isLoading = false;
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Leave Removed'});
           }
         })
       }

@@ -233,18 +233,29 @@
 
         <div class="grid mt-4 ml-3 mr-3">
             <div class="col-6">
-                <div class="grid">
+                <div class="grid" *ngIf="todayAllCourses.length>0">
                     <div class="col-6" *ngFor="let course of todayAllCourses">
                         <p-card header="{{course.teacher.fullName}}'s {{course.grade.name}} {{course.subject.name}} class">
                         </p-card>
                     </div>
                 </div>
+                <div class="grid" *ngIf="todayAllCourses.length<=0">
+                    <div class="col-6">
+                        <h5>There are no classes on today</h5>
+                    </div>
+                </div>
             </div>
             <div class="col-6">
-                <div class="grid">
+                <div class="grid" *ngIf="canceledCoursesOnToday.length>0">
                     <div class="col-6" *ngFor="let course of canceledCoursesOnToday">
                         <p-card header="{{course.teacher.fullName}}'s {{course.grade.name}} {{course.subject.name}} class" class="canceled-card">
                         </p-card>
+                    </div>
+                </div>
+
+                <div class="grid" *ngIf="canceledCoursesOnToday.length <=0">
+                    <div class="col-6">
+                        <h5>There are no canceled classes on today</h5>
                     </div>
                 </div>
             </div>
