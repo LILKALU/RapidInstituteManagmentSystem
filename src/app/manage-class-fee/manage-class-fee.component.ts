@@ -311,6 +311,18 @@ export class ManageClassFeeComponent implements OnInit, OnDestroy {
     this.subs.sink = this.attendanceService.removeUnAttendMonth(courseWiseMonthsWithStudent).subscribe(data =>{
       if(data && data.content && data.content.payingCourseWiseMonths){
         this.notAttendCourseWiseMonth = data.content.payingCourseWiseMonths;
+        this.notAttendCourseWiseMonth.forEach(element => {
+          let cou : CourseVM;
+          if(element && element.course && element.months){
+            cou = element.course;
+            if(element.months.some(el=> el.id == this.thisMonth)){
+              let index :  number;
+              index = element.months.findIndex(el => el.id = this.thisMonth);
+              element.months.splice(index,1);
+            }
+          }
+
+        });
         console.log("updatedCourses",this.notAttendCourseWiseMonth);
         this.getfirstMonthClassFee(studentWiseCourses)
         

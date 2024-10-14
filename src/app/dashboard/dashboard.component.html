@@ -121,7 +121,7 @@
                                         <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.attendanceChart')"></i>
                                     </div>
                                 </div>
-                                <div class="text-center text-2xl font-semibold mt-3 mb-3">Class Wise Student Count</div>
+                                <div class="text-center text-2xl font-semibold mt-3 mb-3">Course Wise Student Attendance</div>
                                 <p-chart type="bar" [data]="attendanceCountByMonthAndCourseChartData" [options]="basicOptionsForstack" />
                                 
                                 
@@ -145,7 +145,7 @@
                                 <i class="fa-solid fa-print fa-xl" (click)="generatePDF('.cwsChart')"></i>
                             </div>
                         </div>
-                        <div class="text-center text-2xl font-semibold mt-3 mb-3">Class Wise Student Count</div>
+                        <div class="text-center text-2xl font-semibold mt-3 mb-3">Course Wise Student Count</div>
                         <p-chart type="pie" [data]="studentCountByCourseChartData" [options]="basicOptionsForPie" />
                     </div>
                 </div>

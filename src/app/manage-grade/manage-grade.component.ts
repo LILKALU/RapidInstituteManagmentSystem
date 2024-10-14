@@ -158,30 +158,46 @@ export class ManageGradeComponent implements OnInit, OnDestroy {
 
     let delGrade : GradeVM;
 
-    this.confirmationService.confirm({
-      message: 'Are you sure that you want to delete',
-      accept: () => {
-        this.isLoading = true;
-        delGrade = {
-          ...grade,
-          isActive : false
-        }
-    
-        this.subs.sink = this.gradeService.deleteGrade(delGrade).subscribe(data =>{
-          if(data){
-            this.deletedGrade = data.content
-            this.allGrades.forEach((element,index) => {
-              if(element.id == grade.id){
-                this.allGrades.splice(index , 1);
+    if(grade.id && grade.id >0){
+      this.subs.sink = this.gradeService.checkGradeDeleteAvailability(grade.id).subscribe(data =>{
+        if(data && data.content){
+          let isDeleteAvailable : Boolean = false;
+          isDeleteAvailable = data.content.isDeleteAvailable ? data.content.isDeleteAvailable : false;
+
+          if(isDeleteAvailable){
+            this.confirmationService.confirm({
+              message: 'Are you sure that you want to delete',
+              accept: () => {
+                this.isLoading = true;
+                delGrade = {
+                  ...grade,
+                  isActive : false
+                }
+            
+                this.subs.sink = this.gradeService.deleteGrade(delGrade).subscribe(data =>{
+                  if(data){
+                    this.deletedGrade = data.content
+                    this.allGrades.forEach((element,index) => {
+                      if(element.id == grade.id){
+                        this.allGrades.splice(index , 1);
+                      }
+                    });
+                    this.tableGrades = this.allGrades
+                    this.isLoading = false;
+                    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Grade Removed' });
+                  }
+                })
               }
             });
-            this.tableGrades = this.allGrades
-            this.isLoading = false;
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Grade Removed' });
+          }else{
+            this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Delete Cannot Proceed.'});
           }
-        })
-      }
-  });
+        }
+      })
+    }
+    
+
+    
   }
 
   reset(){
